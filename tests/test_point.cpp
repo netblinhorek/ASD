@@ -48,22 +48,6 @@ TEST(TestPoint, test_setters) {
     ASSERT_NEAR(p.get_y(), 20.7f, EPSILON);
 }
 
-//TEST(TestPoint, test_set_negative_radius_exception) {
-//    // Arrange
-//    Point p;
-//
-//    // Act & Assert
-//    ASSERT_THROW(p.set_radius(-5.0f), std::invalid_argument);
-//}
-
-//TEST(TestPoint, test_set_zero_radius_no_exception) {
-//    // Arrange
-//    Point p;
-//
-//    // Act & Assert
-//    ASSERT_NO_THROW(p.set_radius(0.0f));
-//}
-
 TEST(TestPoint, test_distance_to) {
     // Arrange
     Point p1(0.0f, 0.0f);

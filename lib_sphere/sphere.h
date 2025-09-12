@@ -31,3 +31,4 @@ public:
 };
 template<typename Sphere>
 std::string get_spheres_relation(const Sphere& s1, const Sphere& s2);
+template std::string get_spheres_relation<Sphere>(const Sphere&, const Sphere&);

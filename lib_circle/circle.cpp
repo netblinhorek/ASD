@@ -70,3 +70,4 @@ std::string get_circles_relation(const CircleT& c1, const CircleT& c2) {
     }
     return "Not intersected";
 }
+template std::string get_circles_relation<Circle>(const Circle&, const Circle&);

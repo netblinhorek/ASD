@@ -22,3 +22,4 @@ public:
 
 template<typename CircleT>
 std::string get_circles_relation(const CircleT& c1, const CircleT& c2);
+extern template std::string get_circles_relation<Circle>(const Circle&, const Circle&);

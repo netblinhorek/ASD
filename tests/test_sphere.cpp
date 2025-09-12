@@ -122,15 +122,6 @@ TEST(TestSphere, test_zero_radius_no_exception_sphere) {
     ASSERT_NO_THROW(Sphere(0, 0, 0, 0));
 }
 
-//TEST(TestSphere, test_distance_calculation) {
-//    Sphere s1(0, 0, 0, 5), s2(10, 0, 0, 5);
-//
-//    float expected_distance = 10.0f;
-//    float actual_distance = get_spheres_distance(s1, s2);
-//
-//    EXPECT_NEAR(expected_distance, actual_distance, EPSILON);
-//}
-
 TEST(TestSphere, test_floating_point_precision_internal_touch) {
     Sphere s1(0, 0, 0, 5), s2(2.999999f, 0, 0, 2);
     ASSERT_EQ(std::string("One inside the other"), get_spheres_relation(s1, s2));

@@ -105,3 +105,4 @@ bool Sphere::operator==(const Sphere& other) const {
 bool Sphere::operator!=(const Sphere& other) const {
     return !(*this == other);
 }
+template std::string get_spheres_relation<Sphere>(const Sphere&, const Sphere&);

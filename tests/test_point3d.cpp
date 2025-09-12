@@ -125,19 +125,6 @@ TEST(TestPoint3D, test_assignment_operator) {
     ASSERT_NEAR(p2.get_z(), 7.0f, EPSILON);
     ASSERT_TRUE(p1 == p2);
 }
-
-//TEST(TestPoint3D, test_inequality_operator) {
-//    Point3D p1(1.0f, 2.0f, 3.0f);
-//    Point3D p2(1.1f, 2.0f, 3.0f);
-//    Point3D p3(1.0f, 2.1f, 3.0f);
-//    Point3D p4(1.0f, 2.0f, 3.1f);
-//
-//    ASSERT_TRUE(p1 != p2);
-//    ASSERT_TRUE(p1 != p3);
-//    ASSERT_TRUE(p1 != p4);
-//    ASSERT_FALSE(p1 != p1);  
-//}
-
 TEST(TestPoint3D, test_distance_precision) {
     Point3D p1(0.1f, 0.2f, 0.3f);
     Point3D p2(0.4f, 0.6f, 0.9f);
