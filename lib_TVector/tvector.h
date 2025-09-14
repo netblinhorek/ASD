@@ -52,6 +52,9 @@ public:
     size_t size() const noexcept;
 
     inline bool is_empty() const noexcept;
+    T& get(size_t index);
+    const T& get(size_t index) const;
+    void set(size_t index, const T& value);
 
     inline T& front() ;
     inline T& back() ;
@@ -253,6 +256,45 @@ inline bool TVector<T>::is_empty() const noexcept {
         }
     }
     return true;
+}
+
+template<class T>
+T& TVector<T>::get(size_t index) {
+    size_t busy_count = 0;
+    for (size_t i = 0; i < _capacity; ++i) {
+        if (_states[i] == State::busy) {
+            if (busy_count == index) return _data[i];
+            ++busy_count;
+        }
+    }
+    throw std::out_of_range("Index out of range");
+}
+
+template<class T>
+const T& TVector<T>::get(size_t index) const {
+    size_t busy_count = 0;
+    for (size_t i = 0; i < _capacity; ++i) {
+        if (_states[i] == State::busy) {
+            if (busy_count == index) return _data[i];
+            ++busy_count;
+        }
+    }
+    throw std::out_of_range("Index out of range");
+}
+
+template<class T>
+void TVector<T>::set(size_t index, const T& value) {
+    size_t busy_count = 0;
+    for (size_t i = 0; i < _capacity; ++i) {
+        if (_states[i] == State::busy) {
+            if (busy_count == index) {
+                _data[i] = value;
+                return;
+            }
+            ++busy_count;
+        }
+    }
+    throw std::out_of_range("Index out of range");
 }
 
 template<class T>

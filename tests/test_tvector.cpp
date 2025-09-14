@@ -126,6 +126,39 @@ TEST(TestTVector, test_destructor_empty) {
     TVector<int>* v = new TVector<int>();
     ASSERT_NO_THROW(delete v);
 }
+TEST(TestTVector, BasicOperations) {
+    int arr[] = { 1, 2, 3, 4, 5 };
+    TVector<int> vec(arr, 5);
+
+    EXPECT_EQ(vec.size(), 5);
+    EXPECT_EQ(vec.get(0), 1);
+    EXPECT_EQ(vec.get(4), 5);
+}
+
+TEST(TestTVector, GetSetOperations) {
+    TVector<int> vec(3);
+    vec.set(0, 10);
+    vec.set(1, 20);
+    vec.set(2, 30);
+
+    EXPECT_EQ(vec.get(0), 10);
+    EXPECT_EQ(vec.get(1), 20);
+    EXPECT_EQ(vec.get(2), 30);
+
+    EXPECT_THROW(vec.get(5), std::out_of_range);
+    EXPECT_THROW(vec.set(5, 100), std::out_of_range);
+}
+
+TEST(TestTVector, test_copy_constructor) {
+    int arr[] = { 1, 2, 3 };
+    TVector<int> vec1(arr, 3);
+    TVector<int> vec2(vec1);
+
+    EXPECT_EQ(vec2.size(), 3);
+    EXPECT_EQ(vec2.get(0), 1);
+    EXPECT_EQ(vec2.get(1), 2);
+    EXPECT_EQ(vec2.get(2), 3);
+}
 TEST(TestTVector, test_assignment_operator_self_assignment) {
     TVector<int> v;
     v.push_back(1);
