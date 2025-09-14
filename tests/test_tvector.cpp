@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include "../lib_easy_example/easy_example.h"
 #include "tvector.h"
 #include <iostream>
 #include <cassert>

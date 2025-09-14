@@ -92,7 +92,8 @@ public:
     TVector<T>& operator=(const TVector<T>& other);
     bool operator==(const TVector<T>& other) const;
     bool operator!=(const TVector<T>& other) const;
-    T& operator[](size_t pos);
+    const T& operator[](size_t pos) const;
+    T& operator[](size_t index);
 
     void print_elems();
     void print_states();
@@ -747,7 +748,21 @@ bool TVector<T>::operator!=(const TVector<T>& other) const {
 }
 
 template<class T>
-T& TVector<T>::operator[](size_t pos) {
+const T& TVector<T>::operator[](size_t pos) const{
+    size_t busy_count = 0;
+    for (size_t i = 0; i < _capacity; ++i) {
+        if (_states[i] == State::busy) {
+            if (busy_count == pos) {
+                return _data[i];
+            }
+            ++busy_count;
+        }
+    }
+    throw std::out_of_range("Index out of range");
+}
+
+template<class T>
+T& TVector<T>::operator[](size_t pos){
     size_t busy_count = 0;
     for (size_t i = 0; i < _capacity; ++i) {
         if (_states[i] == State::busy) {
