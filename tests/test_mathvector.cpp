@@ -568,7 +568,7 @@ TEST(TestMathVector, test_differentiation_mathvectors_div) {
     ASSERT_THROW(a / b, std::invalid_argument);
     ASSERT_THROW(a / b, std::invalid_argument);
 }
-TEST(TestMathVector, test_dot_mathvectors_vectors) {
+TEST(TestMathVector, test_the_scalar_product_mathvectors_vectors) {
     MathVector<float> a;
     a.push_back(1);
     a.push_back(2);
@@ -581,7 +581,7 @@ TEST(TestMathVector, test_dot_mathvectors_vectors) {
     ASSERT_THROW(a / b, std::invalid_argument);
 
 }
-TEST(TestMathVector, test_dot_product_basic) {
+TEST(TestMathVector, test_the_scalar_product_product_basic) {
     MathVector<int> a;
     a.push_back(1);
     a.push_back(2);
@@ -592,11 +592,11 @@ TEST(TestMathVector, test_dot_product_basic) {
     b.push_back(5);
     b.push_back(6);
 
-    int result = a.dot(b);
+    int result = a.the_scalar_product(b);
     ASSERT_EQ(result, 32);
 }
 
-TEST(TestMathVector, test_dot_product_zeros) {
+TEST(TestMathVector, test_the_scalar_product_product_zeros) {
     MathVector<int> a;
     a.push_back(0);
     a.push_back(0);
@@ -607,11 +607,11 @@ TEST(TestMathVector, test_dot_product_zeros) {
     b.push_back(2);
     b.push_back(3);
 
-    int result = a.dot(b);
+    int result = a.the_scalar_product(b);
     ASSERT_EQ(result, 0); 
 }
 
-TEST(TestMathVector, test_dot_product_negative) {
+TEST(TestMathVector, test_the_scalar_product_product_negative) {
     MathVector<int> a;
     a.push_back(-1);
     a.push_back(-2);
@@ -622,11 +622,11 @@ TEST(TestMathVector, test_dot_product_negative) {
     b.push_back(5);
     b.push_back(6);
 
-    int result = a.dot(b);
+    int result = a.the_scalar_product(b);
     ASSERT_EQ(result, -32); 
 }
 
-TEST(TestMathVector, test_dot_product_float) {
+TEST(TestMathVector, test_the_scalar_product_product_float) {
     MathVector<float> a;
     a.push_back(1.5f);
     a.push_back(2.5f);
@@ -637,30 +637,30 @@ TEST(TestMathVector, test_dot_product_float) {
     b.push_back(3.0f);
     b.push_back(4.0f);
 
-    float result = a.dot(b);
+    float result = a.the_scalar_product(b);
     ASSERT_NEAR(result, 24.5f, EPSILON); 
 }
 
-TEST(TestMathVector, test_dot_product_single_element) {
+TEST(TestMathVector, test_the_scalar_product_product_single_element) {
     MathVector<int> a;
     a.push_back(5);
 
     MathVector<int> b;
     b.push_back(7);
 
-    int result = a.dot(b);
+    int result = a.the_scalar_product(b);
     ASSERT_EQ(result, 35); 
 }
 
-TEST(TestMathVector, test_dot_product_empty) {
+TEST(TestMathVector, test_the_scalar_product_product_empty) {
     MathVector<int> a;
     MathVector<int> b;
 
-    int result = a.dot(b);
+    int result = a.the_scalar_product(b);
     ASSERT_EQ(result, 0); 
 }
 
-TEST(TestMathVector, test_dot_product_different_sizes) {
+TEST(TestMathVector, test_the_scalar_product_product_different_sizes) {
     MathVector<int> a;
     a.push_back(1);
     a.push_back(2);
@@ -670,10 +670,10 @@ TEST(TestMathVector, test_dot_product_different_sizes) {
     b.push_back(4);
     b.push_back(5);
 
-    ASSERT_THROW(a.dot(b), std::invalid_argument);
+    ASSERT_THROW(a.the_scalar_product(b), std::invalid_argument);
 }
 
-TEST(TestMathVector, test_dot_product_commutative) {
+TEST(TestMathVector, test_the_scalar_product_product_commutative) {
     MathVector<int> a;
     a.push_back(1);
     a.push_back(2);
@@ -684,10 +684,10 @@ TEST(TestMathVector, test_dot_product_commutative) {
     b.push_back(5);
     b.push_back(6);
 
-    ASSERT_EQ(a.dot(b), b.dot(a));
+    ASSERT_EQ(a.the_scalar_product(b), b.the_scalar_product(a));
 }
 
-TEST(TestMathVector, test_dot_product_orthogonal) {
+TEST(TestMathVector, test_the_scalar_product_product_orthogonal) {
     MathVector<int> a;
     a.push_back(1);
     a.push_back(0);
@@ -696,16 +696,16 @@ TEST(TestMathVector, test_dot_product_orthogonal) {
     b.push_back(0);
     b.push_back(1);
 
-    int result = a.dot(b);
+    int result = a.the_scalar_product(b);
     ASSERT_EQ(result, 0); 
 }
 
-TEST(TestMathVector, test_dot_product_self) {
+TEST(TestMathVector, test_the_scalar_product_product_self) {
     MathVector<int> a;
     a.push_back(3);
     a.push_back(4);
 
-    int result = a.dot(a);
+    int result = a.the_scalar_product(a);
     ASSERT_EQ(result, 25);
 }
 

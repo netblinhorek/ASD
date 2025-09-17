@@ -25,8 +25,10 @@ public:
     explicit MathVector(size_t size) : TVector<T>(size) {} 
     MathVector(const T* arr, size_t size) : TVector<T>(arr, size) {}  
     MathVector(const MathVector<T>& other) : TVector<T>(other) {}  
-
-    T dot(const MathVector<T>& other) const;
+    MathVector(size_t size, const T& value) {
+        this->assign(size, value);
+    } 
+    T the_scalar_product(const MathVector<T>& other) const;
     T norm() const;
     MathVector<T> normalized() const;
 
@@ -36,25 +38,27 @@ public:
     MathVector<T>& operator=(const MathVector<T>& other);
     bool operator==(const MathVector<T>& other) const;
     bool operator!=(const MathVector<T>& other) const;
+    
+    size_t start_index() const;
+
     MathVector<T> operator+(const MathVector<T>& other) const;
-    MathVector<T> operator+(T value) const;
-
     MathVector<T> operator-(const MathVector<T>& other) const;
-    MathVector<T> operator-(T value) const;
-
     MathVector<T> operator*(const MathVector<T>& other) const;
-    MathVector<T> operator*(T value) const;
-
     MathVector<T> operator/(const MathVector<T>& other) const;
+
+    MathVector<T> operator+(T value) const;
+    MathVector<T> operator-(T value) const;
+    MathVector<T> operator*(T value) const;
     MathVector<T> operator/(T value) const;
 
     MathVector<T>& operator+=(const MathVector<T>& other);
-    MathVector<T>& operator+=(T value);
     MathVector<T>& operator-=(const MathVector<T>& other);
-    MathVector<T>& operator-=(T value);
     MathVector<T>& operator*=(const MathVector<T>& other);
-    MathVector<T>& operator*=(T value);
     MathVector<T>& operator/=(const MathVector<T>& other);
+
+    MathVector<T>& operator+=(T value);
+    MathVector<T>& operator-=(T value);
+    MathVector<T>& operator*=(T value);
     MathVector<T>& operator/=(T value);
     
     MathVector<T> operator-() const;
@@ -90,7 +94,7 @@ public:
 
 
 template <typename T>
-T MathVector<T>::dot(const MathVector<T>& other) const {
+T MathVector<T>::the_scalar_product(const MathVector<T>& other) const {
     if (this->size() != other.size()) {
         throw std::invalid_argument("Vectors must have the same size");
     }
@@ -103,7 +107,7 @@ T MathVector<T>::dot(const MathVector<T>& other) const {
     
 template <typename T>
 T MathVector<T>::norm() const {
-    return sqrt(this->dot(*this));
+    return sqrt(this->the_scalar_product(*this));
 }
 
 template <typename T>
@@ -341,4 +345,14 @@ MathVector<T> MathVector<T>::operator-() const {
 template <typename T>
 MathVector<T> MathVector<T>::operator+() const {
     return *this;
+}
+
+template <typename T>
+size_t MathVector<T>::start_index() const {
+    for (size_t i = 0; i < this->size(); ++i) {
+        if ((*this)[i] != T(0)) {
+            return i;
+        }
+    }
+    return this->size();
 }

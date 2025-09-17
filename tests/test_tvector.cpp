@@ -522,6 +522,14 @@ TEST(TestTVector, test_resize_to_zero) {
     ASSERT_EQ(v.size(), 0);
     ASSERT_TRUE(v.is_empty());
 }
+TEST(TestTVector, test_states_after_construction) {
+    TVector<int> vec(3);
+    const State* states = vec.states();
+
+    for (size_t i = 0; i < 3; ++i) {
+        ASSERT_EQ(states[i], State::busy) << "Element at index " << i << " should be busy";
+    }
+}
 
 TEST(TestTVector, test_resize_with_default_value) {
     TVector<int> v;
@@ -737,4 +745,184 @@ TEST(TestTVector, test_push_front_after_operations) {
     ASSERT_EQ(static_cast<size_t>(2), v.size());
     ASSERT_EQ(200, v[0]);
     ASSERT_EQ(100, v[1]);
+}
+
+
+TEST(TestTVector, test_states_after_push_back) {
+    TVector<int> vec;
+    vec.push_back(10);
+    vec.push_back(20);
+
+    const State* states = vec.states();
+    ASSERT_EQ(states[0], State::busy);
+    ASSERT_EQ(states[1], State::busy);
+}
+
+TEST(TestTVector, test_states_after_pop_back) {
+    TVector<int> vec;
+    vec.push_back(10);
+    vec.push_back(20);
+    vec.push_back(30);
+
+    vec.pop_back();
+    const State* states = vec.states();
+
+    size_t busy_count = 0;
+    size_t deleted_count = 0;
+
+    for (size_t i = 0; i < vec.capacity(); ++i) {
+        if (states[i] == State::busy) busy_count++;
+        if (states[i] == State::deleted) deleted_count++;
+    }
+
+    ASSERT_EQ(busy_count, 2);
+    ASSERT_EQ(deleted_count, 1);
+}
+
+TEST(TestTVector, test_states_after_erase) {
+    TVector<int> vec;
+    vec.push_back(10);
+    vec.push_back(20);
+    vec.push_back(30);
+
+    vec.erase(1);
+    const State* states = vec.states();
+
+    size_t busy_count = 0;
+    for (size_t i = 0; i < vec.capacity(); ++i) {
+        if (states[i] == State::busy) busy_count++;
+    }
+
+    ASSERT_EQ(busy_count, 2); 
+}
+
+TEST(TestTVector, test_states_after_clear) {
+    TVector<int> vec;
+    vec.push_back(10);
+    vec.push_back(20);
+    vec.push_back(30);
+
+    vec.clear();
+    const State* states = vec.states();
+
+    for (size_t i = 0; i < vec.capacity(); ++i) {
+        ASSERT_EQ(states[i], State::empty) << "Element at index " << i << " should be empty after clear";
+    }
+}
+
+TEST(TestTVector, test_states_after_insert) {
+    TVector<int> vec;
+    vec.push_back(10);
+    vec.push_back(30);
+
+    vec.insert(20, 1); 
+    const State* states = vec.states();
+
+    size_t busy_count = 0;
+    for (size_t i = 0; i < vec.capacity(); ++i) {
+        if (states[i] == State::busy) busy_count++;
+    }
+
+    ASSERT_EQ(busy_count, 3);
+}
+
+TEST(TestTVector, test_states_after_compact) {
+    TVector<int> vec;
+    for (int i = 0; i < 20; ++i) {
+        vec.push_back(i);
+    }
+
+    for (int i = 0; i < 10; ++i) {
+        vec.pop_back();
+    }
+
+    const State* states = vec.states();
+
+    bool has_deleted = false;
+    for (size_t i = 0; i < vec.capacity(); ++i) {
+        if (states[i] == State::deleted) {
+            has_deleted = true;
+            break;
+        }
+    }
+
+    ASSERT_FALSE(has_deleted) << "After compact, there should be no deleted states";
+}
+
+TEST(TestTVector, test_states_after_resize_grow) {
+    TVector<int> vec;
+    vec.push_back(10);
+    vec.resize(5, 0);
+
+    const State* states = vec.states();
+
+    for (size_t i = 0; i < 5; ++i) {
+        ASSERT_EQ(states[i], State::busy) << "Element at index " << i << " should be busy after resize";
+    }
+}
+
+TEST(TestTVector, test_states_after_resize_shrink) {
+    TVector<int> vec;
+    for (int i = 0; i < 5; ++i) {
+        vec.push_back(i);
+    }
+
+    vec.resize(2);
+    const State* states = vec.states();
+
+    for (size_t i = 0; i < 2; ++i) {
+        ASSERT_EQ(states[i], State::busy);
+    }
+    for (size_t i = 2; i < vec.capacity(); ++i) {
+        ASSERT_EQ(states[i], State::empty);
+    }
+}
+
+TEST(TestTVector, test_states_empty_cells_after_construction) {
+    TVector<int> vec(5);
+
+    const State* states = vec.states();
+    for (size_t i = 5; i < vec.capacity(); ++i) {
+        ASSERT_EQ(states[i], State::empty) << "Empty cell at index " << i << " should have empty state";
+    }
+}
+
+TEST(TestTVector, test_states_after_multiple_operations) {
+    TVector<int> vec;
+
+    vec.push_back(1);
+    vec.push_back(2);
+    vec.pop_back();
+    vec.push_back(3);
+    vec.insert(4, 1);
+    vec.erase(0);
+
+    const State* states = vec.states();
+
+    size_t busy_count = 0;
+    size_t deleted_count = 0;
+    size_t empty_count = 0;
+
+    for (size_t i = 0; i < vec.capacity(); ++i) {
+        switch (states[i]) {
+        case State::busy: busy_count++; break;
+        case State::deleted: deleted_count++; break;
+        case State::empty: empty_count++; break;
+        }
+    }
+
+    ASSERT_EQ(busy_count, 2);
+    ASSERT_GE(empty_count, 0);
+}
+
+TEST(TestTVector, test_state_transitions) {
+    TVector<int> vec;
+
+    ASSERT_TRUE(vec.is_empty());
+
+    vec.push_back(42);
+    ASSERT_EQ(vec.states()[0], State::busy);
+
+    vec.pop_back();
+    ASSERT_EQ(vec.states()[0], State::deleted);
 }
