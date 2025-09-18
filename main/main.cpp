@@ -13,6 +13,7 @@
 #define MENU
 #ifdef MENU
 #include "../lib_Triangle/triangle.h"
+#include "../lib_Matrix/matrix.h"
 #endif
 
 #ifdef EASY_EXAMPLE
@@ -237,13 +238,6 @@ catch (std::exception err) {
 
 #ifdef MENU
 
-void create_regular_matrix(Matrix<double>& matrix, const std::string& name);
-void create_triangle_matrix(Triangle<double>& matrix, const std::string& name);
-void add_matrices();
-void subtract_matrices();
-void multiply_matrices();
-void scalar_multiply();
-void transpose_matrix();
 int show_main_menu();
 
 
@@ -256,53 +250,44 @@ void create_regular_matrix(Matrix<double>& matrix, const std::string& name) {
     std::cin >> cols;
 
     if (rows <= 0 || cols <= 0) {
-        throw std::invalid_argument("Размеры матрицы должны быть положительными");
+        throw std::invalid_argument("Размеры матрицы должны быть"
+            "положительными");
     }
 
     matrix = Matrix<double>(rows, cols);
-    std::cout << "Матрица " << name << " создана размером " << rows << "x" << cols << std::endl;
+    std::cout << "Матрица " << name << " создана размером " << rows
+        << "x" << cols << std::endl;
 
     std::cout << "Заполните матрицу значениями:" << std::endl;
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            std::cout << "Элемент [" << i << "][" << j << "]: ";
-            std::cin >> matrix[i][j];
-        }
-    }
 }
 
-void create_triangle_matrix(Triangle<double>& matrix, const std::string& name, int size, TriangleType type) {
-    matrix = Triangle<double>(size, type);
-    std::cout << "Треугольная матрица " << name << " создана размером " << size << "x" << size << std::endl;
-    std::cout << "Заполните значимые элементы матрицы:" << std::endl;
-    if (type == TriangleType::Lower) {
-        for (int i = 0; i < size; ++i)
-            for (int j = i; j < size; ++j) {
-                std::cout << name << "[" << i << "][" << j << "]: ";
-                std::cin >> matrix(i, j);
-            }
-    }
-    else {
-        for (int i = 0; i < size; ++i)
-            for (int j = 0; j <= i; ++j) {
-                std::cout << name << "[" << i << "][" << j << "]: ";
-                std::cin >> matrix(i, j);
-            }
-    }
+void create_triangle_matrix(Triangle<double>& matrix,
+    const std::string& name,
+    int size, TriangleType type) {
+    matrix = Triangle<double>();
+    std::cout << "Треугольная матрица " << name 
+        << " создана размером " << size 
+        << "x" << size << std::endl;
+    std::cout << "Заполните значимые элементы матрицы:" 
+        << std::endl;
 }
-void create_triangle_matrix(Triangle<double>& matrix, const std::string& name) {
+void create_triangle_matrix(Triangle<double>& matrix,
+    const std::string& name) {
     int size;
     int type_choice;
 
-    std::cout << "\nСоздание треугольной матрицы " << name << std::endl;
+    std::cout << "\nСоздание треугольной матрицы " << name
+        << std::endl;
     std::cout << "Введите размер матрицы (N x N): ";
     std::cin >> size;
 
     if (size <= 0) {
-        throw std::invalid_argument("Размер матрицы должен быть положительным");
+        throw std::invalid_argument("Размер матрицы должен быть"
+            "положительным");
     }
 
-    std::cout << "Выберите тип треугольной матрицы:" << std::endl;
+    std::cout << "Выберите тип треугольной матрицы:"
+        << std::endl;
     std::cout << "1. Нижняя треугольная" << std::endl;
     std::cout << "2. Верхняя треугольная" << std::endl;
     std::cout << "Выбор: ";
@@ -316,261 +301,11 @@ void create_triangle_matrix(Triangle<double>& matrix, const std::string& name) {
         type = TriangleType::Upper;
     }
     else {
-        throw std::invalid_argument("Неверный выбор типа матрицы");
+        throw std::invalid_argument("Неверный выбор типа"
+            "матрицы");
     }
 
     create_triangle_matrix(matrix, name, size, type);
-}
-void add_matrices() {
-    int choice;
-    std::cout << "\n=== СЛОЖЕНИЕ МАТРИЦ ===" << std::endl;
-    std::cout << "1. Обычные матрицы" << std::endl;
-    std::cout << "2. Треугольные матрицы" << std::endl;
-    std::cout << "Выбор: ";
-    std::cin >> choice;
-
-    if (choice == 1) {
-        int rows, cols;
-        std::cout << "Введите количество строк: ";
-        std::cin >> rows;
-        std::cout << "Введите количество столбцов: ";
-        std::cin >> cols;
-        if (rows <= 0 || cols <= 0) {
-            std::cout << "Ошибка: Размеры матрицы должны быть положительными" << std::endl;
-            return;
-        }
-        Matrix<double> m1(rows, cols), m2(rows, cols);
-        std::cout << "Заполните матрицу A:" << std::endl;
-        for (int i = 0; i < rows; ++i)
-            for (int j = 0; j < cols; ++j) {
-                std::cout << "A[" << i << "][" << j << "]: ";
-                std::cin >> m1[i][j];
-            }
-        std::cout << "Заполните матрицу B:" << std::endl;
-        for (int i = 0; i < rows; ++i)
-            for (int j = 0; j < cols; ++j) {
-                std::cout << "B[" << i << "][" << j << "]: ";
-                std::cin >> m2[i][j];
-            }
-        try {
-            std::cout << "\nРезультат сложения:" << std::endl;
-        }
-        catch (const std::exception& e) {
-            std::cout << "Ошибка: " << e.what() << std::endl;
-        }
-    }
-    else {
-        Triangle<double> t1, t2;
-        create_triangle_matrix(t1, "A");
-        create_triangle_matrix(t2, "B", t1.rows(), t1.get_type());
-        try {
-            if (t1.get_type() != t2.get_type()) {
-                throw std::invalid_argument("Типы треугольных матриц должны совпадать");
-            }
-            std::cout << "\nРезультат сложения:" << std::endl;
-        }
-        catch (const std::exception& e) {
-            std::cout << "Ошибка: " << e.what() << std::endl;
-        }
-    }
-}
-
-void subtract_matrices() {
-    int choice;
-    std::cout << "\n=== ВЫЧИТАНИЕ МАТРИЦ ===" << std::endl;
-    std::cout << "1. Обычные матрицы" << std::endl;
-    std::cout << "2. Треугольные матрицы" << std::endl;
-    std::cout << "Выбор: ";
-    std::cin >> choice;
-
-    if (choice == 1) {
-        int rows, cols;
-        std::cout << "Введите количество строк: ";
-        std::cin >> rows;
-        std::cout << "Введите количество столбцов: ";
-        std::cin >> cols;
-        if (rows <= 0 || cols <= 0) {
-            std::cout << "Ошибка: Размеры матрицы должны быть положительными" << std::endl;
-            return;
-        }
-        Matrix<double> m1(rows, cols), m2(rows, cols);
-        std::cout << "Заполните матрицу A:" << std::endl;
-        for (int i = 0; i < rows; ++i)
-            for (int j = 0; j < cols; ++j) {
-                std::cout << "A[" << i << "][" << j << "]: ";
-                std::cin >> m1[i][j];
-            }
-        std::cout << "Заполните матрицу B:" << std::endl;
-        for (int i = 0; i < rows; ++i)
-            for (int j = 0; j < cols; ++j) {
-                std::cout << "B[" << i << "][" << j << "]: ";
-                std::cin >> m2[i][j];
-            }
-        try {
-            std::cout << "\nРезультат вычитания:" << std::endl;
-            
-        }
-        catch (const std::exception& e) {
-            std::cout << "Ошибка: " << e.what() << std::endl;
-        }
-    }
-    else {
-        Triangle<double> t1, t2;
-        create_triangle_matrix(t1, "A");
-        create_triangle_matrix(t2, "B", t1.rows(), t1.get_type());
-        try {
-            if (t1.get_type() != t2.get_type()) {
-                throw std::invalid_argument("Типы треугольных матриц должны совпадать");
-            }
-            std::cout << "\nРезультат вычитания:" << std::endl;
-        }
-        catch (const std::exception& e) {
-            std::cout << "Ошибка: " << e.what() << std::endl;
-        }
-    }
-}
-
-void multiply_matrices() {
-    int choice;
-    std::cout << "\n=== УМНОЖЕНИЕ МАТРИЦ ===" << std::endl;
-    std::cout << "1. Обычные матрицы" << std::endl;
-    std::cout << "2. Треугольные матрицы" << std::endl;
-    std::cout << "Выбор: ";
-    std::cin >> choice;
-
-    if (choice == 1) {
-        int rows, cols, cols2;
-        std::cout << "Введите количество строк первой матрицы: ";
-        std::cin >> rows;
-        std::cout << "Введите количество столбцов первой матрицы (и строк второй): ";
-        std::cin >> cols;
-        std::cout << "Введите количество столбцов второй матрицы: ";
-        std::cin >> cols2;
-        if (rows <= 0 || cols <= 0 || cols2 <= 0) {
-            std::cout << "Ошибка: Размеры матрицы должны быть положительными" << std::endl;
-            return;
-        }
-        Matrix<double> m1(rows, cols), m2(cols, cols2);
-        std::cout << "Заполните матрицу A:" << std::endl;
-        for (int i = 0; i < rows; ++i)
-            for (int j = 0; j < cols; ++j) {
-                std::cout << "A[" << i << "][" << j << "]: ";
-                std::cin >> m1[i][j];
-            }
-        std::cout << "Заполните матрицу B:" << std::endl;
-        for (int i = 0; i < cols; ++i)
-            for (int j = 0; j < cols2; ++j) {
-                std::cout << "B[" << i << "][" << j << "]: ";
-                std::cin >> m2[i][j];
-            }
-        try {
-            std::cout << "\nРезультат умножения:" << std::endl;
-        }
-        catch (const std::exception& e) {
-            std::cout << "Ошибка: " << e.what() << std::endl;
-        }
-    }
-    else {
-        Triangle<double> t1, t2;
-        create_triangle_matrix(t1, "A");
-        create_triangle_matrix(t2, "B", t1.rows(), t1.get_type());
-        try {
-            std::cout << "\nРезультат умножения:" << std::endl;
-        }
-        catch (const std::exception& e) {
-            std::cout << "Ошибка: " << e.what() << std::endl;
-        }
-    }
-}
-
-void scalar_multiply() {
-    int choice;
-    double scalar;
-    std::cout << "\n=== УМНОЖЕНИЕ НА СКАЛЯР ===" << std::endl;
-    std::cout << "1. Обычная матрица" << std::endl;
-    std::cout << "2. Треугольная матрица" << std::endl;
-    std::cout << "Выбор: ";
-    std::cin >> choice;
-    std::cout << "Введите скаляр: ";
-    std::cin >> scalar;
-    if (choice == 1) {
-        int rows, cols;
-        std::cout << "Введите количество строк: ";
-        std::cin >> rows;
-        std::cout << "Введите количество столбцов: ";
-        std::cin >> cols;
-        if (rows <= 0 || cols <= 0) {
-            std::cout << "Ошибка: Размеры матрицы должны быть положительными" << std::endl;
-            return;
-        }
-        Matrix<double> m(rows, cols);
-        std::cout << "Заполните матрицу:" << std::endl;
-        for (int i = 0; i < rows; ++i)
-            for (int j = 0; j < cols; ++j) {
-                std::cout << "A[" << i << "][" << j << "]: ";
-                std::cin >> m[i][j];
-            }
-        std::cout << "\nРезультат умножения на скаляр:" << std::endl;
-    }
-    else {
-        Triangle<double> t;
-        create_triangle_matrix(t, "A");
-        for (size_t i = 0; i < t.rows(); ++i) {
-            for (size_t j = 0; j < t.rows(); ++j) {
-                if ((t.get_type() == TriangleType::Lower && j >= i) ||
-                    (t.get_type() == TriangleType::Upper && j <= i)) {
-                }
-            }
-        }
-        std::cout << "\nРезультат умножения на скаляр:" << std::endl;
-    }
-}
-
-void transpose_matrix() {
-    int choice;
-    std::cout << "\n=== ТРАНСПОНИРОВАНИЕ МАТРИЦЫ ===" << std::endl;
-    std::cout << "1. Обычная матрица" << std::endl;
-    std::cout << "2. Треугольная матрица" << std::endl;
-    std::cout << "Выбор: ";
-    std::cin >> choice;
-    if (choice == 1) {
-        int rows, cols;
-        std::cout << "Введите количество строк: ";
-        std::cin >> rows;
-        std::cout << "Введите количество столбцов: ";
-        std::cin >> cols;
-        if (rows <= 0 || cols <= 0) {
-            std::cout << "Ошибка: Размеры матрицы должны быть положительными" << std::endl;
-            return;
-        }
-        Matrix<double> m(rows, cols);
-        std::cout << "Заполните матрицу:" << std::endl;
-        for (int i = 0; i < rows; ++i)
-            for (int j = 0; j < cols; ++j) {
-                std::cout << "A[" << i << "][" << j << "]: ";
-                std::cin >> m[i][j];
-            }
-        try {
-            std::cout << "\nТранспонированная матрица:" << std::endl;
-        }
-        catch (const std::exception& e) {
-            std::cout << "Ошибка: " << e.what() << std::endl;
-        }
-    }
-    else {
-        std::cout << "Транспонирование треугольных матриц меняет их тип" << std::endl;
-        Triangle<double> t;
-        create_triangle_matrix(t, "A");
-        TriangleType new_type = (t.get_type() == TriangleType::Lower) ? TriangleType::Upper : TriangleType::Lower;
-        for (size_t i = 0; i < t.rows(); ++i) {
-            for (size_t j = 0; j < t.rows(); ++j) {
-                if ((new_type == TriangleType::Lower && j >= i) ||
-                    (new_type == TriangleType::Upper && j <= i)) {
-                }
-            }
-        }
-        std::cout << "\nТранспонированная матрица:" << std::endl;
-    }
 }
 
 int show_main_menu() {
@@ -580,67 +315,215 @@ int show_main_menu() {
     std::cout << "2. Вычитание матриц" << std::endl;
     std::cout << "3. Умножение матриц" << std::endl;
     std::cout << "4. Умножение на скаляр" << std::endl;
-    std::cout << "5. Транспонирование матрицы" << std::endl;
-    std::cout << "6. Показать информацию о матрицах" << std::endl;
+    std::cout << "5. Деление на скаляр" << std::endl;
+    std::cout << "6. Транспонирование матрицы" << std::endl;
+    std::cout << "7. Показать информацию о матрицах" << std::endl;
     std::cout << "0. Выйти" << std::endl;
     std::cout << "Выбор: ";
     std::cin >> choice;
     return choice;
 }
 
+template<typename T>
+bool ask_continue(const std::string& msg, T& obj, bool& has_obj) {
+    if (!has_obj) return false;
+    char again;
+    std::cout << msg;
+    std::cin >> again;
+    if (again == 'y' || again == 'Y') return true;
+    has_obj = false;
+    return false;
+}
+
 int main() {
     setlocale(LC_ALL, "rus");
 
+    Matrix<double> m1, m2, result;
+    bool has_m1 = false, has_m2 = false;
+    Triangle<double> t1, t2, tresult;
+    bool has_t1 = false, has_t2 = false;
+
     std::cout << "================================" << std::endl;
     std::cout << "|   СИСТЕМА РАБОТЫ С МАТРИЦАМИ  |" << std::endl;
-    std::cout << "|  (обычные и треугольные)      |" << std::endl;
+    std::cout << "|    (обычные и треугольные)    |" << std::endl;
     std::cout << "================================" << std::endl;
 
     try {
         while (true) {
             int choice = show_main_menu();
-
+            if (choice == 0) {
+                std::cout << "Выход из программы..." << std::endl;
+                break;
+            }
             switch (choice) {
             case 1:
-                add_matrices();
-                break;
             case 2:
-                subtract_matrices();
-                break;
             case 3:
-                multiply_matrices();
-                break;
             case 4:
-                scalar_multiply();
+            {
+                int type;
+                std::cout << "1. Обычные матрицы\n2. Треугольные матрицы\nВыбор: ";
+                std::cin >> type;
+                if (type == 1) {
+                    if (has_m1) {
+                        std::cout << "Текущая матрица A: " << m1.rows() << " x " << m1.cols() << std::endl;
+                    }
+                    if (!ask_continue("Использовать первую матрицу (A)? (y/n): ", m1, has_m1)) {
+                        
+                        int rows, cols;
+                        std::cout << "Введите количество строк для A: ";
+                        std::cin >> rows;
+                        std::cout << "Введите количество столбцов для A: ";
+                        std::cin >> cols;
+                        m1 = Matrix<double>(rows, cols);
+                        has_m1 = true;
+                        std::cout << "Заполните матрицу A:\n/.../\nЗаполнение матрицы выполнено\n";
+                    }
+                    if (has_m2) {
+                        std::cout << "Текущая матрица B: " << m2.rows() << " x " << m2.cols() << std::endl;
+                    }
+                    if (!ask_continue("Использовать вторую матрицу (B)? (y/n): ", m2, has_m2)) {
+                        int rows, cols;
+                        std::cout << "Введите количество строк для B: ";
+                        std::cin >> rows;
+                        std::cout << "Введите количество столбцов для B: ";
+                        std::cin >> cols;
+                        m2 = Matrix<double>(rows, cols);
+                        has_m2 = true;
+                        std::cout << "Заполните матрицу B:\n/.../\nЗаполнение матрицы выполнено\n";
+                    }
+                    try {
+                        if (choice == 1) result = m1 + m2;
+                        if (choice == 2) result = m1 - m2;
+                        if (choice == 3) result = m1 * m2;
+                        if (choice == 4) result = m1 / m2;
+                        std::cout << "\nРезультат:\n" << result << std::endl;
+                    } catch (const std::exception& e) {
+                        std::cout << "Ошибка: " << e.what() << std::endl;
+                    }
+                } else {
+                    if (!ask_continue("Использовать первую треугольную матрицу (A)? (y/n): ", t1, has_t1)) {
+                        int size, type_choice;
+                        std::cout << "Введите размер треугольной матрицы A (N x N): ";
+                        std::cin >> size;
+                        std::cout << "1. Нижняя треугольная\n2. Верхняя треугольная\nВыбор: ";
+                        std::cin >> type_choice;
+                        TriangleType ttype = (type_choice == 1) ? TriangleType::Lower : TriangleType::Upper;
+                        t1 = Triangle<double>();
+                        has_t1 = true;
+                        std::cout << "Заполните треугольную матрицу A:\n/.../\nЗаполнение матрицы выполнено\n";
+                    }
+                    if (!ask_continue("Использовать вторую треугольную матрицу (B)? (y/n): ", t2, has_t2)) {
+                        int size = t1.rows();
+                        TriangleType ttype = t1.get_type();
+                        t2 = Triangle<double>();
+                        has_t2 = true;
+                        std::cout << "Заполните треугольную матрицу B:\n/.../\nЗаполнение матрицы выполнено\n";
+                    }
+                    try {
+                        if (choice == 1) tresult = t1 + t2;
+                        if (choice == 2) tresult = t1 - t2;
+                        if (choice == 3) tresult = t1 * t2;
+                        if (choice == 4) tresult = t1 / t2;
+                        std::cout << "\nРезультат:\n" << tresult << std::endl;
+                    } catch (const std::exception& e) {
+                        std::cout << "Ошибка: " << e.what() << std::endl;
+                    }
+                }
                 break;
-            case 5:
-                transpose_matrix();
+            }
+            case 5: 
+            case 6: 
+            case 7: 
+            {
+                int type;
+                std::cout << "1. Обычная матрица\n2. Треугольная матрица\nВыбор: ";
+                std::cin >> type;
+                if (type == 1) {
+                    if (!ask_continue("Использовать текущую матрицу? (y/n): ", m1, has_m1)) {
+                        int rows, cols;
+                        std::cout << "Введите количество строк: ";
+                        std::cin >> rows;
+                        std::cout << "Введите количество столбцов: ";
+                        std::cin >> cols;
+                        m1 = Matrix<double>(rows, cols);
+                        has_m1 = true;
+                        std::cout << "Заполните матрицу:\n/.../\nЗаполнение матрицы выполнено\n";
+                    }
+                    try {
+                        if (choice == 5) {
+                            double scalar;
+                            std::cout << "Введите скаляр: ";
+                            std::cin >> scalar;
+                            result = m1 * scalar;
+                        }
+                        if (choice == 6) {
+                            double scalar;
+                            std::cout << "Введите скаляр: ";
+                            std::cin >> scalar;
+                            result = m1 / scalar;
+                        }
+                        if (choice == 7) {
+                            result = m1.transpose();
+                        }
+                        std::cout << "\nРезультат:\n" << result << std::endl;
+                    } catch (const std::exception& e) {
+                        std::cout << "Ошибка: " << e.what() << std::endl;
+                    }
+                } else {
+                    if (!ask_continue("Использовать текущую треугольную матрицу? (y/n): ", t1, has_t1)) {
+                        int size, type_choice;
+                        std::cout << "Введите размер треугольной матрицы (N x N): ";
+                        std::cin >> size;
+                        std::cout << "1. Нижняя треугольная\n2. Верхняя треугольная\nВыбор: ";
+                        std::cin >> type_choice;
+                        TriangleType ttype = (type_choice == 1) ? TriangleType::Lower : TriangleType::Upper;
+                        t1 = Triangle<double>();
+                        has_t1 = true;
+                        std::cout << "Заполните треугольную матрицу:\n/.../\nЗаполнение матрицы выполнено\n";
+                    }
+                    try {
+                        if (choice == 5) {
+                            double scalar;
+                            std::cout << "Введите скаляр: ";
+                            std::cin >> scalar;
+                            tresult = t1 * scalar;
+                        }
+                        if (choice == 6) {
+                            double scalar;
+                            std::cout << "Введите скаляр: ";
+                            std::cin >> scalar;
+                            tresult = t1 / scalar;
+                        }
+                        if (choice == 7) {
+                            tresult = t1.transpose();
+                        }
+                        std::cout << "\nРезультат:\n" << tresult << std::endl;
+                    } catch (const std::exception& e) {
+                        std::cout << "Ошибка: " << e.what() << std::endl;
+                    }
+                }
                 break;
-            case 6:
+            }
+            case 8:
                 std::cout << "\nИнформация о типах матриц:" << std::endl;
                 std::cout << "- Обычные матрицы: любые размеры M x N" << std::endl;
                 std::cout << "- Треугольные матрицы: только квадратные N x N" << std::endl;
                 std::cout << "- Нижние треугольные: нули выше главной диагонали" << std::endl;
                 std::cout << "- Верхние треугольные: нули ниже главной диагонали" << std::endl;
                 break;
-            case 0:
-                std::cout << "Выход из программы..." << std::endl;
-                return 0;
             default:
                 std::cout << "Неверный выбор! Попробуйте снова." << std::endl;
                 break;
             }
-
             std::cout << "\nНажмите Enter для продолжения...";
             std::cin.ignore();
             std::cin.get();
         }
-    }
-    catch (const std::exception& e) {
+    } catch (const std::exception& e) {
         std::cout << "Произошла ошибка: " << e.what() << std::endl;
     }
-
     return 0;
 }
 
-#endif MENU
+#endif

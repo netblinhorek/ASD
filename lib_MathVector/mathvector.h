@@ -21,13 +21,13 @@ MathVector<T> operator*(T value, const MathVector<T>& vec);
 template <typename T>
 class MathVector : public TVector<T> {
 public:
-    MathVector() : TVector<T>() {}  
-    explicit MathVector(size_t size) : TVector<T>(size) {} 
-    MathVector(const T* arr, size_t size) : TVector<T>(arr, size) {}  
-    MathVector(const MathVector<T>& other) : TVector<T>(other) {}  
+    MathVector() : TVector<T>() {}
+    explicit MathVector(size_t size) : TVector<T>(size) {}
+    MathVector(const T* arr, size_t size) : TVector<T>(arr, size) {}
+    MathVector(const MathVector<T>& other) : TVector<T>(other) {}
     MathVector(size_t size, const T& value) {
         this->assign(size, value);
-    } 
+    }
     T the_scalar_product(const MathVector<T>& other) const;
     T norm() const;
     MathVector<T> normalized() const;
@@ -38,7 +38,7 @@ public:
     MathVector<T>& operator=(const MathVector<T>& other);
     bool operator==(const MathVector<T>& other) const;
     bool operator!=(const MathVector<T>& other) const;
-    
+
     size_t start_index() const;
 
     MathVector<T> operator+(const MathVector<T>& other) const;
@@ -60,7 +60,7 @@ public:
     MathVector<T>& operator-=(T value);
     MathVector<T>& operator*=(T value);
     MathVector<T>& operator/=(T value);
-    
+
     MathVector<T> operator-() const;
     MathVector<T> operator+() const;
     friend MathVector<T> operator+(T value, const MathVector<T>& vec) {
@@ -71,7 +71,7 @@ public:
         return result;
     }
 
-     friend MathVector<T> operator*(T value, const MathVector<T>& vec) {
+    friend MathVector<T> operator*(T value, const MathVector<T>& vec) {
         MathVector<T> result(vec.size());
         for (size_t i = 0; i < vec.size(); i++) {
             result[i] = value * vec[i];
@@ -104,14 +104,14 @@ T MathVector<T>::the_scalar_product(const MathVector<T>& other) const {
     }
     return result;
 }
-    
+
 template <typename T>
 T MathVector<T>::norm() const {
     return sqrt(this->the_scalar_product(*this));
 }
 
 template <typename T>
-MathVector<T> MathVector<T>::normalized() const { 
+MathVector<T> MathVector<T>::normalized() const {
     T length = this->norm();
     if (length == 0) {
         throw std::invalid_argument("Cannot normalize zero vector");
