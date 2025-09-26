@@ -1,3 +1,4 @@
+#pragma once
 #include <cstddef> 
 #include <stdlib.h> 
 #include <time.h> 
@@ -25,8 +26,10 @@ public:
     explicit MathVector(size_t size) : TVector<T>(size) {}
     MathVector(const T* arr, size_t size) : TVector<T>(arr, size) {}
     MathVector(const MathVector<T>& other) : TVector<T>(other) {}
-    MathVector(size_t size, const T& value) {
-        this->assign(size, value);
+    MathVector(size_t size, const T& value) : TVector<T>(size) {
+        for (size_t i = 0; i < size; ++i) {
+            (*this)[i] = value;
+        }
     }
     T the_scalar_product(const MathVector<T>& other) const;
     T norm() const;
@@ -98,7 +101,7 @@ T MathVector<T>::the_scalar_product(const MathVector<T>& other) const {
     if (this->size() != other.size()) {
         throw std::invalid_argument("Vectors must have the same size");
     }
-    T result = 0;
+    T result{};
     for (size_t i = 0; i < this->size(); i++) {
         result += (*this)[i] * other[i];
     }
@@ -107,7 +110,7 @@ T MathVector<T>::the_scalar_product(const MathVector<T>& other) const {
 
 template <typename T>
 T MathVector<T>::norm() const {
-    return sqrt(this->the_scalar_product(*this));
+    return std::sqrt(this->the_scalar_product(*this));
 }
 
 template <typename T>
@@ -126,12 +129,12 @@ MathVector<T> MathVector<T>::normalized() const {
 
 template <typename T>
 T& MathVector<T>::operator[](size_t index) {
-    return this->get(index);
+    return TVector<T>::operator[](index);
 }
 
 template <typename T>
 const T& MathVector<T>::operator[](size_t index) const {
-    return this->get(index);
+    return TVector<T>::operator[](index);
 }
 
 

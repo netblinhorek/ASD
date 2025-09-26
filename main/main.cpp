@@ -265,10 +265,10 @@ void create_triangle_matrix(Triangle<double>& matrix,
     const std::string& name,
     int size, TriangleType type) {
     matrix = Triangle<double>();
-    std::cout << "Треугольная матрица " << name 
-        << " создана размером " << size 
+    std::cout << "Треугольная матрица " << name
+        << " создана размером " << size
         << "x" << size << std::endl;
-    std::cout << "Заполните значимые элементы матрицы:" 
+    std::cout << "Заполните значимые элементы матрицы:"
         << std::endl;
 }
 void create_triangle_matrix(Triangle<double>& matrix,
@@ -334,20 +334,30 @@ bool ask_continue(const std::string& msg, T& obj, bool& has_obj) {
     has_obj = false;
     return false;
 }
-
-void input_matrix(Matrix<double>& m, const std::string& name) {
-    int rows, cols;
-    std::cout << "Введите количество строк для " << name << ": ";
-    std::cin >> rows;
-    std::cout << "Введите количество столбцов для " << name << ": ";
-    std::cin >> cols;
-    m = Matrix<double>(rows, cols);
-    std::cout << "Заполните матрицу " << name << ":\n/.../\nЗаполнение матрицы выполнено\n";
-}
-
 void show_matrix_info(const Matrix<double>& m, const std::string& name) {
     std::cout << "Текущая матрица " << name << ": " << m.rows() << " x " << m.cols() << std::endl;
+    std::cout << m << std::endl;
 }
+void input_matrix(Matrix<double>& m, const std::string& name, int rows = -1, int cols = -1) {
+    if (rows <= 0 || cols <= 0) {
+        std::cout << "Введите количество строк для " << name << ": ";
+        std::cin >> rows;
+        std::cout << "Введите количество столбцов для " << name << ": ";
+        std::cin >> cols;
+    }
+    m = Matrix<double>(rows, cols);
+    std::cout << "Заполните матрицу " << name << ":\n";
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            std::cout << "  [" << i << "," << j << "]: ";
+            std::cin >> m[i][j];
+        }
+    }
+    std::cout << "Заполнение матрицы выполнено\n";
+    show_matrix_info(m, name);
+}
+
+
 
 void input_triangle(Triangle<double>& t, const std::string& name) {
     int size, type_choice;
@@ -373,22 +383,41 @@ void start_print() {
 
 void perform_matrix_operation(int choice, Matrix<double>& m1, Matrix<double>& m2, Matrix<double>& result,
     bool& has_m1, bool& has_m2) {
-    if (has_m1) show_matrix_info(m1, "A");
-    if (!ask_continue("Использовать первую матрицу (A)? (y/n): ", m1, has_m1)) {
+    if (has_m1) {
+        show_matrix_info(m1, "A");
+        std::cout << "Использовать текущую матрицу A? (y/n): ";
+        char use_current;
+        std::cin >> use_current;
+        if (use_current != 'y' && use_current != 'Y') {
+            input_matrix(m1, "A");
+        }
+    }
+    else {
         input_matrix(m1, "A");
         has_m1 = true;
     }
-    if (has_m2) show_matrix_info(m2, "B");
-    if (!ask_continue("Использовать вторую матрицу (B)? (y/n): ", m2, has_m2)) {
-        input_matrix(m2, "B");
-        has_m2 = true;
-    }
+    input_matrix(m2, "B", m1.rows(), m1.cols());
     try {
         if (choice == 1) result = m1 + m2;
         if (choice == 2) result = m1 - m2;
         if (choice == 3) result = m1 * m2;
         if (choice == 4) result = m1 / m2;
-        std::cout << "\nРезультат:\n" << result << std::endl;
+        std::cout << "\nРезультат:\n";
+        show_matrix_info(result, "Result");
+        char use_result;
+        std::cout << "Использовать полученную матрицу как новую матрицу A, B или не использовать? (a/b/n): ";
+        std::cin >> use_result;
+        if (use_result == 'a' || use_result == 'A') {
+            m1 = result;
+            has_m1 = true;
+            std::cout << "Теперь матрица A:\n";
+            show_matrix_info(m1, "A");
+        }
+        else if (use_result == 'b' || use_result == 'B') {
+            m2 = result;
+            std::cout << "Теперь матрица B:\n";
+            show_matrix_info(m2, "B");
+        }
     }
     catch (const std::exception& e) {
         std::cout << "Ошибка: " << e.what() << std::endl;
@@ -420,9 +449,17 @@ void perform_triangle_operation(int choice, Triangle<double>& t1, Triangle<doubl
 }
 
 void perform_unary_matrix_operation(int choice, Matrix<double>& m1, Matrix<double>& result, bool& has_m1) {
-    if (has_m1) show_matrix_info(m1, "");
-    if (!ask_continue("Использовать текущую матрицу? (y/n): ", m1, has_m1)) {
-        input_matrix(m1, "");
+    if (has_m1) {
+        show_matrix_info(m1, "A");
+        std::cout << "Использовать текущую матрицу A? (y/n): ";
+        char use_current;
+        std::cin >> use_current;
+        if (use_current != 'y' && use_current != 'Y') {
+            input_matrix(m1, "A");
+        }
+    }
+    else {
+        input_matrix(m1, "A");
         has_m1 = true;
     }
     try {
@@ -441,7 +478,29 @@ void perform_unary_matrix_operation(int choice, Matrix<double>& m1, Matrix<doubl
         if (choice == 7) {
             result = m1.transpose();
         }
-        std::cout << "\nРезультат:\n" << result << std::endl;
+        std::cout << "\nРезультат:\n";
+        show_matrix_info(result, "Result");
+        char use_result;
+        std::cout << "Использовать полученную матрицу как новую матрицу A, B или не использовать? (a/b/n): ";
+        std::cin >> use_result;
+        if (use_result == 'a' || use_result == 'A') {
+            m1 = result;
+            has_m1 = true;
+            std::cout << "Теперь матрица A:\n";
+            show_matrix_info(m1, "A");
+        }
+        else if (use_result == 'b' || use_result == 'B') {
+            std::cout << "Введите количество строк для B: ";
+            int rows = result.rows();
+            std::cout << rows << std::endl;
+            std::cout << "Введите количество столбцов для B: ";
+            int cols = result.cols();
+            std::cout << cols << std::endl;
+            Matrix<double> m2 = result;
+            bool has_m2 = true;
+            std::cout << "Теперь матрица B:\n";
+            show_matrix_info(m2, "B");
+        }
     }
     catch (const std::exception& e) {
         std::cout << "Ошибка: " << e.what() << std::endl;

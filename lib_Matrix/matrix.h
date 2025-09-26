@@ -1,52 +1,318 @@
 #pragma once
-#include <iostream>
+#include <cstddef> 
+#include <stdlib.h> 
+#include <time.h> 
 #include <stdexcept>
+#include <iostream>
+#include <algorithm>
+#include <cmath>
 #include "../lib_MathVector/mathvector.h"
 
-template <class T>
+
+template <typename T>
 class Matrix : public MathVector<MathVector<T>> {
 public:
-    Matrix() {}
-    Matrix(size_t rows, size_t cols)
-        : MathVector<MathVector<T>>(rows) {}
-  
-    Matrix(size_t rows, size_t cols, const T& value) {}
-    Matrix(const Matrix<T>& other) {}
+    Matrix();
+    Matrix(size_t rows, size_t cols);
+    Matrix(size_t rows, size_t cols, const T& value);
+    Matrix(const Matrix<T>& other) = default;
 
-    size_t rows() const { return 0; }
-    size_t cols() const { return 0; }
+    size_t rows() const;
+    size_t cols() const;
 
-    MathVector<T>& operator[](size_t index) {
+    Matrix<T> transpose() const;
+
+    bool is_square() const;
+    bool is_valid() const;
+
+    Matrix<T> operator+(const Matrix<T>& other) const;
+    Matrix<T> operator-(const Matrix<T>& other) const;
+    Matrix<T> operator*(const Matrix<T>& other) const;
+    Matrix<T> operator/(const Matrix<T>& other) const;
+
+    Matrix<T> operator+(T value) const;
+    Matrix<T> operator-(T value) const;
+    Matrix<T> operator*(T value) const;
+    Matrix<T> operator/(T value) const;
+
+    Matrix<T>& operator+=(const Matrix<T>& other);
+    Matrix<T>& operator-=(const Matrix<T>& other);
+    Matrix<T>& operator*=(const Matrix<T>& other);
+    Matrix<T>& operator/=(const Matrix<T>& other);
+
+    Matrix<T>& operator+=(T value);
+    Matrix<T>& operator-=(T value);
+    Matrix<T>& operator*=(T value);
+    Matrix<T>& operator/=(T value);
+
+    friend Matrix<T> operator+(T value, const Matrix<T>& matrix) {
+        return matrix + value;
     }
-    const MathVector<T>& operator[](size_t index) const {
+
+    friend Matrix<T> operator*(T value, const Matrix<T>& matrix) {
+        return matrix * value;
     }
 
-    Matrix<T> transpose() const { return Matrix<T>(); }
+    friend std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
+        os << "[\n";
+        for (size_t i = 0; i < matrix.rows(); ++i) {
+            os << "  " << matrix[i];
+            if (i < matrix.rows() - 1) os << ",\n";
+        }
+        os << "\n]";
+        return os;
+    }
 
-    bool is_square() const {}
-    bool is_valid() const { }
+    // ƒобавим operator[] const и неконстантный дл€ доступа к строкам
+    inline MathVector<T>& operator[](size_t index) {
+        return MathVector<MathVector<T>>::operator[](index);
+    }
+    inline const MathVector<T>& operator[](size_t index) const {
+        return MathVector<MathVector<T>>::operator[](index);
+    }
 
-    Matrix<T> operator+(const Matrix<T>& other) const { return Matrix<T>(); }
-    Matrix<T> operator-(const Matrix<T>& other) const { return Matrix<T>(); }
-    Matrix<T> operator*(const Matrix<T>& other) const { return Matrix<T>(); }
-    Matrix<T> operator/(const Matrix<T>& other) const { return Matrix<T>(); }
-
-    Matrix<T> operator+(T value) const { return Matrix<T>(); }
-    Matrix<T> operator-(T value) const { return Matrix<T>(); }
-    Matrix<T> operator*(T value) const { return Matrix<T>(); }
-    Matrix<T> operator/(T value) const { return Matrix<T>(); }
-
-    Matrix<T>& operator+=(const Matrix<T>& other) { return *this; }
-    Matrix<T>& operator-=(const Matrix<T>& other) { return *this; }
-    Matrix<T>& operator*=(const Matrix<T>& other) { return *this; }
-    Matrix<T>& operator/=(const Matrix<T>& other) { return *this; }
-
-    Matrix<T>& operator+=(T value) { return *this; }
-    Matrix<T>& operator-=(T value) { return *this; }
-    Matrix<T>& operator*=(T value) { return *this; }
-    Matrix<T>& operator/=(T value) { return *this; }
-
-    friend Matrix<T> operator+(T value, const Matrix<T>& matrix) { return Matrix<T>(); }
-    friend Matrix<T> operator*(T value, const Matrix<T>& matrix) { return Matrix<T>(); }
-    friend std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) { return os; }
 };
+template <typename T>
+Matrix<T>::Matrix() : MathVector<MathVector<T>>() {}
+
+template <typename T>
+Matrix<T>::Matrix(size_t rows, size_t cols) : MathVector<MathVector<T>>() {
+    if (rows > 100000 || cols > 100000) {
+        throw std::invalid_argument("Matrix dimensions too large");
+    }
+    for (size_t i = 0; i < rows; ++i) {
+        this->push_back(MathVector<T>(cols));
+    }
+}
+
+template <typename T>
+Matrix<T>::Matrix(size_t rows, size_t cols, const T& value) : MathVector<MathVector<T>>() {
+    if (rows > 100000 || cols > 100000) {
+        throw std::invalid_argument("Matrix dimensions too large");
+    }
+    for (size_t i = 0; i < rows; i++) {
+        MathVector<T> row_vector;
+
+        for (size_t j = 0; j < cols; j++) {
+            row_vector.push_back(value);
+        }
+        this->push_back(row_vector);
+    }
+}
+
+template <typename T>
+size_t Matrix<T>::rows() const {
+    return this->size();
+
+}
+
+template <typename T>
+size_t Matrix<T>::cols() const {
+    if (this->is_empty()) return 0;
+    return (*this)[0].size();
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::operator+(const Matrix<T>& other) const {
+    if (rows() != other.rows() || cols() != other.cols()) {
+        throw std::invalid_argument("Matrix dimensions must match");
+    }
+
+    Matrix<T> result(rows(), cols());
+    for (size_t i = 0; i < rows(); ++i) {
+        result[i] = (*this)[i] + other[i];
+    }
+
+    return result;
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::operator-(const Matrix<T>& other) const {
+    if (rows() != other.rows() || cols() != other.cols()) {
+        throw std::invalid_argument("Matrix dimensions must match");
+    }
+
+    Matrix<T> result(rows(), cols());
+    for (size_t i = 0; i < rows(); ++i) {
+        result[i] = (*this)[i] - other[i];
+    }
+    return result;
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::operator*(const Matrix<T>& other) const {
+    if (!is_valid() || !other.is_valid()) {
+        throw std::invalid_argument("Matrices are not valid");
+    }
+    if (cols() != other.rows()) {
+        throw std::invalid_argument("Matrix dimensions don't match for multiplication");
+    }
+
+    Matrix<T> result(rows(), other.cols(), T(0));
+    for (size_t i = 0; i < rows(); ++i) {
+        for (size_t j = 0; j < other.cols(); ++j) {
+            for (size_t k = 0; k < cols(); ++k) {
+                result[i][j] += (*this)[i][k] * other[k][j];
+            }
+        }
+    }
+    return result;
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::operator/(const Matrix<T>& other) const {
+    if (rows() != other.rows() || cols() != other.cols()) {
+        throw std::invalid_argument("Matrix dimensions must match");
+    }
+
+    Matrix<T> result(rows(), cols());
+    for (size_t i = 0; i < rows(); ++i) {
+        result[i] = (*this)[i] / other[i];
+    }
+    return result;
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::operator+(T value) const {
+    Matrix <T> result(rows(), cols());
+    for (size_t i = 0; i < rows(); i++) {
+        result[i] = (*this)[i] + value;
+    }
+    return result;
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::operator-(T value) const {
+    Matrix <T> result(rows(), cols());
+    for (size_t i = 0; i < rows(); i++) {
+        result[i] = (*this)[i] - value;
+    }
+    return result;
+}
+
+
+template <typename T>
+Matrix<T> Matrix<T>::operator*(T value) const {
+    Matrix <T> result(rows(), cols());
+    for (size_t i = 0; i < rows(); i++) {
+        result[i] = (*this)[i] * value;
+    }
+    return result;
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::operator/(T value) const {
+    Matrix <T> result(rows(), cols());
+    for (size_t i = 0; i < rows(); i++) {
+        result[i] = (*this)[i] / value;
+    }
+    return result;
+}
+template <typename T>
+Matrix<T>& Matrix<T>::operator+=(const Matrix<T>& other) {
+    if (rows() != other.rows() || cols() != other.cols()) {
+        throw std::invalid_argument("Matrix dimensions must match");
+    }
+    for (size_t i = 0; i < rows(); i++) {
+        (*this)[i] += other[i];
+    }
+    return *this;
+}
+
+template <typename T>
+Matrix<T>& Matrix<T>::operator-=(const Matrix<T>& other) {
+    if (rows() != other.rows() || cols() != other.cols()) {
+        throw std::invalid_argument("Matrix dimensions must match");
+    }
+    for (size_t i = 0; i < rows(); i++) {
+        (*this)[i] -= other[i];
+    }
+    return *this;
+}
+
+template <typename T>
+Matrix<T>& Matrix<T>::operator*=(const Matrix<T>& other) {
+    if (rows() != other.rows() || cols() != other.cols()) {
+        throw std::invalid_argument("Matrix dimensions must match");
+    }
+    for (size_t i = 0; i < rows(); i++) {
+        (*this)[i] *= other[i];
+    }
+    return *this;
+}
+
+template <typename T>
+Matrix<T>& Matrix<T>::operator/=(const Matrix<T>& other) {
+    if (rows() != other.rows() || cols() != other.cols()) {
+        throw std::invalid_argument("Matrix dimensions must match");
+    }
+    for (size_t i = 0; i < rows(); i++) {
+        (*this)[i] /= other[i];
+    }
+    return *this;
+}
+
+template <typename T>
+Matrix<T>& Matrix<T>::operator+=(T value) {
+    for (size_t i = 0; i < rows(); i++) {
+        (*this)[i] += value;
+    }
+    return *this;
+}
+
+template <typename T>
+Matrix<T>& Matrix<T>::operator-=(T value) {
+    for (size_t i = 0; i < rows(); i++) {
+        (*this)[i] -= value;
+    }
+    return *this;
+}
+
+template <typename T>
+Matrix<T>& Matrix<T>::operator*=(T value) {
+    for (size_t i = 0; i < rows(); i++) {
+        (*this)[i] *= value;
+    }
+    return *this;
+}
+
+template <typename T>
+Matrix<T>& Matrix<T>::operator/=(T value) {
+    for (size_t i = 0; i < rows(); i++) {
+        (*this)[i] /= value;
+    }
+    return *this;
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::transpose() const {
+    if (!is_valid()) {
+        throw std::invalid_argument("Matrix is not valid");
+    }
+
+    Matrix<T> result(cols(), rows());
+    for (size_t i = 0; i < rows(); ++i) {
+        for (size_t j = 0; j < cols(); ++j) {
+            result[j][i] = (*this)[i][j];
+        }
+    }
+    return result;
+}
+
+template <typename T>
+bool Matrix<T>::is_square() const {
+    return (rows() == cols());
+}
+
+template <typename T>
+bool Matrix<T>::is_valid() const {
+    if (this->is_empty()) return true;
+    size_t expected_cols = (*this)[0].size();
+    for (size_t i = 1; i < this->size(); ++i) {
+        if ((*this)[i].size() != expected_cols) {
+            return false;
+        }
+    }
+    return true;
+}
+
