@@ -1,48 +1,168 @@
-#pragma once
 #include <iostream>
 #include <stdexcept>
 #include "../lib_Matrix/matrix.h"
 
 enum class TriangleType { Lower, Upper };
 
-template <typename T>
+template<typename T>
 class Triangle : public Matrix<T> {
 private:
     TriangleType _type;
 
 public:
-    Triangle() {}
-    Triangle(size_t size, const T& value, TriangleType type = TriangleType::Lower) {}
-    Triangle(const Matrix<T>& other, TriangleType type = TriangleType::Lower) {}
+    Triangle();
+    Triangle(size_t size, const T& value, TriangleType type = TriangleType::Lower);
+    Triangle(const Matrix<T>& other, TriangleType type = TriangleType::Lower);
 
-    T& operator()(size_t row, size_t col) {}
-    const T& operator()(size_t row, size_t col) const {}
+    T& operator()(size_t row, size_t col);
+    const T& operator()(size_t row, size_t col) const;
 
-    TriangleType get_type() const noexcept { return TriangleType::Lower; }
-    size_t rows() const { return 0; }
-    size_t cols() const { return 0; }
+    TriangleType get_type() const noexcept;
+    size_t rows() const;
+    size_t cols() const;
 
-    Triangle<T> operator+(const Triangle<T>& other) const { return Triangle<T>(); }
-    Triangle<T> operator-(const Triangle<T>& other) const { return Triangle<T>(); }
-    Triangle<T> operator*(const Triangle<T>& other) const { return Triangle<T>(); }
-    Triangle<T> operator/(const Triangle<T>& other) const { return Triangle<T>(); }
+    Triangle<T> operator+(const Triangle<T>& other) const;
 
-    Triangle<T>& operator+=(const Triangle<T>& other) { return *this; }
-    Triangle<T>& operator-=(const Triangle<T>& other) { return *this; }
-    Triangle<T>& operator*=(const Triangle<T>& other) { return *this; }
-    Triangle<T>& operator/=(const Triangle<T>& other) { return *this; }
-
-    Triangle<T> operator+(T value) const { return Triangle<T>(); }
-    Triangle<T> operator-(T value) const { return Triangle<T>(); }
-    Triangle<T> operator*(T value) const { return Triangle<T>(); }
-    Triangle<T> operator/(T value) const { return Triangle<T>(); }
-
-    Triangle<T>& operator+=(T value) { return *this; }
-    Triangle<T>& operator-=(T value) { return *this; }
-    Triangle<T>& operator*=(T value) { return *this; }
-    Triangle<T>& operator/=(T value) { return *this; }
-
-    friend Triangle<T> operator+(T value, const Triangle<T>& matrix) { return Triangle<T>(); }
-    friend Triangle<T> operator*(T value, const Triangle<T>& matrix) { return Triangle<T>(); }
-    friend std::ostream& operator<<(std::ostream& os, const Triangle<T>& matrix) { return os; }
+private:
+    bool is_valid_access(size_t row, size_t col) const;
 };
+
+
+template<typename T>
+Triangle<T>::Triangle() : Matrix<T>(), _type(TriangleType::Lower) {}
+
+
+template<typename T>
+Triangle<T>::Triangle(size_t size, const T& value, TriangleType type) : _type(type) {
+    this->clear();
+
+    for (size_t i = 0; i < size; ++i) {
+        if (_type == TriangleType::Lower) {
+            MathVector<T> row(size - i, value);
+            this->push_back(row);
+        }
+        else {
+            MathVector<T> row(i + 1, value);
+            this->push_back(row);
+        }
+    }
+}
+
+template<typename T>
+Triangle<T>::Triangle(const Matrix<T>& other, TriangleType type) : _type(type) {
+    if (!other.is_square()) {
+        throw std::invalid_argument("Triangle matrix must be square");
+    }
+
+    size_t size = other.rows();
+    this->clear();
+
+    for (size_t i = 0; i < size; ++i) {
+        if (_type == TriangleType::Lower) {
+            MathVector<T> row(size - i);
+            for (size_t j = i; j < size; ++j) {
+                row[j - i] = other[i][j];
+            }
+            this->push_back(row);
+        }
+        else {
+            MathVector<T> row(i + 1);
+            for (size_t j = 0; j <= i; ++j) {
+                row[j] = other[i][j];
+            }
+            this->push_back(row);
+        }
+    }
+}
+
+template<typename T>
+bool Triangle<T>::is_valid_access(size_t row, size_t col) const {
+    if (row >= this->rows() || col >= this->rows()) {
+        return false;
+    }
+
+    if (_type == TriangleType::Lower) {
+        return col >= row;
+    }
+    else {
+        return col <= row;
+    }
+}
+
+template<typename T>
+T& Triangle<T>::operator()(size_t row, size_t col) {
+    if (!is_valid_access(row, col)) {
+        if (row >= this->rows() || col >= this->rows()) {
+            throw std::out_of_range("Index out of range");
+        }
+        else {
+            throw std::invalid_argument("Cannot modify zero elements in triangular matrix");
+        }
+    }
+
+    if (_type == TriangleType::Lower) {
+        return (*this)[row][col - row];
+    }
+    else {
+        return (*this)[row][col];
+    }
+}
+
+template<typename T>
+const T& Triangle<T>::operator()(size_t row, size_t col) const {
+    if (!is_valid_access(row, col)) {
+        if (row >= this->rows() || col >= this->rows()) {
+            throw std::out_of_range("Index out of range");
+        }
+        else {
+            static T zero = T(0);
+            return zero;
+        }
+    }
+
+    if (_type == TriangleType::Lower) {
+        return (*this)[row][col - row];
+    }
+    else {
+        return (*this)[row][col];
+    }
+}
+
+template<typename T>
+TriangleType Triangle<T>::get_type() const noexcept {
+    return _type;
+}
+
+template<typename T>
+size_t Triangle<T>::rows() const {
+    return Matrix<T>::size();
+}
+
+template<typename T>
+size_t Triangle<T>::cols() const {
+    return this->rows();
+}
+
+template<typename T>
+Triangle<T> Triangle<T>::operator+(const Triangle<T>& other) const {
+    if (this->rows() != other.rows() || _type != other._type) {
+        throw std::invalid_argument("Matrix dimensions and types must match");
+    }
+
+    Triangle<T> result(this->rows(), T(0), _type);
+
+    for (size_t i = 0; i < this->rows(); ++i) {
+        if (_type == TriangleType::Lower) {
+            for (size_t j = i; j < this->rows(); ++j) {
+                result(i, j) = (*this)(i, j) + other(i, j);
+            }
+        }
+        else {
+            for (size_t j = 0; j <= i; ++j) {
+                result(i, j) = (*this)(i, j) + other(i, j);
+            }
+        }
+    }
+
+    return result;
+}
