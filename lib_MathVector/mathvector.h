@@ -23,7 +23,7 @@ template <typename T>
 class MathVector : public TVector<T> {
 public:
     MathVector() : TVector<T>() {}
-    explicit MathVector(size_t size) : TVector<T>(size) {}
+    MathVector(size_t size) : TVector<T>(size) {} 
     MathVector(const T* arr, size_t size) : TVector<T>(arr, size) {}
     MathVector(const MathVector<T>& other) : TVector<T>(other) {}
     MathVector(size_t size, const T& value) : TVector<T>(size) {
@@ -31,6 +31,7 @@ public:
             (*this)[i] = value;
         }
     }
+
     T the_scalar_product(const MathVector<T>& other) const;
     T norm() const;
     MathVector<T> normalized() const;
@@ -66,6 +67,7 @@ public:
 
     MathVector<T> operator-() const;
     MathVector<T> operator+() const;
+
     friend MathVector<T> operator+(T value, const MathVector<T>& vec) {
         MathVector<T> result(vec.size());
         for (size_t i = 0; i < vec.size(); i++) {

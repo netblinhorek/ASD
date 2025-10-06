@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <stdexcept>
 #include "../lib_Matrix/matrix.h"
@@ -27,14 +28,14 @@ private:
     bool is_valid_access(size_t row, size_t col) const;
 };
 
-
 template<typename T>
 Triangle<T>::Triangle() : Matrix<T>(), _type(TriangleType::Lower) {}
 
-
 template<typename T>
 Triangle<T>::Triangle(size_t size, const T& value, TriangleType type) : _type(type) {
-    this->clear();
+    while (this->size() > 0) {
+        this->pop_back();
+    }
 
     for (size_t i = 0; i < size; ++i) {
         if (_type == TriangleType::Lower) {
@@ -55,7 +56,9 @@ Triangle<T>::Triangle(const Matrix<T>& other, TriangleType type) : _type(type) {
     }
 
     size_t size = other.rows();
-    this->clear();
+    while (this->size() > 0) {
+        this->pop_back();
+    }
 
     for (size_t i = 0; i < size; ++i) {
         if (_type == TriangleType::Lower) {

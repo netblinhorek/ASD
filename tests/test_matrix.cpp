@@ -411,10 +411,10 @@ TEST(TestMatrix, test_operator_mult_equals_matrix) {
 
     m1 *= m2;
 
-    ASSERT_EQ(m1[0][0], 2);
-    ASSERT_EQ(m1[0][1], 6);
-    ASSERT_EQ(m1[1][0], 12);
-    ASSERT_EQ(m1[1][1], 20);
+    ASSERT_EQ(m1[0][0], 11);  
+    ASSERT_EQ(m1[0][1], 16);  
+    ASSERT_EQ(m1[1][0], 19);  
+    ASSERT_EQ(m1[1][1], 28);  
 }
 
 TEST(TestMatrix, test_operator_divide_equals_matrix) {
