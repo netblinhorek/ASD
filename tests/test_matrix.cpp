@@ -1,4 +1,3 @@
-
 #include <gtest/gtest.h>
 #include <iostream>
 #include <cassert>
@@ -14,6 +13,7 @@
 #include "matrix.h"
 
 #define EPSILON 0.000001
+
 
 TEST(TestMatrix, test_constructor_rows_cols) {
     size_t rows = 3;

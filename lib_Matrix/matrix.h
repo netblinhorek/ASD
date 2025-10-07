@@ -28,6 +28,7 @@ public:
     bool is_square() const;
     bool is_valid() const;
 
+
     Matrix<T> operator+(const Matrix<T>& other) const;
     Matrix<T> operator-(const Matrix<T>& other) const;
     Matrix<T> operator*(const Matrix<T>& other) const;
@@ -95,8 +96,6 @@ public:
     }
 
 };
-
-
 
 template <typename T>
 Matrix<T>::Matrix() : MathVector<MathVector<T>>() {}
