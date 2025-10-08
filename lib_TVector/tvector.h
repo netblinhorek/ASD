@@ -97,6 +97,7 @@ public:
     bool operator!=(const TVector<T>& other) const;
     const T& operator[](size_t pos) const;
     T& operator[](size_t index);
+    inline bool is_full() const noexcept;
 
     void print_elems();
     void print_states();
@@ -112,7 +113,7 @@ public:
     friend void hoara_sort<T>(const TVector<T>& vec);
 
 private:
-    inline bool is_full() const noexcept;
+    
     void allocate(size_t);
     void reallocate(size_t);
     void compact_and_reallocate();
