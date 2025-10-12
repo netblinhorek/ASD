@@ -12,13 +12,7 @@ class Queue {
 
 public:
     
-    Queue(int size) : _size(size), _head(0), _tail(0){
-        if (size <= 0) {
-            throw std::invalid_argument("Queue size must be positive");
-        }
-        _data = new T[_size];
-    }
-
+    Queue(int size);
     ~Queue() {
         delete[] _data;
     }
@@ -30,6 +24,15 @@ public:
     inline bool is_full() const noexcept;
     void clear() noexcept;
 };
+
+template<class T>
+Queue<T>::Queue(int size) : _size(size), _head(0), _tail(0) {
+    if (size <= 0) {
+        throw std::invalid_argument("Queue size must be positive");
+    }
+    _data = new T[_size];
+}
+
 
 template<class T>
 void Queue<T>::push(T val) {

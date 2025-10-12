@@ -269,37 +269,6 @@ TEST(TestMatrix, test_operator_mult_dimension_mismatch) {
     EXPECT_THROW(m1 * m2, std::invalid_argument);
 }
 
-TEST(TestMatrix, test_operator_div) {
-    Matrix<double> m1(2, 2);
-    m1[0][0] = 10.0; m1[0][1] = 8.0;
-    m1[1][0] = 6.0; m1[1][1] = 4.0;
-
-    Matrix<double> m2(2, 2);
-    m2[0][0] = 2.0; m2[0][1] = 4.0;
-    m2[1][0] = 3.0; m2[1][1] = 2.0;
-
-    Matrix<double> result = m1 / m2;
-
-    ASSERT_DOUBLE_EQ(result[0][0], 5.0);
-    ASSERT_DOUBLE_EQ(result[0][1], 2.0);
-    ASSERT_DOUBLE_EQ(result[1][0], 2.0);
-    ASSERT_DOUBLE_EQ(result[1][1], 2.0);
-}
-
-TEST(TestMatrix, test_operator_divide_by_zero) {
-    Matrix<double> m1(2, 2);
-    Matrix<double> m2(2, 2);
-    m2[0][0] = 1.0; m2[0][1] = 0.0;
-
-    EXPECT_THROW(m1 / m2, std::invalid_argument);
-}
-
-TEST(TestMatrix, test_operator_div_dimension_mismatch) {
-    Matrix<double> m1(2, 2);
-    Matrix<double> m2(3, 3);
-
-    EXPECT_THROW(m1 / m2, std::invalid_argument);
-}
 
 TEST(TestMatrix, test_operator_add_scalar) {
     Matrix<int> m1(2, 2);
@@ -417,30 +386,8 @@ TEST(TestMatrix, test_operator_mult_equals_matrix) {
     ASSERT_EQ(m1[1][1], 28);  
 }
 
-TEST(TestMatrix, test_operator_divide_equals_matrix) {
-    Matrix<double> m1(2, 2);
-    m1[0][0] = 10.0; m1[0][1] = 8.0;
-    m1[1][0] = 6.0; m1[1][1] = 4.0;
 
-    Matrix<double> m2(2, 2);
-    m2[0][0] = 2.0; m2[0][1] = 4.0;
-    m2[1][0] = 3.0; m2[1][1] = 2.0;
 
-    m1 /= m2;
-
-    ASSERT_DOUBLE_EQ(m1[0][0], 5.0);
-    ASSERT_DOUBLE_EQ(m1[0][1], 2.0);
-    ASSERT_DOUBLE_EQ(m1[1][0], 2.0);
-    ASSERT_DOUBLE_EQ(m1[1][1], 2.0);
-}
-
-TEST(TestMatrix, test_operator_divide_equals_matrix_by_zero) {
-    Matrix<double> m1(2, 2);
-    Matrix<double> m2(2, 2);
-    m2[0][0] = 1.0; m2[0][1] = 0.0;
-
-    EXPECT_THROW(m1 /= m2, std::invalid_argument);
-}
 
 TEST(TestMatrix, test_operator_plus_equals_scalar) {
     Matrix<int> m(2, 2);

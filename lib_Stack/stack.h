@@ -9,21 +9,8 @@ class Stack {
     int _top;       
 
 public:
-    Stack(int size) : _size(size), _top(-1) {
-        if (size <= 0) {
-            throw std::invalid_argument("Stack size must be positive");
-        }
-        _data = new T[_size];
-    }
-
-
-    Stack(const Stack& other) : _size(other._size), _top(other._top) {
-        _data = new T[_size];  
-
-        for (int i = 0; i <= _top; i++) {
-            _data[i] = other._data[i];
-        }
-    }
+    Stack(int size);
+    Stack(const Stack& other);
     ~Stack() {
         delete[] _data;
     }
@@ -35,6 +22,24 @@ public:
     inline bool is_full() const noexcept;
     void clear() noexcept;
 };
+
+template<class T>
+ Stack<T>::Stack(int size) : _size(size), _top(-1)
+{
+     if (size <= 0) {
+         throw std::invalid_argument("Stack size must be positive");
+     }
+     _data = new T[_size];
+}
+
+ template<class T>
+ Stack<T>::Stack(const Stack& other) : _size(other._size), _top(other._top) {
+     _data = new T[_size];
+
+     for (int i = 0; i <= _top; i++) {
+         _data[i] = other._data[i];
+     }
+ }
 
 template<class T>
 void Stack<T>::push(T val) {

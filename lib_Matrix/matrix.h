@@ -32,7 +32,6 @@ public:
     Matrix<T> operator+(const Matrix<T>& other) const;
     Matrix<T> operator-(const Matrix<T>& other) const;
     Matrix<T> operator*(const Matrix<T>& other) const;
-    Matrix<T> operator/(const Matrix<T>& other) const;
 
     Matrix<T> operator+(T value) const;
     Matrix<T> operator-(T value) const;
@@ -179,18 +178,6 @@ Matrix<T> Matrix<T>::operator*(const Matrix<T>& other) const {
     return result;
 }
 
-template <typename T>
-Matrix<T> Matrix<T>::operator/(const Matrix<T>& other) const {
-    if (rows() != other.rows() || cols() != other.cols()) {
-        throw std::invalid_argument("Matrix dimensions must match for division");
-    }
-
-    Matrix<T> result(rows(), cols());
-    for (size_t i = 0; i < rows(); ++i) {
-        result[i] = (*this)[i] / other[i];
-    }
-    return result;
-}
 
 template <typename T>
 Matrix<T> Matrix<T>::operator+(T value) const {
@@ -249,11 +236,6 @@ Matrix<T>& Matrix<T>::operator*=(const Matrix<T>& other) {
     return *this;
 }
 
-template <typename T>
-Matrix<T>& Matrix<T>::operator/=(const Matrix<T>& other) {
-    *this = *this / other;
-    return *this;
-}
 
 template <typename T>
 Matrix<T>& Matrix<T>::operator+=(T value) {

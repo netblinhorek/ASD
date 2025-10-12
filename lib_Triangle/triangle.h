@@ -33,22 +33,11 @@ Triangle<T>::Triangle() : Matrix<T>(), _type(TriangleType::Lower) {}
 
 template<typename T>
 Triangle<T>::Triangle(size_t size, const T& value, TriangleType type) : _type(type) {
-    while (this->size() > 0) {
-        this->pop_back();
-    }
-
     for (size_t i = 0; i < size; ++i) {
-        if (_type == TriangleType::Lower) {
-            MathVector<T> row(size - i, value);
-            this->push_back(row);
-        }
-        else {
-            MathVector<T> row(i + 1, value);
-            this->push_back(row);
-        }
+        MathVector<T> row(size, value); 
+        this->push_back(row);
     }
 }
-
 template<typename T>
 Triangle<T>::Triangle(const Matrix<T>& other, TriangleType type) : _type(type) {
     if (!other.is_square()) {
@@ -56,58 +45,56 @@ Triangle<T>::Triangle(const Matrix<T>& other, TriangleType type) : _type(type) {
     }
 
     size_t size = other.rows();
-    while (this->size() > 0) {
-        this->pop_back();
-    }
 
     for (size_t i = 0; i < size; ++i) {
         if (_type == TriangleType::Lower) {
-            MathVector<T> row(size - i);
-            for (size_t j = i; j < size; ++j) {
-                row[j - i] = other[i][j];
-            }
-            this->push_back(row);
-        }
-        else {
             MathVector<T> row(i + 1);
             for (size_t j = 0; j <= i; ++j) {
                 row[j] = other[i][j];
             }
             this->push_back(row);
         }
+        else {
+            MathVector<T> row(size - i);
+            for (size_t j = i; j < size; ++j) {
+                row[j - i] = other[i][j];
+            }
+            this->push_back(row);
+        }
     }
 }
 
 template<typename T>
-bool Triangle<T>::is_valid_access(size_t row, size_t col) const {
-    if (row >= this->rows() || col >= this->rows()) {
-        return false;
+bool  Triangle<T>::is_valid_access(size_t row, size_t col) const {
+    if (row >= this->size() || col >= this->size()) {
+        return false;  
     }
 
     if (_type == TriangleType::Lower) {
-        return col >= row;
+        return col <= row;  
     }
     else {
-        return col <= row;
+        return col >= row; 
     }
 }
 
 template<typename T>
 T& Triangle<T>::operator()(size_t row, size_t col) {
-    if (!is_valid_access(row, col)) {
-        if (row >= this->rows() || col >= this->rows()) {
-            throw std::out_of_range("Index out of range");
-        }
-        else {
-            throw std::invalid_argument("Cannot modify zero elements in triangular matrix");
-        }
+    if (row >= this->size() || col >= this->size()) {
+        throw std::out_of_range("Index out of range");
     }
 
     if (_type == TriangleType::Lower) {
-        return (*this)[row][col - row];
+        if (col > row) {
+            throw std::invalid_argument("Cannot modify zero elements in triangular matrix");
+        }
+        return (*this)[row][col];
     }
     else {
-        return (*this)[row][col];
+        if (col < row) {
+            throw std::invalid_argument("Cannot modify zero elements in triangular matrix");
+        }
+        return (*this)[row][col - row];
     }
 }
 
