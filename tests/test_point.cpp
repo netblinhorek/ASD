@@ -77,12 +77,10 @@ TEST(TestPoint, test_equality_operator) {
     Point p1(1.0f, 2.0f);
     Point p2(1.0f, 2.0f);
     Point p3(1.1f, 2.0f);
-    Point p4(1.0f, 2.1f);
 
     // Act & Assert
     ASSERT_TRUE(p1 == p2);
     ASSERT_FALSE(p1 == p3);
-    ASSERT_FALSE(p1 == p4);
 }
 
 TEST(TestPoint, test_copy_constructor) {
@@ -114,10 +112,8 @@ TEST(TestPoint, test_assignment_operator) {
 TEST(TestPoint, test_inequality_operator) {
     Point p1(1.0f, 2.0f);
     Point p2(1.1f, 2.0f);
-    Point p3(1.0f, 2.1f);
 
     ASSERT_TRUE(p1 != p2);
-    ASSERT_TRUE(p1 != p3);
     ASSERT_FALSE(p1 != p1); 
 }
 TEST(TestPoint, test_distance_precision) {

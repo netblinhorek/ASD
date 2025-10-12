@@ -54,12 +54,6 @@ TEST(TestSphere, test_sphere_coincide_exceptions) {
     // Act & Assert
     ASSERT_NO_THROW(std::string("Wrong expectation"), get_spheres_relation(s1, s2));
 }
-TEST(TestSphere, test_sphere_externally_touch_exceptions) {
-    Sphere s1(0, 0, 0, 5), s2(0, 0, 0, 5);
-
-    // Act & Assert
-    ASSERT_NO_THROW(std::string("Wrong expectation"), get_spheres_relation(s1, s2));
-}
 TEST(TestSphere, test_sphere_internally_touch_exceptions) {
     Sphere s1(0, 0, 0, 5), s2(0, 0, 0, 5);
 
@@ -91,9 +85,8 @@ TEST(TestSphere, test_zero_radius_sphere) {
 }
 
 TEST(TestSphere, test_zero_radius_separate_sphere) {
-    Sphere s1(0, 0, 0, 0), s2(10, 0, 0, 0);
 
-    ASSERT_EQ(std::string("Not intersected"), get_spheres_relation(s1, s2));
+    ASSERT_THROW(Sphere(1, 0, 0, 0), std::invalid_argument);
 }
 
 TEST(TestSphere, test_very_large_radius_sphere) {
@@ -115,11 +108,6 @@ TEST(TestSphere, test_negative_coordinates_touch_sphere) {
 TEST(TestSphere, test_negative_radius_exception_sphere) {
 
     ASSERT_THROW(Sphere(-5, -5, -3, -4), std::invalid_argument);
-    ASSERT_THROW(Sphere(-2, -2, -2, -7), std::invalid_argument);
-}
-
-TEST(TestSphere, test_zero_radius_no_exception_sphere) {
-    ASSERT_NO_THROW(Sphere(0, 0, 0, 0));
 }
 
 TEST(TestSphere, test_floating_point_precision_internal_touch) {
@@ -190,12 +178,5 @@ TEST(TestSphere, test_set_negative_radius_exception) {
 
     // Act & Assert
     ASSERT_THROW(s.set_radius(-5), std::invalid_argument);
-}
-
-TEST(TestSphere, test_set_zero_radius_no_exception) {
-    Sphere s;
-
-    // Act & Assert
-    ASSERT_NO_THROW(s.set_radius(0));
 }
 

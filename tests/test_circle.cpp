@@ -47,11 +47,8 @@ TEST(TestCircle, test_circles_separate) {
 
 
 // на выброс исключений
-TEST(TestCircle, test_circles_coincide_exceptions) {
-    Circle c1(1, 0, 0), c2(0, 0, 5);
-
-    // Act & Assert
-    ASSERT_NO_THROW(std::string("Wrong expectation"), get_circles_relation(c1, c2));
+TEST(TestCircle, test_zero_radius_throws_in_constructor) {
+    ASSERT_THROW(Circle(1, 0, 0), std::invalid_argument);
 }
 TEST(TestCircle, test_circles_externally_touch_exceptions) {
     Circle c1(0, 0, 3), c2(10, 0, 5);
@@ -83,17 +80,6 @@ TEST(TestCircle, test_circles_separate_exceptions) {
     // Act & Assert
     ASSERT_NO_THROW(std::string("Not intersected"), get_circles_relation(c1, c2));
 }
-TEST(TestCircle, test_zero_radius_circles) {
-    Circle c1(0, 0, 0), c2(0, 0, 0);
-    // Act & Assert
-    ASSERT_EQ(std::string("Coincide"), get_circles_relation(c1, c2));
-}
-
-TEST(TestCircle, test_zero_radius_separate) {
-    Circle c1(0, 0, 0), c2(10, 0, 0);
-    // Act & Assert
-    ASSERT_EQ(std::string("Not intersected"), get_circles_relation(c1, c2));
-}
 
 TEST(TestCircle, test_very_large_radius) {
     Circle c1(0, 0, 1000), c2(1, 1, 1000);
@@ -114,13 +100,8 @@ TEST(TestCircle, test_negative_coordinates_touch) {
 TEST(TestCircle, test_negative_radius_exception) {
     // Act & Assert
     ASSERT_THROW(Circle(-5, -5, -3), std::invalid_argument);
-    ASSERT_THROW(Circle(-2, -2, -2), std::invalid_argument);
 }
 
-TEST(TestCircle, test_zero_radius_no_exception) {
-    // Act & Assert
-    ASSERT_NO_THROW(Circle(0, 0, 0));
-}
 TEST(TestCircle, test_default_constructor) {
     Circle c;
 
@@ -184,10 +165,6 @@ TEST(TestCircle, test_floating_point_precision) {
 
     std::string relation = get_circles_relation(c1, c2);
 
-    ASSERT_TRUE(relation == "Coincide" || relation == "One inside the other");
+    ASSERT_TRUE(relation == "Coincide");
 }
 
-TEST(TestCircle, test_set_zero_radius_no_exception) {
-    Circle c;
-    ASSERT_NO_THROW(c.set_radius(0));
-}

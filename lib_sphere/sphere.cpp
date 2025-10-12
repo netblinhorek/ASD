@@ -35,7 +35,7 @@ std::string get_spheres_relation(const SphereT& s1, const SphereT& s2) {
 
 Sphere::Sphere(float x, float y, float z, float radius)
     : center(x, y, z), radius(radius) {
-    if (radius < 0) {
+    if (radius <= 0) {
         throw std::invalid_argument("Radius cannot be negative");
     }
 }

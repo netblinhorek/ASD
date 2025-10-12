@@ -3,9 +3,11 @@
 #include <stdexcept>
 #include <cmath>
 
-Circle::Circle(float x, float y, float radius) : center(x, y), radius(radius) {
-    if (radius < 0) {
-        throw std::invalid_argument("Radius cannot be negative");
+Circle::Circle(float x, float y, float radius)
+    : center(x, y), radius(radius)
+{
+    if (radius <= 0) {
+        throw std::invalid_argument("Radius must be positive");
     }
 }
 Point Circle::get_center() const {
