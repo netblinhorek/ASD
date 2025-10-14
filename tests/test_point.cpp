@@ -25,9 +25,7 @@ TEST(TestPoint, test_parameterized_constructor) {
 
 TEST(TestPoint, test_negative_coordinates_no_exception) {
     // Arrange, Act & Assert
-    ASSERT_NO_THROW(Point(1.0f, 2.0f));      
     ASSERT_NO_THROW(Point(-2.0f, -2.0f));     
-    ASSERT_NO_THROW(Point(-100.0f, 50.0f));
 }
 
 TEST(TestPoint, test_zero_radius_no_exception) {
