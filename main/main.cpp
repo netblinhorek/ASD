@@ -9,8 +9,8 @@
 //#define MATHVECTOR
 // #define MATRIX
 //#define TRIANGLE
-
-#define MENU
+#define STACK
+//#define MENU
 #ifdef MENU
 #include "../lib_Triangle/triangle.h"
 #include "../lib_Matrix/matrix.h"
@@ -30,6 +30,10 @@
 
 #ifdef TRIANGLE
 #include "../lib_Triangle/triangle.h"
+#endif
+
+#ifdef STACK
+#include "../lib_Stack/stack.h"
 #endif
 
 //int main() {
@@ -253,11 +257,9 @@ int show_main_menu() {
     std::cout << "1. Сложение матриц" << std::endl;
     std::cout << "2. Вычитание матриц" << std::endl;
     std::cout << "3. Умножение матриц" << std::endl;
-    std::cout << "4. Деление матриц" << std::endl;
-    std::cout << "5. Умножение на скаляр" << std::endl;
-    std::cout << "6. Деление на скаляр" << std::endl;
-    std::cout << "7. Транспонирование матрицы" << std::endl;
-    std::cout << "8. Показать информацию о матрицах" << std::endl;
+    std::cout << "4. Умножение на скаляр" << std::endl;
+    std::cout << "5. Транспонирование матрицы" << std::endl;
+    std::cout << "6. Показать информацию о матрицах" << std::endl;
     std::cout << "0. Выйти" << std::endl;
     std::cout << "Выбор: ";
     std::cin >> choice;
@@ -426,7 +428,6 @@ void perform_matrix_operation(int choice, Matrix<double>& m1, Matrix<double>& m2
         case 1: result = m1 + m2; break;
         case 2: result = m1 - m2; break;
         case 3: result = m1 * m2; break;
-        case 4: result = m1 / m2; break;
         }
 
         std::cout << "\nРезультат:\n";
@@ -512,7 +513,6 @@ void perform_triangle_operation(int choice, Triangle<double>& t1, Triangle<doubl
         case 1: tresult = t1 + t2; break;
         case 2: tresult = t1 - t2; break;
         case 3: tresult = t1 * t2; break;
-        case 4: tresult = t1 / t2; break;
         }
 
         std::cout << "\nРезультат:\n";
@@ -611,21 +611,21 @@ void perform_unary_triangle_operation(int choice, Triangle<double>& t1, Triangle
 
     try {
         switch (choice) {
-        case 5: {
+        case 4: {
             double scalar;
             std::cout << "Введите скаляр: ";
             std::cin >> scalar;
             tresult = t1 * scalar;
             break;
         }
-        case 6: {
+        case 5: {
             double scalar;
             std::cout << "Введите скаляр: ";
             std::cin >> scalar;
             tresult = t1 / scalar;
             break;
         }
-        case 7: {
+        case 6: {
             tresult = t1.transpose();
             break;
         }
@@ -717,4 +717,25 @@ int main() {
     return 0;
 }
 
-#endif
+#endif MENU
+
+#ifdef STACK
+int main() {
+    setlocale(LC_ALL, "rus");
+    std::string input;
+
+    std::cout << "Введите выражение для проверки скобок: ";
+    std::getline(std::cin, input);
+
+    number_of_brackets(input);
+
+    if (check_of_brackets(input)) {
+        std::cout << "Скобки расставлены правильно!" << std::endl;
+    }
+    else {
+        std::cout << "Ошибка в расстановке скобок!" << std::endl;
+    }
+
+    return 0;
+}
+#endif STACK

@@ -79,3 +79,4 @@ template<class T>
 void Stack<T>::clear() noexcept {
     _top = -1;
 }
+
