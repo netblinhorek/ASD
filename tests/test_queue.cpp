@@ -17,6 +17,11 @@ TEST(TestQueue, test_is_push) {
     Queue<int> queue(2);
     queue.push(4);
     queue.push(5);
+    queue.pop();
+    queue.push(7);
+
+    EXPECT_EQ(7, queue.tail());
+    EXPECT_EQ(queue.head(), 5);
     EXPECT_FALSE(queue.is_empty());
 }
 
@@ -31,7 +36,7 @@ TEST(TestQueue, test_is_pop) {
     queue.push(1);
     queue.push(2);
     queue.pop();
-    EXPECT_EQ(queue.top(), 2);
+    EXPECT_EQ(queue.head(), 2);
 }
 TEST(TestQueue, test_is_pop_throw) {
     Queue<int> queue(3);
@@ -40,12 +45,12 @@ TEST(TestQueue, test_is_pop_throw) {
 TEST(TestQueue, test_is_top) {
     Queue<int> queue(3);
     queue.push(42);
-    EXPECT_EQ(queue.top(), 42);
+    EXPECT_EQ(queue.head(), 42);
 }
 
 TEST(TestQueue, test_is_top_throw) {
     Queue<int> queue(3);
-    EXPECT_THROW(queue.top(), std::logic_error);
+    EXPECT_THROW(queue.head(), std::logic_error);
 }
 
 TEST(TestQueue, test_is_empty) {
