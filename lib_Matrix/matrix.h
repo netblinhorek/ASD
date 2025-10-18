@@ -41,7 +41,7 @@ public:
     Matrix<T>& operator+=(const Matrix<T>& other);
     Matrix<T>& operator-=(const Matrix<T>& other);
     Matrix<T>& operator*=(const Matrix<T>& other);
-    Matrix<T>& operator/=(const Matrix<T>& other);
+
 
     Matrix<T>& operator+=(T value);
     Matrix<T>& operator-=(T value);

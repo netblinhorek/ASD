@@ -3,7 +3,8 @@
 
 
 template <typename T>
-void find_smallest_neighbor(const Matrix<T>& matrix, size_t& row, size_t& col) {
+void find_smallest_neighbor(const Matrix<T>& matrix, size_t& row,
+    size_t& col) {
     T current = matrix[row][col];
     T min_neighbor = current;
     size_t best_row = row, best_col = col;
@@ -35,20 +36,26 @@ void find_smallest_neighbor(const Matrix<T>& matrix, size_t& row, size_t& col) {
 }
 
 template <typename T>
-bool is_local_minimum(const Matrix<T>& matrix, size_t row, size_t col) {
+bool is_local_minimum(const Matrix<T>& matrix, size_t row,
+    size_t col) {
     T current = matrix[row][col];
     size_t n = matrix.rows();
 
-    if (row > 0 && matrix[row - 1][col] <= current) return false;
-    if (row < n - 1 && matrix[row + 1][col] <= current) return false;
-    if (col > 0 && matrix[row][col - 1] <= current) return false;
-    if (col < n - 1 && matrix[row][col + 1] <= current) return false;
+    if (row > 0 && matrix[row - 1][col] <= current)
+        return false;
+    if (row < n - 1 && matrix[row + 1][col] <= current) 
+        return false;
+    if (col > 0 && matrix[row][col - 1] <= current)
+        return false;
+    if (col < n - 1 && matrix[row][col + 1] <= current) 
+        return false;
 
     return true;
 }
 
 template <typename T>
-bool find_local_minimum(const Matrix<T>& matrix, size_t& row, size_t& col) {
+bool find_local_minimum(const Matrix<T>& matrix, size_t& row, 
+    size_t& col) {
     size_t n = matrix.rows();
     if (n == 0) return false;
 
