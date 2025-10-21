@@ -85,12 +85,3 @@ void Stack<T>::clear() noexcept {
     _top = -1;
 }
 
-
-
-template<class T>
-char Stack<T>::peek() const {
-    if (is_empty()) {
-        throw std::runtime_error("Stack is empty");
-    }
-    return _data[_top];
-}
