@@ -21,7 +21,12 @@ public:
     inline bool is_empty() const noexcept;
     inline bool is_full() const noexcept;
     void clear() noexcept;
+    char peek() const;
+
 };
+bool check_of_brackets(const std::string& str);
+void number_of_brackets(const std::string& str);
+
 
 template<class T>
  Stack<T>::Stack(int size) : _size(size), _top(-1)
@@ -80,3 +85,12 @@ void Stack<T>::clear() noexcept {
     _top = -1;
 }
 
+
+
+template<class T>
+char Stack<T>::peek() const {
+    if (is_empty()) {
+        throw std::runtime_error("Stack is empty");
+    }
+    return _data[_top];
+}
