@@ -21,11 +21,11 @@ public:
     inline bool is_empty() const noexcept;
     inline bool is_full() const noexcept;
     void clear() noexcept;
-    char peek() const;
 
 };
 bool check_of_brackets(const std::string& str);
-void number_of_brackets(const std::string& str);
+void algorithms_read_expression(const std::string& str);
+
 
 
 template<class T>
