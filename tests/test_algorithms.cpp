@@ -3,7 +3,7 @@
 #include <fcntl.h>
 #include <io.h>
 #include <gtest/gtest.h>
-#include "../lib_Algorithms/algorithms.cpp"
+#include "../lib_Algorithms_matrix/algorithms_matrix.cpp"
 
 TEST(TestLocalMinimum, test_empty_matrix) {
     Matrix<int> matrix(0, 0);

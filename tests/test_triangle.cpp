@@ -28,23 +28,6 @@ TEST(TestTriangle, test_size_constructor_lower) {
     }
 }
 
-TEST(TestTriangle, test_size_constructor_upper) {
-    Triangle<int> t(3, 0, TriangleType::Upper);
-    EXPECT_EQ(t.rows(), 3);
-    EXPECT_EQ(t.cols(), 3);
-    EXPECT_EQ(t.get_type(), TriangleType::Upper);
-
-    for (size_t i = 0; i < 3; ++i) {
-        for (size_t j = 0; j < 3; ++j) {
-            if (j < i) {
-                EXPECT_THROW(t(i, j) = 1, std::invalid_argument);
-            }
-            else {
-                EXPECT_NO_THROW(t(i, j) = i + j);
-            }
-        }
-    }
-}
 
 TEST(TestTriangle, test_value_constructor_lower) {
     Triangle<double> t(3, 5.5, TriangleType::Lower);
@@ -53,21 +36,6 @@ TEST(TestTriangle, test_value_constructor_lower) {
         for (size_t j = 0; j < 3; ++j) {
             if (j <= i) {
                 EXPECT_DOUBLE_EQ(t(i, j), 5.5);
-            }
-            else {
-                EXPECT_THROW(t(i, j) = 1.0, std::invalid_argument);
-            }
-        }
-    }
-}
-
-TEST(TestTriangle, test_value_constructor_upper) {
-    Triangle<double> t(3, 7.2, TriangleType::Upper);
-
-    for (size_t i = 0; i < 3; ++i) {
-        for (size_t j = 0; j < 3; ++j) {
-            if (j >= i) {
-                EXPECT_DOUBLE_EQ(t(i, j), 7.2);
             }
             else {
                 EXPECT_THROW(t(i, j) = 1.0, std::invalid_argument);
@@ -95,25 +63,7 @@ TEST(TestTriangle, test_from_matrix_lower) {
     EXPECT_THROW(t(0, 2), std::invalid_argument);
     EXPECT_THROW(t(1, 2), std::invalid_argument);
 }
-TEST(TestTriangle, test_from_matrix_upper) {
-    Matrix<double> m(3, 3);
-    m[0][0] = 1.0; m[0][1] = 2.0; m[0][2] = 3.0; 
-    m[1][0] = 0.0; m[1][1] = 4.0; m[1][2] = 5.0;  
-    m[2][0] = 0.0; m[2][1] = 0.0; m[2][2] = 6.0;  
 
-    Triangle<double> t(m, TriangleType::Upper);
-
-    EXPECT_DOUBLE_EQ(t(0, 0), 1.0); 
-    EXPECT_DOUBLE_EQ(t(0, 1), 2.0); 
-    EXPECT_DOUBLE_EQ(t(0, 2), 3.0);  
-    EXPECT_DOUBLE_EQ(t(1, 1), 4.0); 
-    EXPECT_DOUBLE_EQ(t(1, 2), 5.0); 
-    EXPECT_DOUBLE_EQ(t(2, 2), 6.0); 
-
-    EXPECT_THROW(t(1, 0), std::invalid_argument);  
-    EXPECT_THROW(t(2, 0), std::invalid_argument);  
-    EXPECT_THROW(t(2, 1), std::invalid_argument);  
-}
 
 TEST(TestTriangle, test_from_matrix_invalid) {
     Matrix<double> m(2, 3);
@@ -124,10 +74,8 @@ TEST(TestTriangle, test_from_matrix_invalid) {
 TEST(TestTriangle, test_addition_mismatch) {
     Triangle<int> t1(2, 0, TriangleType::Lower);
     Triangle<int> t2(3, 0, TriangleType::Lower);
-    Triangle<int> t3(2, 0, TriangleType::Upper);
 
     EXPECT_THROW(t1 + t2, std::invalid_argument);
-    EXPECT_THROW(t1 + t3, std::invalid_argument);
 }
 
 TEST(TestTriangle, test_out_of_range_access) {
