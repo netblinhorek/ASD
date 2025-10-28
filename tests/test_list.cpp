@@ -92,3 +92,41 @@ TEST(TestList, test_list_pop_back) {
 	EXPECT_EQ(list.head()->value, 3);
 	EXPECT_EQ(list.tail()->value, 2);
 }
+
+TEST(ListIteratorTest, test_empty_list_iteration) {
+	List<int> emptyList;
+
+	EXPECT_FALSE(emptyList.begin() != emptyList.end());
+}
+
+TEST(ListIteratorTest, test_read_iterator) {
+	List<int> list;
+	list.push_back(10);
+	list.push_back(20);
+	list.push_back(30);
+
+	List<int>::Iterator it = list.begin();
+	EXPECT_EQ(*it, 10);
+
+	++it;
+	EXPECT_EQ(*it, 20);
+
+	++it;
+	EXPECT_EQ(*it, 30);
+}
+
+TEST(ListIteratorTest, test_write_iterator) {
+	List<int> list;
+	list.push_back(1);
+	list.push_back(2);
+	list.push_back(3);
+
+
+	List<int>::Iterator it = list.begin();
+	*it = 100;
+	EXPECT_EQ(*it, 100);
+
+	++it;
+	*it = 200;
+	EXPECT_EQ(*it, 200);
+}

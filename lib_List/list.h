@@ -1,12 +1,14 @@
 #include <iostream>
 
-template <class T>
+
+template <typename T>
 struct Node {
+
 	T value;
 	Node<T>* next;
+
 public:
 	Node(T value_, Node<T>* next_ = nullptr) : value(value_), next(next_) {}
-
 };
 
 template <typename T>
@@ -21,7 +23,51 @@ public:
 	List(const List<T>& other);
 	Node<T>* head();
 	Node<T>* tail();
+	
+	class Iterator {
+		Node<T>* _current;
+	public:
+		Iterator() : _current(nullptr) {}
+		Iterator(Node<T>* node) : _current(node) {}
 
+		Iterator& operator=(const Iterator& other) {
+			if (*this != &other) {
+				_current = other._current;
+			}
+			return *this;
+		
+		}
+		Iterator& operator++() {
+			if (_current != nullptr) {
+				_current = _current->next;
+			}
+			return *this;
+		}
+		Iterator operator++(int) { // it++
+			Iterator tmp = *this;
+			++(*this);
+			return tmp;
+		
+		}
+		bool operator!=(const Iterator& other) {
+			return !(_current == other._current);
+		
+		}
+		T& operator*() {
+			if (_current == nullptr) {
+				throw std::invalid_argument("The end list");
+			}
+			return _current->value;
+		
+		}
+	};
+	Iterator begin() {
+		return Iterator(_head);
+	}
+
+	Iterator end() {
+		return Iterator(nullptr);
+	}
 	bool is_empty();
 	void push_front(const T& value)noexcept;
 	void push_back(const T& value)noexcept;
@@ -67,6 +113,7 @@ template<typename T>
  {
 	 return _tail;
  }
+
 
 template <typename T>
 bool List<T>::is_empty() {
@@ -222,4 +269,3 @@ void List<T>::erase(Node<T>* node)
 	delete node;
 	_count--;
 }
-
