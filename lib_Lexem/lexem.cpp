@@ -18,15 +18,8 @@ void Lexem::set_value(double value)
     _value = value;
 }
 
-std::string Lexem::to_string() const
-{
-   
-}
-
 TypeLexem Lexem::get_type() const
 {
     return _type;
 }
 
-Lexem::Lexem(const std::string& name, TypeLexem type, double value)
-    : _name(name), _type(type), _value(value) {}

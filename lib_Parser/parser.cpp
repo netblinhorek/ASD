@@ -1,25 +1,22 @@
 #include <stdexcept>
 #include "parser.h"
-#include <stdexcept>
-
-//const std::map<std::string, int> Parser::OPERATOR_PRIORITY = {
-//    {"+", 1}, {"-", 1}, {"*", 2}, {"/", 2}, {"^", 3}, {"~", 4}
-//};
-//
-//const std::map<char, char> Parser::BRACKET_PAIRS = {
-//    {'(', ')'}, {'{', '}'}, {'[', ']'}
-//};
+#include "../lib_Stack/stack.h"
+#include "../lib_Lexem/lexem.h"
+#include <cctype>
 
 bool Parser::is_digit(char c) {
-    return std::isdigit(c) || c == '.';
+    bool result = std::isdigit(static_cast<unsigned char>(c)) || c == '.';
+    return result;
 }
 
 bool Parser::is_letter(char c) {
-    return std::isalpha(c) || c == '_';
+    bool result = std::isalpha(static_cast<unsigned char>(c)) || c == '_';
+    return result;
 }
 
 bool Parser::is_operator(char c) {
-    return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
+    bool result = c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
+    return result;
 }
 
 bool Parser::is_bracket(char c) {
@@ -42,19 +39,33 @@ std::string Parser::read_identifier(const std::string& expression, size_t& pos) 
     return identifier;
 }
 
-std::string Parser::read_function(const std::string& expression, size_t& pos) {
-    std::string func = read_identifier(expression, pos);
-    return (is_function(func)) ? func : "";
-}
-
 bool Parser::is_function(const std::string& name) {
     return name == "sin" || name == "cos" || name == "tg" || name == "tan";
 }
 
-//int Parser::getPriority(const std::string& op) {
-//   // auto it = OPERATOR_PRIORITY.find(op);
-//    return (it != OPERATOR_PRIORITY.end()) ? it->second : 0;
-//}
+int Parser::get_priority(const std::string& op) {
+
+    if (op == "+" || op == "-") return 1;
+    if (op == "*" || op == "/") return 2;
+    if (op == "^") return 3;
+    if (op == "~") return 4; 
+
+    return 0;
+}
+
+bool Parser::is_valid_variable_name(const std::string& name) {
+    if (name.empty()) return false;
+
+    if (!is_letter(name[0])) return false;
+
+    for (size_t i = 0; i < name.length(); i++) {
+        if (!is_letter(name[i])) {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 List<Lexem> Parser::parse(const std::string& expression) {
     List<Lexem> lexems;
@@ -75,29 +86,33 @@ List<Lexem> Parser::parse(const std::string& expression) {
         else if (is_letter(current)) {
             std::string identifier = read_identifier(expression, pos);
             if (is_function(identifier)) {
-                lexems.push_back(Lexem(identifier, Function));
+                lexems.push_back(Lexem(identifier, Function, 0.0));
             }
             else {
-                lexems.push_back(Lexem(identifier, Variable));
+                if (!is_valid_variable_name(identifier)) {
+                    throw std::runtime_error("Invalid variable name: '" + identifier +
+                        "'. Variable names should contain only letters");
+                }
+                lexems.push_back(Lexem(identifier, Variable, 0.0));
             }
         }
         else if (is_operator(current)) {
             if (current == '-' && (lexems.is_empty() ||
-                lexems.push_front().get_type() == Operator ||
-                lexems.push_front().get_type() == OpenBracket)) {
-                lexems.push_back(Lexem("~", UnOperator));
+                lexems.head()->value.get_type() == Operator ||
+                lexems.head()->value.get_type() == OpenBracket)) {
+                lexems.push_back(Lexem("~", UnOperator, 0.0));
             }
             else {
-                lexems.push_back(Lexem(std::string(1, current), Operator));
+                lexems.push_back(Lexem(std::string(1, current), Operator, 0.0));
             }
             pos++;
         }
         else if (current == '(' || current == '{' || current == '[') {
-            lexems.push_back(Lexem(std::string(1, current), OpenBracket));
+            lexems.push_back(Lexem(std::string(1, current), OpenBracket, 0.0));
             pos++;
         }
         else if (current == ')' || current == '}' || current == ']') {
-            lexems.push_back(Lexem(std::string(1, current), ClosedBracket));
+            lexems.push_back(Lexem(std::string(1, current), ClosedBracket, 0.0));
             pos++;
         }
         else {
@@ -108,60 +123,75 @@ List<Lexem> Parser::parse(const std::string& expression) {
     return lexems;
 }
 
-List<Lexem> Parser::toPolish(const List<Lexem>& lexems) {
-    List<Lexem> polish;
-    List<Lexem> stack;
+List<Lexem> Parser::to_polish(const List<Lexem>& lexems) {
+    List<Lexem> result_queue;
+    Stack<Lexem> operator_stack(100);
 
-    for (auto it = lexems.begin(); it != lexems.end(); ++it) {
-        const Lexem& lexem = *it;
+    Node<Lexem>* current = nullptr; 
+    int step = 0;
 
-        switch (lexem.get_type()) {
-        case Constant:
-        case Variable:
-            polish.push_back(lexem);
-            break;
-
-        case Function:
-        case OpenBracket:
-        case UnOperator:
-            stack.push_front(lexem);
-            break;
-
-        case Operator: {
-            while (!stack.is_empty() &&
-                (stack.push_front().getType() == Operator ||
-                    stack.push_front().getType() == UnOperator) &&
-                get_priority(stack.push_front().getName()) >= get_priority(lexem.get_name())) {
-                polish.push_back(stack.push_front());
-                stack.pop_front();
-            }
-            stack.push_front(lexem);
-            break;
+    try {
+        current = lexems.head(); 
+        if (current == nullptr) {
+            return result_queue;
         }
+        while (current != nullptr) {
 
-        case ClosedBracket: {
-            while (!stack.empty() && stack.push_front().getType() != OpenBracket) {
-                polish.push_back(stack.push_front());
-                stack.pop_front();
+            const Lexem& lexem = current->value;
+            TypeLexem type = lexem.get_type();
+            std::string name = lexem.get_name();
+
+            if (type == Constant || type == Variable) {
+                result_queue.push_back(lexem);
+            } else if (type == Function) {
+                operator_stack.push(lexem);
+            } else if (type == Operator || type == UnOperator) {
+                while (!operator_stack.is_empty() &&
+                       (operator_stack.top().get_type() == Operator || operator_stack.top().get_type() == UnOperator) &&
+                       ((get_priority(name) <= get_priority(operator_stack.top().get_name())) ||
+                        (get_priority(name) == get_priority(operator_stack.top().get_name()) && name != "^")) &&
+                       (operator_stack.top().get_type() != OpenBracket)) {
+                    
+                    result_queue.push_back(operator_stack.top());
+                    operator_stack.pop();
+                }
+                operator_stack.push(lexem);
+            } else if (type == OpenBracket) {
+                operator_stack.push(lexem);
+            } else if (type == ClosedBracket) {
+                bool open_bracket_found = false;
+                while (!operator_stack.is_empty() && operator_stack.top().get_type() != OpenBracket) {
+                    result_queue.push_back(operator_stack.top());
+                    operator_stack.pop();
+                }
+                if (!operator_stack.is_empty() && operator_stack.top().get_type() == OpenBracket) {
+                    operator_stack.pop();
+                    open_bracket_found = true;
+                } else {
+                    throw std::runtime_error("Mismatched parentheses: No matching open bracket for " + lexem.to_string());
+                }
+
+                if (!operator_stack.is_empty() && operator_stack.top().get_type() == Function) {
+                    result_queue.push_back(operator_stack.top());
+                    operator_stack.pop();
+                }
+            } else {
+                throw std::runtime_error("Unexpected lexem type in toPolish: " + lexem.to_string());
             }
-            if (!stack.empty() && stack.push_front().getType() == OpenBracket) {
-                stack.pop_front();
-            }
-            // Если на вершине функция - добавляем в польскую запись
-            if (!stack.empty() && stack.front().getType() == Function) {
-                polish.push_back(stack.front());
-                stack.pop_front();
-            }
-            break;
+            current = current->next;
+            step++;
         }
-        }
+    } catch (const std::exception& e) {
+        std::cerr << "ERROR in toPolish: " << e.what() << std::endl;
+        throw;
     }
 
-    // Выталкиваем оставшиеся операторы из стека
-    while (!stack.is_empty()) {
-        polish.push_back(stack.push_front());
-        stack.pop_front();
+    while (!operator_stack.is_empty()) {
+        if (operator_stack.top().get_type() == OpenBracket || operator_stack.top().get_type() == ClosedBracket) {
+            throw std::runtime_error("Mismatched parentheses: Unclosed bracket left on stack: " + operator_stack.top().to_string());
+        }
+        result_queue.push_back(operator_stack.top());
+        operator_stack.pop();
     }
-
-    return polish;
+    return result_queue;
 }

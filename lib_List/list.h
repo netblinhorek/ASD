@@ -1,3 +1,4 @@
+#pragma once 
 #include <iostream>
 
 
@@ -21,8 +22,9 @@ public:
 	List();
 	~List();
 	List(const List<T>& other);
-	Node<T>* head();
-	Node<T>* tail();
+	List<T>& operator=(const List<T>& other);
+	Node<T>* head() const;
+	Node<T>* tail() const;
 	
 	class Iterator {
 		Node<T>* _current;
@@ -31,44 +33,70 @@ public:
 		Iterator(Node<T>* node) : _current(node) {}
 
 		Iterator& operator=(const Iterator& other) {
-			if (*this != &other) {
+			if (this != &other) {
 				_current = other._current;
 			}
 			return *this;
-		
 		}
+
 		Iterator& operator++() {
 			if (_current != nullptr) {
 				_current = _current->next;
 			}
 			return *this;
 		}
-		Iterator operator++(int) { // it++
+
+		Iterator operator++(int) {
 			Iterator tmp = *this;
 			++(*this);
 			return tmp;
-		
 		}
-		bool operator!=(const Iterator& other) {
-			return !(_current == other._current);
-		
+
+		bool operator!=(const Iterator& other) const {
+			return _current != other._current;
 		}
+
+		bool operator==(const Iterator& other) const {
+			return _current == other._current;
+		}
+
 		T& operator*() {
 			if (_current == nullptr) {
 				throw std::invalid_argument("The end list");
 			}
 			return _current->value;
-		
+		}
+
+		const T& operator*() const {
+			if (_current == nullptr) {
+				throw std::invalid_argument("The end list");
+			}
+			return _current->value;
+		}
+
+		T* operator->() {
+			if (_current == nullptr) {
+				throw std::invalid_argument("The end list");
+			}
+			return &(_current->value);
+		}
+
+		const T* operator->() const {
+			if (_current == nullptr) {
+				throw std::invalid_argument("The end list");
+			}
+			return &(_current->value);
 		}
 	};
-	Iterator begin() {
+	Iterator begin() const {
 		return Iterator(_head);
 	}
 
-	Iterator end() {
+	Iterator end() const {
 		return Iterator(nullptr);
 	}
-	bool is_empty();
+	
+	
 	void push_front(const T& value)noexcept;
 	void push_back(const T& value)noexcept;
 	void insert_at(size_t pos, const T& value);
@@ -77,7 +105,8 @@ public:
 	void pop_back();
 	void erase(size_t pos);
 	void erase(Node<T>* node);
-
+	bool is_empty() const { return _head == nullptr; }
+	size_t size() const { return _count; }
 };
 
 
@@ -92,33 +121,69 @@ List<T>::List()
 template<typename T>
  List<T>::~List()
 {
-	 delete _head;
-	 delete _tail;
-
+	 while (!is_empty())
+		 pop_front();
 }
-
  template<typename T>
- List<T>::List(const List<T>& other): _head(nullptr), _tail(nullptr), _count(0)
- {
+ List<T>::List(const List<T>& other) : _head(nullptr), _tail(nullptr), _count(0) {
+
+	 const Node<T>* current = other._head;
+	 Node<T>* prev = nullptr;
+
+	 while (current != nullptr) {
+		 Node<T>* new_node = new Node<T>(current->value);
+
+		 if (_head == nullptr) {
+			 _head = new_node;
+			 _tail = new_node;
+		 }
+		 else {
+			 prev->next = new_node;
+			 _tail = new_node;
+		 }
+
+		 prev = new_node;
+		 current = current->next;
+		 _count++;
+	 }
  }
 
  template<typename T>
- Node<T>* List<T>::head()
- {
-	 return _head;
+ List<T>& List<T>::operator=(const List<T>& other) {
+	 if (this == &other) { 
+		 return *this;
+	 }
+
+	 while (!is_empty()) {
+		 pop_front();
+	 }
+
+	 const Node<T>* current_other = other._head;
+	 while (current_other != nullptr) {
+		 push_back(current_other->value);
+		 current_other = current_other->next;
+	 }
+
+	 return *this;
  }
 
  template<typename T>
- Node<T>* List<T>::tail()
+  Node<T>* List<T>::head() const{
+	 try {
+		 if (_head == nullptr) {
+			 return nullptr;
+		 }
+		 return _head;
+	 } catch (const std::exception& e) {
+		 throw; 
+	 }
+ }
+
+ template<typename T>
+ Node<T>* List<T>::tail() const
  {
 	 return _tail;
  }
-
-
-template <typename T>
-bool List<T>::is_empty() {
-	return _head == nullptr;
-}
 
 template <class T>
 void List<T>::push_front(const T& value) noexcept {
@@ -126,22 +191,26 @@ void List<T>::push_front(const T& value) noexcept {
 	if (is_empty()) {
 		_head = node;
 		_tail = node;
-		return;
 	}
-	node->next = _head;
-	_head = node;
+	else {
+		node->next = _head;
+		_head = node;
+	}
+	_count++; 
 }
 
 template <class T>
-void List<T>::push_back(const T& value)noexcept {
-	Node<T>* node = new Node<T>(value); //
+void List<T>::push_back(const T& value) noexcept {
+	Node<T>* node = new Node<T>(value);
 	if (is_empty()) {
 		_head = node;
 		_tail = node;
-		return;
 	}
-	_tail->next = node;
-	_tail = node;
+	else {
+		_tail->next = node;
+		_tail = node;
+	}
+	_count++;
 }
 
 template <typename T>

@@ -1,3 +1,4 @@
+#pragma once 
 #include <iostream>
 #include <string>
 #include <map>
@@ -19,13 +20,15 @@ private:
     double _value;
 
 public:
-    Lexem(const std::string& name, TypeLexem type, double value = 0);
+    Lexem() : _name(""), _type(Constant), _value(0) {}
+
+    Lexem(const std::string& name, TypeLexem type, double value = 0.0)
+        : _name(name), _type(type), _value(value) {}
 
     const std::string& get_name() const;
     TypeLexem get_type() const;
     double get_value() const;
     void set_value(double value);
-
 
     std::string to_string() const;
 };

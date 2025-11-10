@@ -1,9 +1,9 @@
-#include <iostream>
+#ifndef PARSER_H
+#define PARSER_H
+
 #include "../lib_List/list.h"
 #include "../lib_Lexem/lexem.h"
 #include <string>
-#include <map>
-#include <cmath>
 
 class Parser {
 private:
@@ -14,12 +14,13 @@ private:
 
     std::string read_number(const std::string& expression, size_t& pos);
     std::string read_identifier(const std::string& expression, size_t& pos);
-    std::string read_function(const std::string& expression, size_t& pos);
-
-    int get_priority(const std::string& op);
     bool is_function(const std::string& name);
+    int get_priority(const std::string& op);
+    bool is_valid_variable_name(const std::string& name);
 
 public:
     List<Lexem> parse(const std::string& expression);
-    List<Lexem> toPolish(const List<Lexem>& lexems);
+    List<Lexem> to_polish(const List<Lexem>& lexems);
 };
+
+#endif
