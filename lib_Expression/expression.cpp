@@ -4,8 +4,7 @@
 #include <map>
 #include "expression.h"
 
-Expression::Expression(std::string expression) : _expression_string(expression) { // Инициализируем здесь
-    // std::cout << "DEBUG Expression: Creating from: '" << expression << "'" << std::endl;
+Expression::Expression(std::string expression) : _expression_string(expression) {  
 
     _lexems = _parser.parse(expression);
     _polish = _parser.to_polish(_lexems);

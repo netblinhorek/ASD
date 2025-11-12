@@ -30,5 +30,5 @@ public:
     double get_value() const;
     void set_value(double value);
 
-    std::string to_string() const;
+   // std::string to_string() const; 
 };

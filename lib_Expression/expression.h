@@ -12,7 +12,7 @@ class Expression {
     List<Lexem> _polish;
     std::map<std::string, double> _variables;
     Parser _parser;
-    std::string _expression_string; // Добавляем для хранения оригинального строкового выражения
+    std::string _expression_string; 
 
 public:
     Expression(std::string expression);
@@ -20,5 +20,5 @@ public:
     void set_variable(const std::string& name, double value);
     double calculate() const;
     const std::map<std::string, double>& variables() const { return _variables; }
-    std::string get_expression_string() const; // Добавляем геттер
+    std::string get_expression_string() const; 
 };

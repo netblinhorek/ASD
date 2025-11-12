@@ -1,8 +1,5 @@
-// Copyright 2024 Marina Usova
-
 #include <iostream>
 #include <string>
-#include <map> // Добавляем include для std::map
 #include <limits>
 //#define EASY_EXAMPLE
 #define ARITHMETIC_EXPRESSION_CALCULATOR
