@@ -20,6 +20,12 @@ template <typename T>
 MathVector<T> operator*(T value, const MathVector<T>& vec);
 
 template <typename T>
+MathVector<T> operator-(T value, const MathVector<T>& vec);
+
+template <typename T>
+MathVector<T> operator/(T value, const MathVector<T>& vec);
+
+template <typename T>
 class MathVector : public TVector<T> {
 public:
     MathVector() : TVector<T>() {}
@@ -80,6 +86,25 @@ public:
         MathVector<T> result(vec.size());
         for (size_t i = 0; i < vec.size(); i++) {
             result[i] = value * vec[i];
+        }
+        return result;
+    }
+
+    friend MathVector<T> operator-(T value, const MathVector<T>& vec) {
+        MathVector<T> result(vec.size());
+        for (size_t i = 0; i < vec.size(); ++i) {
+            result[i] = value - vec[i];
+        }
+        return result;
+    }
+
+    friend MathVector<T> operator/(T value, const MathVector<T>& vec) {
+        MathVector<T> result(vec.size());
+        for (size_t i = 0; i < vec.size(); ++i) {
+            if (vec[i] == T(0)) {
+                throw std::invalid_argument("Division by zero in vector element");
+            }
+            result[i] = value / vec[i];
         }
         return result;
     }

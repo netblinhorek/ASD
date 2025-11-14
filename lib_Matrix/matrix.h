@@ -55,9 +55,7 @@ public:
     friend Matrix<T> operator-(T value, const Matrix<T>& matrix) {
         Matrix<T> result(matrix.rows(), matrix.cols());
         for (size_t i = 0; i < matrix.rows(); ++i) {
-            for (size_t j = 0; j < matrix.cols(); ++j) {
-                result[i][j] = value - matrix[i][j];
-            }
+            result[i] = value - matrix[i];
         }
         return result;
     }
@@ -69,9 +67,7 @@ public:
     friend Matrix<T> operator/(T value, const Matrix<T>& matrix) {
         Matrix<T> result(matrix.rows(), matrix.cols());
         for (size_t i = 0; i < matrix.rows(); ++i) {
-            for (size_t j = 0; j < matrix.cols(); ++j) {
-                result[i][j] = value / matrix[i][j];
-            }
+            result[i] = value / matrix[i];
         }
         return result;
     }
@@ -167,12 +163,12 @@ Matrix<T> Matrix<T>::operator*(const Matrix<T>& other) const {
         throw std::invalid_argument("Matrix dimensions don't match for multiplication");
     }
 
-    Matrix<T> result(rows(), other.cols(), T(0));
+    Matrix<T> result(rows(), other.cols());
+    Matrix<T> other_transposed = other.transpose(); 
+
     for (size_t i = 0; i < rows(); ++i) {
         for (size_t j = 0; j < other.cols(); ++j) {
-            for (size_t k = 0; k < cols(); ++k) {
-                result[i][j] += (*this)[i][k] * other[k][j];
-            }
+            result[i][j] = (*this)[i].the_scalar_product(other_transposed[j]);
         }
     }
     return result;
