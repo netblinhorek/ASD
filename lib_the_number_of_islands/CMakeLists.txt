@@ -1,0 +1,1 @@
+create_project_lib(the_number_of_islands)
