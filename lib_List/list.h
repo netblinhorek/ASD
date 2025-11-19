@@ -183,7 +183,7 @@ template<typename T>
 	 const Node<T>* slow = other.getHead();
 	 const Node<T>* fast = other.getHead();
 
-	 Node<T>* loop_start = nullptr;
+	 const Node<T>* loop_start = nullptr; 
 	 bool has_loop = false;
 
 	 while (fast != nullptr && fast->next != nullptr) {
@@ -197,7 +197,7 @@ template<typename T>
 				 slow = slow->next;
 				 fast = fast->next;
 			 }
-			 loop_start = slow;
+			 loop_start = slow; 
 			 break;
 		 }
 	 }

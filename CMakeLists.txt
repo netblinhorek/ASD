@@ -18,7 +18,10 @@ add_subdirectory(lib_List)
 add_subdirectory(lib_Double_List) 
 add_subdirectory(lib_Lexem) 
 add_subdirectory(lib_Parser) 
-add_subdirectory(lib_Expression) 
+add_subdirectory(lib_Expression)
+add_subdirectory(lib_Stack_on_List) 
+add_subdirectory(lib_Queue_on_List) 
+
 add_subdirectory(lib_Stack) 
 add_subdirectory(main)                # подключаем дополнительный CMakeLists.txt из подкаталога с именем main
 
