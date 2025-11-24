@@ -175,11 +175,15 @@ MathVector<T>& MathVector<T>::operator=(const MathVector<T>& other) {
 
 template <typename T>
 bool MathVector<T>::operator==(const MathVector<T>& other) const {
-    if (this == &other) return true;
-    if (this->size() != other.size()) return false;
+    if (this == &other) 
+        return true;
+
+    if (this->size() != other.size())
+        return false;
 
     for (size_t i = 0; i < this->size(); ++i) {
-        if (this->get(i) != other.get(i)) return false;
+        if (this->get(i) != other.get(i))
+            return false;
     }
     return true;
 }

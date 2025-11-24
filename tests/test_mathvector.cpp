@@ -1,4 +1,3 @@
-
 #include <gtest/gtest.h>
 #include "mathvector.h"
 #include <iostream>
@@ -13,6 +12,32 @@
 #include <fcntl.h>
 #include <io.h>
 #define EPSILON 0.000001
+
+
+TEST(TestMathVector, test_copy_constructor) {
+    // Arrange
+    MathVector<int> original;
+    original.push_back(10);
+    original.push_back(20);
+    original.push_back(30);
+
+    // Act
+    MathVector<int> copy(original);
+
+    ASSERT_EQ(copy.size(), original.size());
+    for (size_t i = 0; i < original.size(); ++i) {
+        ASSERT_EQ(copy[i], original[i]);
+    }
+
+    original.set(0, 99);
+    original.push_back(40);
+
+    ASSERT_EQ(original.size(), 4);
+    ASSERT_EQ(copy.size(), 3); 
+    ASSERT_EQ(copy[0], 10);   
+    ASSERT_EQ(original[0], 99);
+}
+
 
 TEST(TestMathVector, test_assignment_operator) {
     MathVector<int> a;
@@ -171,8 +196,7 @@ TEST(TestMathVector, test_assignment_operator_div_zero) {
     b.push_back(0);
 
     ASSERT_THROW(a / b, std::invalid_argument);
-    ASSERT_THROW(a / b, std::invalid_argument);
-    ASSERT_THROW(a / b, std::invalid_argument);
+    
 }
 
 TEST(TestMathVector, test_assignment_operator_int_div_value) {
@@ -205,8 +229,6 @@ TEST(TestMathVector, test_assignment_operator_div_value_zero) {
     a.push_back(2);
     a.push_back(4);
 
-    ASSERT_THROW(a / 0, std::invalid_argument);
-    ASSERT_THROW(a / 0, std::invalid_argument);
     ASSERT_THROW(a / 0, std::invalid_argument);
 }
 
@@ -539,8 +561,7 @@ TEST(TestMathVector, test_differentiation_mathvectors_sub) {
     b.push_back(6);
 
     ASSERT_THROW(a - b, std::invalid_argument);
-    ASSERT_THROW(a - b, std::invalid_argument);
-    ASSERT_THROW(a - b, std::invalid_argument);
+   
 }
 TEST(TestMathVector, test_differentiation_mathvectors_mult) {
     MathVector<float> a;
@@ -552,8 +573,7 @@ TEST(TestMathVector, test_differentiation_mathvectors_mult) {
     b.push_back(6);
 
     ASSERT_THROW(a * b, std::invalid_argument);
-    ASSERT_THROW(a * b, std::invalid_argument);
-    ASSERT_THROW(a * b, std::invalid_argument);
+    
 }
 TEST(TestMathVector, test_differentiation_mathvectors_div) {
     MathVector<float> a;
@@ -565,8 +585,7 @@ TEST(TestMathVector, test_differentiation_mathvectors_div) {
     b.push_back(6);
 
     ASSERT_THROW(a / b, std::invalid_argument);
-    ASSERT_THROW(a / b, std::invalid_argument);
-    ASSERT_THROW(a / b, std::invalid_argument);
+   
 }
 TEST(TestMathVector, test_the_scalar_product_mathvectors_vectors) {
     MathVector<float> a;
@@ -577,8 +596,7 @@ TEST(TestMathVector, test_the_scalar_product_mathvectors_vectors) {
     b.push_back(4);
     b.push_back(6);
     ASSERT_THROW(a / b, std::invalid_argument);
-    ASSERT_THROW(a / b, std::invalid_argument);
-    ASSERT_THROW(a / b, std::invalid_argument);
+   
 
 }
 TEST(TestMathVector, test_the_scalar_product_product_basic) {
@@ -1009,3 +1027,4 @@ TEST(TestMathVector, test_twice_unary_plus) {
     ASSERT_EQ(b[1], -2);
     ASSERT_EQ(b[2], 3);
 }
+
