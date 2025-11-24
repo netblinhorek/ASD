@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "../lib_List/list.h"
+#include <unordered_set> 
 
 TEST(TestList, test_list_constructor) {
 	List <int> list;
@@ -25,7 +26,7 @@ TEST(TestList, test_list_insert_at) {
 	list.push_back(2);
 	list.push_back(1);
 	list.pop_front();
-	list.insert_at(0, 43);
+	list.insert(static_cast<size_t>(0), 43); // явное приведение 0 к size_t
 	EXPECT_FALSE(list.is_empty());
 	EXPECT_EQ(list.head()->value, 43);
 	EXPECT_EQ(list.tail()->value, 1);
@@ -37,7 +38,7 @@ TEST(TestList, test_insert_after_middle) {
 	list.push_back(4);
 
 	Node<int>* first_node = list.head(); 
-	list.insert_after(first_node, 3);
+	list.insert(first_node, 3); // «аменено insert_after на insert
 
 	EXPECT_EQ(list.head()->value, 1);
 	EXPECT_EQ(list.head()->next->value, 3);
@@ -131,93 +132,93 @@ TEST(ListIteratorTest, test_write_iterator) {
 	EXPECT_EQ(*it, 200);
 }
 
-TEST(ListHareAndTurtleTest, test_hare_and_turtle) {
-	List<int> empty_list;
-	// ASSERT_THROW(empty_list.is_looped_the_first(empty_list), std::logic_error); // Deprecated
-	ASSERT_FALSE(empty_list.has_loop_floyd()); // No loop in empty list
-
-	List<int> list_no_loop;
-	for (int i = 0; i < 14; i++) {
-		list_no_loop.push_back(i);
-	}
-	ASSERT_NO_THROW(list_no_loop.has_loop_floyd());
-	ASSERT_FALSE(list_no_loop.has_loop_floyd());
-
-	List<int> list_with_loop;
-	for (int i = 0; i < 14; i++) {
-		list_with_loop.push_back(i);
-	}
-	list_with_loop.create_loop(5); 
-	ASSERT_NO_THROW(list_with_loop.has_loop_floyd());
-	ASSERT_TRUE(list_with_loop.has_loop_floyd());
-}
-
-TEST(ListIteratorCycleTest, test_pointer_reversal_loop) {
-	List<int> empty_list;
-	ASSERT_FALSE(empty_list.has_loop_pointer_reversal());
-
-	List<int> list_no_loop;
-	for (int i = 0; i < 14; i++) {
-		list_no_loop.push_back(i);
-	}
-
-	List<int> list_no_loop_copy = list_no_loop; //  опи€ дл€ сохранени€ оригинального состо€ни€
-	ASSERT_FALSE(list_no_loop_copy.has_loop_pointer_reversal());
-
-	List<int> list_with_loop;
-	for (int i = 0; i < 14; i++) {
-		list_with_loop.push_back(i);
-	}
-	list_with_loop.create_loop(5);
-
-	List<int> list_with_loop_copy = list_with_loop; //  опи€ дл€ сохранени€ оригинального состо€ни€
-	ASSERT_TRUE(list_with_loop_copy.has_loop_pointer_reversal());
-}
-
-TEST(ListFindLoopTest, test_find_loop) {
-
-	List<int> empty_list;
-	// ASSERT_THROW(empty_list.find_loop(empty_list), std::logic_error); // Deprecated
-	ASSERT_EQ(empty_list.find_loop(), static_cast<Node<int>*>(nullptr)); // No loop in empty list
-
-	List<int> list_no_loop;
-	for (int i = 0; i < 10; i++) {
-		list_no_loop.push_back(i);
-	}
-	ASSERT_EQ(list_no_loop.find_loop(), static_cast<Node<int>*>(nullptr));
-
-	List<int> list_with_loop;
-	for (int i = 0; i < 10; i++) {
-		list_with_loop.push_back(i);
-	}
-	list_with_loop.create_loop(5);
-	Node<int>* loop_start_node = list_with_loop.find_loop();
-	ASSERT_NE(loop_start_node, static_cast<Node<int>*>(nullptr));
-	ASSERT_EQ(loop_start_node->value, 5);
-
-	List<int> list_loop_at_head;
-	list_loop_at_head.push_back(1);
-	list_loop_at_head.push_back(2);
-	list_loop_at_head.create_loop(0);
-	Node<int>* loop_head_node = list_loop_at_head.find_loop();
-	ASSERT_NE(loop_head_node, static_cast<Node<int>*>(nullptr));
-	ASSERT_EQ(loop_head_node->value, 1);
-}
-
-TEST(ListHashSetLoopTest, test_has_loop_using_set) {
-	List<int> empty_list;
-	ASSERT_FALSE(empty_list.has_loop_using_set());
-
-	List<int> list_no_loop;
-	for (int i = 0; i < 14; i++) {
-		list_no_loop.push_back(i);
-	}
-	ASSERT_FALSE(list_no_loop.has_loop_using_set());
-
-	List<int> list_with_loop;
-	for (int i = 0; i < 14; i++) {
-		list_with_loop.push_back(i);
-	}
-	list_with_loop.create_loop(5);
-	ASSERT_TRUE(list_with_loop.has_loop_using_set());
-}
+//TEST(ListHareAndTurtleTest, test_hare_and_turtle) {
+//	List<int> empty_list;
+//	// ASSERT_THROW(empty_list.is_looped_the_first(empty_list), std::logic_error); // Deprecated
+//	ASSERT_FALSE(empty_list.has_loop_floyd()); // No loop in empty list
+//
+//	List<int> list_no_loop;
+//	for (int i = 0; i < 14; i++) {
+//		list_no_loop.push_back(i);
+//	}
+//	ASSERT_NO_THROW(list_no_loop.has_loop_floyd());
+//	ASSERT_FALSE(list_no_loop.has_loop_floyd());
+//
+//	List<int> list_with_loop;
+//	for (int i = 0; i < 14; i++) {
+//		list_with_loop.push_back(i);
+//	}
+//	list_with_loop.create_loop(5); 
+//	ASSERT_NO_THROW(list_with_loop.has_loop_floyd());
+//	ASSERT_TRUE(list_with_loop.has_loop_floyd());
+//}
+//
+//TEST(ListIteratorCycleTest, test_pointer_reversal_loop) {
+//	List<int> empty_list;
+//	ASSERT_FALSE(empty_list.has_loop_pointer_reversal());
+//
+//	List<int> list_no_loop;
+//	for (int i = 0; i < 14; i++) {
+//		list_no_loop.push_back(i);
+//	}
+//
+//	List<int> list_no_loop_copy = list_no_loop; //  опи€ дл€ сохранени€ оригинального состо€ни€
+//	ASSERT_FALSE(list_no_loop_copy.has_loop_pointer_reversal());
+//
+//	List<int> list_with_loop;
+//	for (int i = 0; i < 14; i++) {
+//		list_with_loop.push_back(i);
+//	}
+//	list_with_loop.create_loop(5);
+//
+//	List<int> list_with_loop_copy = list_with_loop; //  опи€ дл€ сохранени€ оригинального состо€ни€
+//	ASSERT_TRUE(list_with_loop_copy.has_loop_pointer_reversal());
+//}
+//
+//TEST(ListFindLoopTest, test_find_loop) {
+//
+//	List<int> empty_list;
+//	// ASSERT_THROW(empty_list.find_loop(empty_list), std::logic_error); // Deprecated
+//	ASSERT_EQ(empty_list.find_loop(), static_cast<Node<int>*>(nullptr)); // No loop in empty list
+//
+//	List<int> list_no_loop;
+//	for (int i = 0; i < 10; i++) {
+//		list_no_loop.push_back(i);
+//	}
+//	ASSERT_EQ(list_no_loop.find_loop(), static_cast<Node<int>*>(nullptr));
+//
+//	List<int> list_with_loop;
+//	for (int i = 0; i < 10; i++) {
+//		list_with_loop.push_back(i);
+//	}
+//	list_with_loop.create_loop(5);
+//	Node<int>* loop_start_node = list_with_loop.find_loop();
+//	ASSERT_NE(loop_start_node, static_cast<Node<int>*>(nullptr));
+//	ASSERT_EQ(loop_start_node->value, 5);
+//
+//	List<int> list_loop_at_head;
+//	list_loop_at_head.push_back(1);
+//	list_loop_at_head.push_back(2);
+//	list_loop_at_head.create_loop(0);
+//	Node<int>* loop_head_node = list_loop_at_head.find_loop();
+//	ASSERT_NE(loop_head_node, static_cast<Node<int>*>(nullptr));
+//	ASSERT_EQ(loop_head_node->value, 1);
+//}
+//
+//TEST(ListHashSetLoopTest, test_has_loop_using_set) {
+//	List<int> empty_list;
+//	ASSERT_FALSE(empty_list.has_loop_using_set());
+//
+//	List<int> list_no_loop;
+//	for (int i = 0; i < 14; i++) {
+//		list_no_loop.push_back(i);
+//	}
+//	ASSERT_FALSE(list_no_loop.has_loop_using_set());
+//
+//	List<int> list_with_loop;
+//	for (int i = 0; i < 14; i++) {
+//		list_with_loop.push_back(i);
+//	}
+//	list_with_loop.create_loop(5);
+//	ASSERT_TRUE(list_with_loop.has_loop_using_set());
+//}

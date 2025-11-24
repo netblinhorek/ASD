@@ -34,6 +34,6 @@ public:
 	}
 
 	size_t size() const {
-		return _list.size();
+		return _list.count();
 	}
 };

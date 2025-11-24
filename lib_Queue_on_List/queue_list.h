@@ -34,14 +34,14 @@ public:
 	}
 
 	size_t size_queue() const {
-		return _list.size();
+		return _list.count();
 	}
 
 	Node<T>* head() const {
 		if (_list.is_empty()) {
 			return nullptr;
 		}
-		return _list.get_head();
+		return _list.head();
 	}
 
 	Node<T>* tail() const {
