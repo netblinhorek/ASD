@@ -209,12 +209,12 @@ TEST(TestLocalMinimum, test_find_smallest_neighbor_function) {
     matrix[2][2] = 9;
 
     size_t row = 1, col = 1;
-    find_smallest_neighbor(matrix, row, col);
+    find_small_neighbor(matrix, row, col);
     ASSERT_EQ(matrix[row][col], 1); 
 
 
     row = 0; col = 0;
-    find_smallest_neighbor(matrix, row, col);
+    find_small_neighbor(matrix, row, col);
     ASSERT_EQ(matrix[row][col], 1); 
 }
 TEST(TestLocalMinimum, test_find_two_min_local) {

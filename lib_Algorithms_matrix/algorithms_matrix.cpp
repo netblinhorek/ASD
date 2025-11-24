@@ -2,7 +2,7 @@
 
 
 template <typename T>
-void find_smallest_neighbor(const Matrix<T>& matrix, size_t& row,
+void find_small_neighbor(const Matrix<T>& matrix, size_t& row,
     size_t& col) {
     T current = matrix[row][col];
     T min_neighbor = current;
@@ -70,7 +70,7 @@ bool find_local_minimum(const Matrix<T>& matrix, size_t& row,
         }
 
         size_t old_row = row, old_col = col;
-        find_smallest_neighbor(matrix, row, col);
+        find_small_neighbor(matrix, row, col);
 
         if (row == old_row && col == old_col) {
             break;
