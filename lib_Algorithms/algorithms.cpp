@@ -71,7 +71,7 @@ void algorithms_read_expression(const std::string& str) {
                 expect_operand = false;
             }
             else {
-                throw std::logic_error("Expected operand but found: " + std::string(1, c));
+                throw std::logic_error("Expected operand");
             }
         }
         else {
@@ -79,7 +79,7 @@ void algorithms_read_expression(const std::string& str) {
                 expect_operand = true;
             }
             else {
-                throw std::logic_error("Expected operator but found: " + std::string(1, c));
+                throw std::logic_error("Expected operator");
             }
         }
     }
