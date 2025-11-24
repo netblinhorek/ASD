@@ -2,7 +2,7 @@
 #include <cmath>
 
 class Point {
-private:
+protected:
     float x;
     float y;
 

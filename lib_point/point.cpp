@@ -28,9 +28,7 @@ float Point::distance_to(const Point& other) const {
 }
 
 bool Point::operator==(const Point& other) const {
-    const float EPSILON = 0.000001f;
-    return (std::abs(x - other.x) < EPSILON) &&
-        (std::abs(y - other.y) < EPSILON);
+    return x == other.x && y == other.y;
 }
 
 bool Point::operator!=(const Point& other) const {

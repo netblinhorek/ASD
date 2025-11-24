@@ -23,12 +23,11 @@ public:
     void set_radius(float radius);
 
     float calculate_distance_from_origin() const;
-    float volume() const;
-    float surface_area() const;
+    float distance_to(const Sphere& other) const;
+   
 
     bool operator==(const Sphere& other) const;
     bool operator!=(const Sphere& other) const;
 };
-template<typename Sphere>
-std::string get_spheres_relation(const Sphere& s1, const Sphere& s2);
-template std::string get_spheres_relation<Sphere>(const Sphere&, const Sphere&);
+
+

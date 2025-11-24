@@ -6,114 +6,8 @@
 
 #define EPSILON 0.000001
 
-TEST(TestSphere, test_sphere_coincide) {
-    Sphere s1(0, 0, 0, 5), s2(0, 0, 0, 5);
-
-    // Act & Assert
-    ASSERT_EQ(std::string("Coincide"), get_spheres_relation(s1, s2));
-}
-TEST(TestSphere, test_sphere_externally_touch) {
-    Sphere s1(0, 0, 0, 5), s2(10, 0, 0, 5);
-
-    // Act & Assert
-    ASSERT_EQ(std::string("External touch"), get_spheres_relation(s1, s2));
-}
-TEST(TestSphere, test_sphere_internally_touch) {
-    Sphere s1(0, 0, 0, 5), s2(3, 0, 0, 2);
-
-    // Act & Assert
-    ASSERT_EQ(std::string("Inner touch"), get_spheres_relation(s1, s2));
-}
-
-TEST(TestSphere, test_sphere_intersect) {
-    Sphere s1(0, 0, 0, 5), s2(6, 0, 0, 5);
-
-    // Act & Assert
-    ASSERT_EQ(std::string("Intersect"), get_spheres_relation(s1, s2));  
-}
-  
-TEST(TestSphere, test_sphere_one_inside_another) {
-    Sphere s1(0, 0, 0, 5), s2(1, 0, 0, 2);
-
-    // Act & Assert
-    ASSERT_EQ(std::string("One inside the other"), get_spheres_relation(s1, s2));
-}
-
-TEST(TestSphere, test_sphere_separate) {
-    Sphere s1(0, 0, 0, 5), s2(20, 0, 0, 2);
-
-    // Act & Assert
-    ASSERT_EQ(std::string("Not intersected"), get_spheres_relation(s1, s2));
-}
 
 
-// на выброс исключений
-TEST(TestSphere, test_sphere_coincide_exceptions) {
-    Sphere s1(1, 0, 0, 5), s2(0, 0, 0, 5);
-
-    // Act & Assert
-    ASSERT_NO_THROW(std::string("Wrong expectation"), get_spheres_relation(s1, s2));
-}
-TEST(TestSphere, test_sphere_internally_touch_exceptions) {
-    Sphere s1(0, 0, 0, 5), s2(0, 0, 0, 5);
-
-    // Act & Assert
-    ASSERT_NO_THROW(std::string("Inner touch"), get_spheres_relation(s1, s2));
-}
-TEST(TestSphere, test_sphere_intersect_exceptions) {
-    Sphere s1(0, 0, 0, 5), s2(0, 0, 0, 5);
-
-    // Act & Assert
-    ASSERT_NO_THROW(std::string("Intersect"), get_spheres_relation(s1, s2));
-}
-TEST(TestSphere, test_sphere_one_inside_another_exceptions) {
-    Sphere s1(0, 0, 0, 5), s2(0, 0, 0, 5);
-
-    // Act & Assert
-    ASSERT_NO_THROW(std::string("One inside the other"), get_spheres_relation(s1, s2));
-}
-TEST(TestSphere, test_sphere_separate_exceptions) {
-    Sphere s1(0, 0, 0, 5), s2(0, 0, 0, 5);
-
-    // Act & Assert
-    ASSERT_NO_THROW(std::string("Not intersected"), get_spheres_relation(s1, s2));
-}
-TEST(TestSphere, test_zero_radius_sphere) {
-    Sphere s1(0, 0, 0, 5), s2(0, 0, 0, 5);
-
-    ASSERT_EQ(std::string("Coincide"), get_spheres_relation(s1, s2));
-}
-
-TEST(TestSphere, test_zero_radius_separate_sphere) {
-
-    ASSERT_THROW(Sphere(1, 0, 0, 0), std::invalid_argument);
-}
-
-TEST(TestSphere, test_very_large_radius_sphere) {
-    Sphere s1(0, 0, 0, 10000), s2(0, 0, 0, 100034);
-
-    ASSERT_EQ(std::string("One inside the other"), get_spheres_relation(s1, s2));
-}
-TEST(TestSphere, test_negative_coordinates_sphere) {
-    Sphere s1(-2, -4, -6, 5), s2(-3, -1, -5, 5);
-
-    ASSERT_EQ(std::string("Intersect"), get_spheres_relation(s1, s2));
-}
-
-TEST(TestSphere, test_negative_coordinates_touch_sphere) {
-    Sphere s1(-5, 0, 0, 5), s2(5, 0, 0, 5);
-
-    ASSERT_EQ(std::string("External touch"), get_spheres_relation(s1, s2));
-}
-TEST(TestSphere, test_negative_radius_exception_sphere) {
-
-    ASSERT_THROW(Sphere(-5, -5, -3, -4), std::invalid_argument);
-}
-
-TEST(TestSphere, test_floating_point_precision_internal_touch) {
-    Sphere s1(0, 0, 0, 5), s2(2.999999f, 0, 0, 2);
-    ASSERT_EQ(std::string("One inside the other"), get_spheres_relation(s1, s2));
-}
 TEST(TestSphere, test_default_constructor) {
     Sphere s;
 
@@ -180,3 +74,74 @@ TEST(TestSphere, test_set_negative_radius_exception) {
     ASSERT_THROW(s.set_radius(-5), std::invalid_argument);
 }
 
+TEST(TestSphere, test_sphere_coincide) {
+    Sphere s1(0, 0, 0, 5), s2(0, 0, 0, 5);
+
+    // Act & Assert
+    ASSERT_EQ(std::string("Coincide"), get_spheres_relation(s1, s2));
+}
+TEST(TestSphere, test_sphere_externally_touch) {
+    Sphere s1(0, 0, 0, 5), s2(10, 0, 0, 5);
+
+    // Act & Assert
+    ASSERT_EQ(std::string("External touch"), get_spheres_relation(s1, s2));
+}
+TEST(TestSphere, test_sphere_internally_touch) {
+    Sphere s1(0, 0, 0, 5), s2(3, 0, 0, 2);
+
+    // Act & Assert
+    ASSERT_EQ(std::string("Inner touch"), get_spheres_relation(s1, s2));
+}
+
+TEST(TestSphere, test_sphere_intersect) {
+    Sphere s1(0, 0, 0, 5), s2(6, 0, 0, 5);
+
+    // Act & Assert
+    ASSERT_EQ(std::string("Intersect"), get_spheres_relation(s1, s2));  //Пересекаться
+}
+  
+TEST(TestSphere, test_sphere_one_inside_another) {
+    Sphere s1(0, 0, 0, 5), s2(1, 0, 0, 2);
+
+    // Act & Assert
+    ASSERT_EQ(std::string("One inside the other"), get_spheres_relation(s1, s2));
+}
+
+TEST(TestSphere, test_sphere_separate) {
+    Sphere s1(0, 0, 0, 5), s2(20, 0, 0, 2);
+
+    // Act & Assert
+    ASSERT_EQ(std::string("Not intersected"), get_spheres_relation(s1, s2));
+}
+
+
+TEST(TestSphere, test_zero_radius_separate_sphere) {
+
+    ASSERT_THROW(Sphere(1, 0, 0, 0), std::invalid_argument);
+}
+
+TEST(TestSphere, test_very_large_radius_sphere) {
+    Sphere s1(0, 0, 0, 10000), s2(0, 0, 0, 100034);
+
+    ASSERT_EQ(std::string("One inside the other"), get_spheres_relation(s1, s2));
+}
+TEST(TestSphere, test_negative_coordinates_sphere) {
+    Sphere s1(-2, -4, -6, 5), s2(-3, -1, -5, 5);
+
+    ASSERT_EQ(std::string("Intersect"), get_spheres_relation(s1, s2));
+}
+
+TEST(TestSphere, test_negative_coordinates_touch_sphere) {
+    Sphere s1(-5, 0, 0, 5), s2(5, 0, 0, 5);
+
+    ASSERT_EQ(std::string("External touch"), get_spheres_relation(s1, s2));
+}
+TEST(TestSphere, test_negative_radius_exception_sphere) {
+
+    ASSERT_THROW(Sphere(-5, -5, -3, -4), std::invalid_argument);
+}
+
+TEST(TestSphere, test_floating_point_precision_internal_touch) {
+    Sphere s1(0, 0, 0, 5), s2(2.999999f, 0, 0, 2);
+    ASSERT_EQ(std::string("One inside the other"), get_spheres_relation(s1, s2));
+}

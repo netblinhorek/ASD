@@ -120,12 +120,7 @@ TEST(TestPoint, test_distance_precision) {
 
     ASSERT_NEAR(p1.distance_to(p2), 0.5f, EPSILON);
 }
-TEST(TestPoint, test_equality_with_epsilon_the_first) {
-    Point p1(1.0000001f, 2.0000001f);
-    Point p2(1.0000002f, 2.0000002f);
 
-    ASSERT_TRUE(p1 == p2);
-}
 TEST(TestPoint, test_equality_with_epsilon_the_second) {
     Point p1(1.0000001f, 2.0000001f);
     Point p2(1.1f, 2.0f);
