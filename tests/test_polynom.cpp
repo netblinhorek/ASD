@@ -1,50 +1,79 @@
-//// Copyright 2024 Marina Usova
+#include <gtest/gtest.h>
+#include "../lib_Polynom/polynom.h"
+#include "../lib_Monom/monom.h"
+
+#define EPSILON 0.000001
+
+TEST(TestPolynom, test_polynom_default_constructor) {
+    Polynom polynom;
+
+    auto it = polynom.begin();  
+    
+    Monom first_monom = *it;
+    ASSERT_DOUBLE_EQ(first_monom.get_coeff(), 0.0);
+    for (int i = 0; i < VARS_COUNT; ++i) {
+        ASSERT_EQ(first_monom.get_power(i), 0);
+    }
+}
+TEST(TestPolynom, test_polynom_copy_constructor) {
+    Polynom polynom;
+
+    auto it = polynom.begin();
+
+    Monom first_monom = *it;
+    ASSERT_DOUBLE_EQ(first_monom.get_coeff(), 0.0);
+    for (int i = 0; i < VARS_COUNT; ++i) {
+        ASSERT_EQ(first_monom.get_power(i), 0);
+    }
+}
+//TEST(TestPolynom, test_polynom_parsing) {
 //
-//#include <gtest/gtest.h>
-//#include "../lib_easy_example/easy_example.h"
-//
-//#define EPSILON 0.000001
-//
-//TEST(TestEasyExampleLib, can_div) {
-//  // Arrange
-//  int x = 10;
-//  int y = 2;
-//
-//  // Act & Assert
-//  ASSERT_NO_THROW(division(x, y));
 //}
-//
-//TEST(TestEasyExampleLib, can_div_correctly) {
-//    // Arrange
-//    int x = 6;
-//    int y = 2;
-//
-//    // Act
-//    int actual_result = division(x, y);
-//
-//    // Assert
-//    int expected_result = 3;
-//    EXPECT_EQ(expected_result, actual_result);
-//}
-//
-//TEST(TestEasyExampleLib, can_div_correctly_with_remainder) {
-//    // Arrange
-//    int x = 5;
-//    int y = 4;
-//
-//    // Act
-//    float actual_result = division(x, y);
-//
-//    // Assert
-//    float expected_result = 1.25;
-//    EXPECT_NEAR(expected_result, actual_result, EPSILON);
-//}
-//
-//TEST(TestEasyExampleLib, throw_when_try_div_by_zero) {
-//  // Arrange
-//  int x = 10;
-//  int y = 0;
-//
-//  // Act & Assert
-//  ASSERT_ANY_THROW(division(x, y));
-//}
+
+TEST(TestPolynom, test_polynom_operator_add) {
+    Polynom p1("x^2 + 2y");
+    Polynom p2("3x^2 - y + 5");
+    Polynom expected_result("4x^2 + y + 5"); 
+    Polynom actual_result = p1 + p2;
+
+    ASSERT_EQ(actual_result, expected_result); 
+}
+TEST(TestPolynom, test_polynom_operator_sub) {
+    Polynom p1("x^2 + 2y^3 + 4z^2");
+    Polynom p2("2x^2 + 3y^3 - z^2");
+    Polynom expected_result("-x^2 - y^3 + 5z^2");
+    Polynom actual_result = p1 - p2;
+
+    ASSERT_EQ(actual_result, expected_result);
+
+}
+////TEST(TestPolynom, test_polynom_operator_mult) {
+////
+////    Polynom p1("x^2 + 2y^3");
+////
+////    Polynom p2("2x^2 + 3y^3 - z^2");
+////
+////    Polynom expected_result("2x^4 + 7x^2y^3 + 6y^6 - x^2z^2 - 2y^3z^2");
+////
+////    Polynom actual_result = p1 * p2;
+////
+////
+////
+////}
+TEST(TestPolynom, test_polynom_operator_div) {
+    Polynom p1("4x^3y^2 + 6x^2y^4");
+    Monom m("2xy^2");
+    Polynom expected_result("2x^2 + 3xy^2");
+    Polynom actual_result = p1 / m;
+
+    ASSERT_EQ(actual_result, expected_result);
+
+    Polynom p2("x + y");
+    Polynom p3("x + 1");
+    ASSERT_THROW(p2 / p3, std::invalid_argument);
+
+    Polynom p4("x");
+    Monom zero_monom(0.0);
+    Polynom p5(zero_monom);
+    ASSERT_THROW(p4 / p5, std::invalid_argument);
+}
