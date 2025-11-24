@@ -41,7 +41,7 @@ public:
 		if (_list.is_empty()) {
 			return nullptr;
 		}
-		return _list.getHead();
+		return _list.get_head();
 	}
 
 	Node<T>* tail() const {

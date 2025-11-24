@@ -1,6 +1,7 @@
 #pragma once 
 #include <iostream>
 #include <algorithm> 
+#include <unordered_set>
 
 
 template <typename T>
@@ -20,6 +21,7 @@ private:
 	Node<T>* _tail;
 	size_t _count;
 
+	void remove_loop(); 
 public:
 	List();
 	~List();
@@ -55,7 +57,7 @@ public:
 		}
 
 		bool operator!=(const Iterator& other) const {
-			return _current != other._current;
+			return !(_current == other._current);
 		}
 
 		bool operator==(const Iterator& other) const {
@@ -76,19 +78,7 @@ public:
 			return _current->value;
 		}
 
-		T* operator->() {
-			if (_current == nullptr) {
-				throw std::invalid_argument("The end list");
-			}
-			return &(_current->value);
-		}
-
-		const T* operator->() const {
-			if (_current == nullptr) {
-				throw std::invalid_argument("The end list");
-			}
-			return &(_current->value);
-		}
+		
 	};
 	Iterator begin() const {
 		return Iterator(_head);
@@ -98,8 +88,8 @@ public:
 		return Iterator(nullptr);
 	}
 	
-	Node<T>* getHead() const { return _head; }
-	size_t getCount() const { return _count; }
+	Node<T>* get_head() const { return _head; }
+	size_t get_count() const { return _count; }
 	
 	void push_front(const T& value)noexcept;
 	void push_back(const T& value)noexcept;
@@ -111,9 +101,12 @@ public:
 	void erase(Node<T>* node);
 	bool is_empty() const { return _head == nullptr; }
 	size_t size() const { return _count; }
-	bool is_looped_the_first(const List<T>& list) const;
-	bool is_looped_the_second(const List<T>& list) const;
-	Node<T>* find_loop(const List<T>& list) const;
+	
+	bool has_loop_floyd() const;
+	bool has_loop_pointer_reversal();
+	bool has_loop_using_set() const;
+
+	Node<T>* find_loop() const; 
 	void create_loop(int pos);
 
 	Node<T>* get_node(size_t index) const {
@@ -128,6 +121,7 @@ public:
 };
 
 
+
 template<typename T>
 List<T>::List()
 {
@@ -139,31 +133,7 @@ List<T>::List()
 template<typename T>
  List<T>::~List()
 {
-	 if (_head == nullptr) {
-		 return;
-	 }
-
-	 Node<T>* slow = _head;
-	 Node<T>* fast = _head;
-	 Node<T>* loop_start = nullptr;
-
-	 while (fast != nullptr && fast->next != nullptr) {
-		 slow = slow->next;
-		 fast = fast->next->next;
-		 if (slow == fast) {
-			 loop_start = _head;
-			 while (loop_start != slow) {
-				 loop_start = loop_start->next;
-				 slow = slow->next;
-			 }
-			 Node<T>* breaker = loop_start;
-			 while (breaker->next != loop_start) {
-				 breaker = breaker->next;
-			 }
-			 breaker->next = nullptr;
-			 break; 
-		 }
-	 }
+     remove_loop(); 
 
 	 Node<T>* current = _head;
 	 while (current != nullptr) {
@@ -180,30 +150,11 @@ template<typename T>
 	 if (other.is_empty()) {
 		 return;
 	 }
-	 const Node<T>* slow = other.getHead();
-	 const Node<T>* fast = other.getHead();
 
-	 const Node<T>* loop_start = nullptr; 
-	 bool has_loop = false;
-
-	 while (fast != nullptr && fast->next != nullptr) {
-		 slow = slow->next;
-		 fast = fast->next->next;
-
-		 if (slow == fast) {
-			 has_loop = true;
-			 slow = other.getHead();
-			 while (slow != fast) {
-				 slow = slow->next;
-				 fast = fast->next;
-			 }
-			 loop_start = slow; 
-			 break;
-		 }
-	 }
-
-	 const Node<T>* current_other = other.getHead();
+	 const Node<T>* loop_start_other = other.find_loop(); 
 	 Node<T>* copied_loop_start = nullptr;
+
+	 const Node<T>* current_other = other.get_head();
 
 	 while (current_other != nullptr) {
 		 Node<T>* new_node = new Node<T>(current_other->value);
@@ -217,14 +168,13 @@ template<typename T>
 			 _tail = new_node;
 		 }
 
-		 if (has_loop && current_other == loop_start) {
+		 if (current_other == loop_start_other) {
 			 copied_loop_start = new_node;
 		 }
 
 		 _count++;
 		 current_other = current_other->next;
-
-		 if (has_loop && current_other == loop_start) {
+		 if (current_other == loop_start_other && loop_start_other != nullptr) {
 			 _tail->next = copied_loop_start;
 			 break;
 		 }
@@ -242,14 +192,10 @@ template<typename T>
 
  template<typename T>
   Node<T>* List<T>::head() const{
-	 try {
-		 if (_head == nullptr) {
+	 if (_head == nullptr) {
 			 return nullptr;
 		 }
 		 return _head;
-	 } catch (const std::exception& e) {
-		 throw; 
-	 }
  }
 
  template<typename T>
@@ -412,7 +358,34 @@ void List<T>::erase(Node<T>* node)
 	delete node;
 	_count--;
 }
+template<typename T>
+void List<T>::remove_loop() {
+    if (_head == nullptr) {
+        return;
+    }
 
+    Node<T>* slow = _head;
+    Node<T>* fast = _head;
+    Node<T>* loop_start = nullptr;
+
+    while (fast != nullptr && fast->next != nullptr) {
+        slow = slow->next;
+        fast = fast->next->next;
+        if (slow == fast) {
+            loop_start = _head;
+            while (loop_start != slow) {
+                loop_start = loop_start->next;
+                slow = slow->next;
+            }
+            Node<T>* breaker = loop_start;
+            while (breaker->next != loop_start) {
+                breaker = breaker->next;
+            }
+            breaker->next = nullptr; 
+            return;
+        }
+    }
+}
 template<typename T>
 void List<T>::create_loop(int pos) {
 	if (pos < 0 || pos >= _count) return;
@@ -435,12 +408,13 @@ void List<T>::create_loop(int pos) {
 }
 
 template<typename T>
-bool List<T>::is_looped_the_first(const List<T>& list) const {
-	if (list.is_empty())
-		throw std::logic_error("Cannot check for loop in empty list");
+bool List<T>::has_loop_floyd() const {
+	if (is_empty()) {
+		return false; 
+	}
 
-	Node<T>* slow = list.getHead();
-	Node<T>* fast = list.getHead();
+	Node<T>* slow = _head;
+	Node<T>* fast = _head;
 
 	while (fast != nullptr && fast->next != nullptr) {
 		slow = slow->next;
@@ -455,30 +429,77 @@ bool List<T>::is_looped_the_first(const List<T>& list) const {
 }
 
 template<typename T>
-bool List<T>::is_looped_the_second(const List<T>& list) const {
-	if (list.is_empty())
-		throw std::logic_error("Cannot check for loop in empty list");
+bool List<T>::has_loop_pointer_reversal() {
+	if (is_empty() || _head->next == nullptr) {
+		return false;
+	}
 
-	Node<T>* slow = list.getHead();
-	Node<T>* fast = list.getHead();
+	Node<T>* prev = nullptr;
+	Node<T>* current = _head;
+	Node<T>* next_node = nullptr;
 
-	while (fast != nullptr && fast->next != nullptr) {
-		slow = slow->next;
-		fast = fast->next->next;
-
-		if (slow == fast) {
-			return true; 
+	while (current != nullptr) {
+		next_node = current->next;
+		current->next = prev;
+		prev = current;
+		current = next_node;
+		if (current == _head) {
+			Node<T>* temp_head = _head;
+			_head = prev;
+			prev = nullptr;
+			current = _head;
+			while (current != nullptr) {
+				next_node = current->next;
+				current->next = prev;
+				prev = current;
+				current = next_node;
+			}
+			_head = prev; 
+			return true;
 		}
 	}
-	return false; 
+    Node<T>* temp_head = _head;
+    _head = prev;
+    prev = nullptr;
+    current = _head;
+    while (current != nullptr) {
+        next_node = current->next;
+        current->next = prev;
+        prev = current;
+        current = next_node;
+    }
+    _head = prev;
+    return false;
 }
-template<typename T>
-Node<T>* List<T>::find_loop(const List<T>& list) const {
-	if (list.is_empty())
-		throw std::logic_error("Cannot check for loop in empty list");
 
-	Node<T>* slow = list.getHead();
-	Node<T>* fast = list.getHead();
+template<typename T>
+bool List<T>::has_loop_using_set() const {
+	if (is_empty()) {
+		return false;
+	}
+
+	std::unordered_set<Node<T>*> visited_nodes;
+	Node<T>* current = _head;
+
+	while (current != nullptr) {
+		if (visited_nodes.count(current)) {
+			return true;
+		}
+		visited_nodes.insert(current);
+		current = current->next;
+	}
+
+	return false;
+}
+
+template<typename T>
+Node<T>* List<T>::find_loop() const {
+	if (is_empty()) {
+		return nullptr; 
+	}
+
+	Node<T>* slow = _head;
+	Node<T>* fast = _head;
 
 	while (fast != nullptr && fast->next != nullptr) {
 		slow = slow->next;
@@ -493,11 +514,11 @@ Node<T>* List<T>::find_loop(const List<T>& list) const {
 		return nullptr;
 	}
 
-	slow = list.getHead();
+	slow = _head;
 	while (slow != fast) {
 		slow = slow->next;
 		fast = fast->next;
 	}
 
-	return slow; 
+	return slow;
 }
