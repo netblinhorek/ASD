@@ -1,5 +1,3 @@
-// Copyright 2024 Marina Usova
-
 #include <gtest/gtest.h>
 #include "../lib_DSU/DSU.h"
 
@@ -54,6 +52,32 @@ TEST(TestDSU, test_DSU_repeated_union) {
     ASSERT_NO_THROW(dsu.union_set(1, 0)); 
 
     ASSERT_EQ(dsu.find(0), dsu.find(1));
+}
+
+TEST(TestDSU, test_DSU_rank) {
+    DSU dsu(7);
+
+    for (int i = 0; i < 7; ++i) {
+        ASSERT_EQ(dsu.get_rank(i), 0);
+    }
+
+    dsu.union_set(0, 1);
+    ASSERT_EQ(dsu.get_rank(dsu.find(0)), 1); 
+
+    dsu.union_set(2, 3);
+    dsu.union_set(4, 5);
+
+    ASSERT_EQ(dsu.get_rank(dsu.find(2)), 1);
+    ASSERT_EQ(dsu.get_rank(dsu.find(4)), 1);
+
+    dsu.union_set(0, 2);
+    ASSERT_EQ(dsu.get_rank(dsu.find(0)), 2);
+
+    dsu.union_set(0, 6);
+    ASSERT_EQ(dsu.get_rank(dsu.find(0)), 2);
+
+    ASSERT_THROW(dsu.get_rank(-1), std::logic_error);
+    ASSERT_THROW(dsu.get_rank(7), std::logic_error);
 }
 
 TEST(TestDSU, test_DSU_negative_indices) {
