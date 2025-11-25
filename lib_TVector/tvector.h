@@ -988,7 +988,7 @@ int* find_elems(const TVector<T>& vec, const T& value) {
         return result;
     }
 
-    int* result = new int[size + 1]; // Corrected: Allocate size + 1 for sentinel
+    int* result = new int[size + 1]; 
     int index = 0;
 
     for (int i = 0, j = 0; i < vec._capacity; i++) {
@@ -999,7 +999,7 @@ int* find_elems(const TVector<T>& vec, const T& value) {
             index++;
         }
     }
-    result[size] = -1; // Added: Add sentinel value
+    result[size] = -1; 
 
     return result;
 }
