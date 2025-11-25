@@ -26,7 +26,7 @@ TEST(TestList, test_list_insert_at) {
 	list.push_back(2);
 	list.push_back(1);
 	list.pop_front();
-	list.insert(static_cast<size_t>(0), 43); // явное приведение 0 к size_t
+	list.insert(static_cast<size_t>(0), 43);
 	EXPECT_FALSE(list.is_empty());
 	EXPECT_EQ(list.head()->value, 43);
 	EXPECT_EQ(list.tail()->value, 1);
@@ -38,7 +38,7 @@ TEST(TestList, test_insert_after_middle) {
 	list.push_back(4);
 
 	Node<int>* first_node = list.head(); 
-	list.insert(first_node, 3); // «аменено insert_after на insert
+	list.insert(first_node, 3);
 
 	EXPECT_EQ(list.head()->value, 1);
 	EXPECT_EQ(list.head()->next->value, 3);
