@@ -58,6 +58,17 @@ TEST(TestPoint, test_distance_to) {
     ASSERT_NEAR(distance, 5.0f, EPSILON);
 }
 
+TEST(TestPoint, test_distance_to_the_second) {
+    // Arrange
+    Point p1(0.0f, 0.0f);
+    Point p2(1.0f, 4.0f);
+
+    // Act
+    float distance = p1.distance_to(p2);
+
+    // Assert
+    ASSERT_NEAR(distance, sqrt(17.0f), EPSILON);
+}
 TEST(TestPoint, test_distance_to_same_point) {
     // Arrange
     Point p1(2.0f, 3.0f);
