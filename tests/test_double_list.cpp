@@ -90,6 +90,9 @@ TEST(TestDoubleList, test_double_list_pop_front) {
 
     double_list.pop_front();
     double_list.pop_front();
+    EXPECT_TRUE(double_list.is_empty());
+    EXPECT_EQ(double_list.head(), nullptr);
+    EXPECT_EQ(double_list.tail(), nullptr);
     EXPECT_THROW(double_list.pop_front(), std::logic_error);
 }
 
@@ -128,6 +131,9 @@ TEST(TestDoubleList, test_double_list_pop_back) {
 
     double_list.pop_back();
     double_list.pop_back();
+    EXPECT_TRUE(double_list.is_empty());
+    EXPECT_EQ(double_list.head(), nullptr);
+    EXPECT_EQ(double_list.tail(), nullptr);
     EXPECT_THROW(double_list.pop_back(), std::logic_error);
 }
 
@@ -302,43 +308,56 @@ TEST(DoubleListIterator, test_double_list_empty_throws_iterator) {
     EXPECT_THROW(++it2, std::invalid_argument);
 }
 
-TEST(DoubleListIterator, test_double_list_write_iteration) {
+TEST(DoubleListIterator, test_double_list_postfix_decrement_iteration) {
     Double_List<int> list;
     list.push_back(1);
     list.push_back(2);
     list.push_back(3);
 
-    Double_List<int>::Iterator it = list.begin();
-    ++it; ++it; 
-    EXPECT_EQ(*it, 3);
-
-    --it; 
-    EXPECT_EQ(*it, 2);
-
-    it -= 1;
+    int expected = 3;
+    auto it = Double_List<int>::Iterator(list.tail());
+    for (; it != list.begin(); it--) {
+        EXPECT_EQ(*it, expected);
+        expected--;
+    }
     EXPECT_EQ(*it, 1);
 
-    EXPECT_THROW(--it, std::invalid_argument);
+    auto begin_it = list.begin();
+    EXPECT_THROW(begin_it--, std::invalid_argument);
 }
 
+TEST(DoubleListIterator, test_double_list_prefix_decrement_iteration) {
+    Double_List<int> list;
+    list.push_back(1);
+    list.push_back(2);
+    list.push_back(3);
 
+    int expected = 3;
+    auto it = Double_List<int>::Iterator(list.tail());
+    for (; it != list.begin(); --it) {
+        EXPECT_EQ(*it, expected);
+        expected--;
+    }
+    EXPECT_EQ(*it, 1);
 
-TEST(DoubleListIterator, test_double_list_read_iteration) {
+    auto begin_it = list.begin();
+    EXPECT_THROW(--begin_it, std::invalid_argument);
+}
+
+TEST(DoubleListIterator, test_double_list_minus_equal_iteration) {
     Double_List<int> list;
     list.push_back(10);
     list.push_back(20);
     list.push_back(30);
 
-    Double_List<int>::Iterator it = list.begin();
-    EXPECT_EQ(*it, 10); 
+    int expected = 30;
+    auto it = Double_List<int>::Iterator(list.tail());
+    for (; it != list.begin(); it -= 1) {
+        EXPECT_EQ(*it, expected);
+        expected -= 10;
+    }
+    EXPECT_EQ(*it, 10);
 
-    ++it;  
-    EXPECT_EQ(*it, 20);
-
-    ++it;  
-    EXPECT_EQ(*it, 30);
-
-    ++it;  
-    EXPECT_EQ(it, list.end());
+    auto begin_it = list.begin();
+    EXPECT_THROW(begin_it-=1, std::invalid_argument);
 }
-

@@ -43,16 +43,18 @@ public:
 		}
 		Iterator& operator++() {
 			if (_current == nullptr) {
-				throw std::invalid_argument("Cannot increment end iterator");
+				throw std::invalid_argument("The end list");
 			}
-			_current = _current->next;
+			else {
+				_current = _current->next;
+			}
 			return *this;
-		}
+		};
+
 		Iterator operator++(int) {
-			Iterator tmp = *this;
+			Iterator temp = *this;
 			++(*this);
-			return tmp;
-		
+			return temp;
 		}
 		Iterator& operator--() { 
 			if (_current == nullptr) {
@@ -69,16 +71,9 @@ public:
 			--(*this);
 			return tmp;
 		}
-		Iterator& operator-=(int n) {
-			if (n < 0) {
-				for (int i = 0; i < -n && _current != nullptr; ++i) {
-					_current = _current->next;
-				}
-			}
-			else {
-				for (int i = 0; i < n && _current != nullptr; ++i) {
-					_current = _current->prev;
-				}
+		Iterator& operator-=(int size) {
+			for (int i = 0; i < size; ++i) {
+				(*this)--;
 			}
 			return *this;
 		}
@@ -234,6 +229,14 @@ void Double_List<T>::pop_front() {
 		throw std::logic_error("Cannot pop from empty list");
 	}
 
+	if (_head == _tail) {
+		delete _head;
+		_head = nullptr;
+		_tail = nullptr;
+		_count = 0;
+		return;
+	}
+
 	Node<T>* to_delete = _head;
 	_head = _head->next;
 
@@ -276,6 +279,14 @@ void Double_List<T>::pop_front() {
  void Double_List<T>::pop_back() {
 	 if (is_empty()) {
 		 throw std::logic_error("Cannot pop from empty list");
+	 }
+
+	 if (_head == _tail) {
+		 delete _tail;
+		 _head = nullptr;
+		 _tail = nullptr;
+		 _count = 0;
+		 return;
 	 }
 
 	 Node<T>* to_delete = _tail;

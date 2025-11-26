@@ -17,6 +17,8 @@ class List {
   Node<T>* _head, * _tail;
   size_t _count;
 
+  void remove_loop_if_exists();
+
 public:
   List();
   List(const List<T>&);
@@ -37,6 +39,12 @@ public:
   void erase(size_t pos);
   void erase(Node <T>* node);
 
+  bool has_loop_floyd() const;
+  bool has_loop_pointer_reversal();
+  Node<T>* find_loop() const;
+  void create_loop(int pos);
+
+
   template <typename U>
   friend std::ostream& operator<<(std::ostream& os, const List<U>& list);
 
@@ -52,23 +60,26 @@ public:
     }
 
     Iterator& operator++() {
-      if (_current != nullptr) {
-        _current = _current->next;
-      }
+        if (_current == nullptr) {
+            throw std::invalid_argument("The end list");
+        }
+        else {
+            _current = _current->next;
+        }
       return *this;
     };
 
     Iterator operator++(int) {
       Iterator temp = *this;
-      (*this)++;
+      ++(*this);
       return temp;
     }
 
-    bool operator!=(const Iterator& other) {
+    bool operator!=(const Iterator& other) const {
       return (_current != other._current);
     }
 
-    bool operator==(const Iterator& other) {
+    bool operator==(const Iterator& other) const {
       return (_current == other._current);
     }
 
@@ -85,8 +96,6 @@ public:
   Iterator end() {
     return Iterator(nullptr);
   }
-
-private:
 
 };
 
@@ -116,7 +125,6 @@ void List<T>::clear() {
   while (_head != nullptr) {
     Node<T>* temp = _head;
     _head = _head->next;
-    temp->next = nullptr; 
     delete temp;
   }
   _tail = nullptr;
@@ -125,6 +133,7 @@ void List<T>::clear() {
 
 template <class T>
 List<T>::~List() {
+  remove_loop_if_exists();
   clear();
 }
 
@@ -227,9 +236,10 @@ void List<T>::pop_front() {
     delete _head;
     _head = nullptr;
     _tail = nullptr;
+    _count = 0; 
     return;
   }
-  _head = _head->next;
+  _head = _head->next; 
   _count--;
 };
 
@@ -244,6 +254,7 @@ void List<T>::pop_back() {
     delete _head;
     _head = nullptr;
     _tail = nullptr;
+    _count = 0; 
     return;
   }
   Node <T>* cur = _head;
@@ -265,6 +276,7 @@ void List<T>::erase(Node <T>* node) {
     delete _head;
     _head = nullptr;
     _tail = nullptr;
+    _count = 0; 
     return;
   }
   if (node == _head) {
@@ -279,140 +291,35 @@ void List<T>::erase(Node <T>* node) {
     throw std::invalid_argument("Position is wrong");
   }
   cur->next = node->next;
-  node->next = nullptr;
   delete node;
   _count -= 1;
 };
-
 template <class T>
-void List<T>::erase(size_t pos) {
-  if (is_empty()) {
-    throw std::invalid_argument("List is empty");
+Node<T>* List<T>::find_loop() const {
+  if (_head == nullptr || _head->next == nullptr) {
+    return nullptr;
   }
-  if (_tail == _head) {
-    delete _head;
-    _head = nullptr;
-    _tail = nullptr;
-    return;
-  }
-  Node <T>* cur = _head;
-  size_t cur_pos = 0;
-  while (cur_pos < pos && cur != nullptr) {
-    cur_pos++;
-    cur = cur->next;
-  }
-  if (cur == nullptr) {
-    throw std::invalid_argument("Position is wrong");
-  }
-  erase(cur);
-};
+  Node<T>* slow = _head;
+  Node<T>* fast = _head;
+  while (fast != nullptr && fast->next != nullptr) {
+    slow = slow->next;
+    fast = fast->next->next;
+    if (slow == fast) {
+      break; 
+    }
 
-//template <class T>
-//bool List<T>::has_loop_floyd() const {
-//  if (_head == nullptr || _head->next == nullptr) {
-//    return false;
-//  }
-//  Node<T>* slow = _head;
-//  Node<T>* fast = _head->next;
-//  while (fast != nullptr && fast->next != nullptr) {
-//    if (slow == fast) {
-//      return true;
-//    }
-//    slow = slow->next;
-//    fast = fast->next->next;
-//  }
-//  return false;
-//}
-//
-//template <class T>
-//bool List<T>::has_loop_pointer_reversal() {
-//    if (_head == nullptr)
-//        return false;
-//
-//    Node<T>* original_head = _head;
-//    Node<T>* prev = nullptr;
-//    Node<T>* current = _head;
-//    Node<T>* next = nullptr;
-//    bool has_loop = false;
-//
-//    while (current != nullptr) {
-//        next = current->next;
-//        current->next = prev;
-//        prev = current;
-//        current = next;
-//
-//        if (current == original_head) {
-//            has_loop = true;
-//            break;
-//        }
-//    }
-//
-//    current = prev;
-//    prev = nullptr;
-//    while (current != nullptr) {
-//        next = current->next;
-//        current->next = prev;
-//        prev = current;
-//        current = next;
-//    }
-//    _head = prev;
-//
-//    if (_head == nullptr) {
-//        _tail = nullptr;
-//    }
-//    else {
-//        Node<T>* temp = _head;
-//        while (temp->next != nullptr) {
-//            temp = temp->next;
-//        }
-//        _tail = temp;
-//    }
-//
-//    return has_loop;
-//}
-//
-//
-//template <class T>
-//Node<T>* List<T>::find_loop() const {
-//  if (_head == nullptr || _head->next == nullptr) {
-//    return nullptr;
-//  }
-//  Node<T>* slow = _head;
-//  Node<T>* fast = _head;
-//  while (fast != nullptr && fast->next != nullptr) {
-//    slow = slow->next;
-//    fast = fast->next->next;
-//    if (slow == fast) {
-//      break; 
-//    }
-//
-//  }
-//  if (slow != fast) {
-//    return nullptr;
-//  }
-//  slow = _head;
-//  while (slow != fast) {
-//    slow = slow->next;
-//    fast = fast->next;
-//  }
-//  return slow; 
-//}
-//
-//template <class T>
-//void List<T>::create_loop(int pos) {
-//  if (pos < 0 || pos >= _count) {
-//    throw std::invalid_argument("Invalid position for creating loop");
-//  }
-//  if (_head == nullptr) {
-//    throw std::logic_error("Cannot create loop in an empty list");
-//  }
-//  Node<T>* loop_start_node = _head;
-//  for (int i = 0; i < pos; ++i) {
-//    loop_start_node = loop_start_node->next;
-//  }
-//  _tail->next = loop_start_node;
-//}
-//
+  }
+  if (slow != fast) {
+    return nullptr;
+  }
+  slow = _head;
+  while (slow != fast) {
+    slow = slow->next;
+    fast = fast->next;
+  }
+  return slow; 
+}
+
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const List<T>& list) {
   Node<T>* cur = list.head();
@@ -428,3 +335,123 @@ std::ostream& operator<<(std::ostream& os, const List<T>& list) {
   return os;
 
 }
+
+template <class T>
+void List<T>::erase(size_t pos) {
+  if (is_empty()) {
+    throw std::invalid_argument("List is empty");
+  }
+  if (_tail == _head) {
+    delete _head;
+    _head = nullptr;
+    _tail = nullptr;
+    _count = 0;
+    return;
+  }
+  Node <T>* cur = _head;
+  size_t cur_pos = 0;
+  while (cur_pos < pos && cur != nullptr) {
+    cur_pos++;
+    cur = cur->next;
+  }
+  if (cur == nullptr) {
+    throw std::invalid_argument("Position is wrong");
+  }
+  erase(cur);
+};
+
+template <class T>
+bool List<T>::has_loop_floyd() const {
+  if (_head == nullptr || _head->next == nullptr) {
+    return false;
+  }
+  Node<T>* turtle = _head;
+  Node<T>* hare = _head->next;
+  while (hare != nullptr && hare->next != nullptr) {
+    if (turtle == hare) {
+      return true;
+    }
+    turtle = turtle->next;
+    hare = hare->next->next;
+  }
+  return false;
+}
+
+template <class T>
+bool List<T>::has_loop_pointer_reversal() {
+    if (_head == nullptr)
+        return false;
+
+    Node<T>* original_head = _head;
+    Node<T>* prev = nullptr;
+    Node<T>* current = _head;
+    Node<T>* next = nullptr;
+    bool has_loop = false;
+
+    while (current != nullptr) {
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+
+        if (current == original_head) {
+            has_loop = true;
+            break;
+        }
+    }
+
+    current = prev;
+    prev = nullptr;
+    while (current != nullptr) {
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+    _head = prev;
+
+    if (_head == nullptr) {
+        _tail = nullptr;
+    }
+    else {
+        Node<T>* temp = _head;
+        while (temp->next != nullptr) {
+            temp = temp->next;
+        }
+        _tail = temp;
+    }
+
+    return has_loop;
+}
+
+
+template <class T>
+void List<T>::remove_loop_if_exists() {
+  Node<T>* loop_start = find_loop();
+  if (loop_start == nullptr) {
+    return;
+  }
+
+  Node<T>* current = loop_start;
+  while (current->next != loop_start) {
+    current = current->next;
+  }
+  current->next = nullptr;
+  _tail = current;
+}
+
+template <class T>
+void List<T>::create_loop(int pos) {
+  if (pos < 0 || pos >= _count) {
+    throw std::invalid_argument("Invalid position for creating loop");
+  }
+  if (_head == nullptr) {
+    throw std::logic_error("Cannot create loop in an empty list");
+  }
+  Node<T>* loop_start_node = _head;
+  for (int i = 0; i < pos; ++i) {
+    loop_start_node = loop_start_node->next;
+  }
+  _tail->next = loop_start_node;
+}
+
