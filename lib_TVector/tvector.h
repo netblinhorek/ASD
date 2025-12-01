@@ -41,6 +41,78 @@ class TVector {
     size_t deleted_count_;
     State* _states;
 public:
+    class Iterator {
+        TVector<T>* _vec;
+        size_t _index;
+    public:
+        Iterator() : _vec(nullptr), _index(0) {}
+        Iterator(TVector<T>* vec, size_t index) : _vec(vec), _index(index) {}
+
+        Iterator& operator=(const Iterator& other) noexcept {
+            if (this != &other) {
+                _vec = other._vec;
+                _index = other._index;
+            }
+            return *this;
+        }
+
+        bool operator==(const Iterator& other) const {
+            return _vec == other._vec && _index == other._index;
+        }
+
+        bool operator!=(const Iterator& other) const {
+            return !(*this == other);
+        }
+
+        Iterator& operator++() {
+            if (_vec == nullptr || _index >= _vec->size()) {
+                throw std::invalid_argument("Cannot increment iterator");
+            }
+            ++_index;
+            return *this;
+        }
+
+        Iterator operator++(int) {
+            Iterator temp = *this;
+            ++(*this);
+            return temp;
+        }
+
+        Iterator& operator--() {
+            if (_vec == nullptr || _vec->size() == 0 || _index == 0) {
+                throw std::invalid_argument("Cannot decrement iterator");
+            }
+            --_index;
+            return *this;
+        }
+
+        Iterator operator--(int) {
+            Iterator temp = *this;
+            --(*this);
+            return temp;
+        }
+
+        Iterator& operator-=(int count) {
+            if (count < 0) {
+                for (int i = 0; i < -count; ++i) {
+                    ++(*this);
+                }
+                return *this;
+            }
+            for (int i = 0; i < count; ++i) {
+                --(*this);
+            }
+            return *this;
+        }
+
+        T& operator*() {
+            if (_vec == nullptr || _index >= _vec->size()) {
+                throw std::invalid_argument("Iterator out of range");
+            }
+            return (*_vec)[_index];
+        }
+    };
+
     TVector();
     TVector(size_t);
     TVector(const T*, size_t);
@@ -59,8 +131,8 @@ public:
     inline T& front() ;
     inline T& back() ;
 
-    inline T* begin() noexcept;
-    inline T* end() noexcept;
+    inline Iterator begin() noexcept;
+    inline Iterator end() noexcept;
 
 
     inline const T* data() const noexcept;
@@ -240,13 +312,13 @@ inline T& TVector<T>::back()  {
 }
 
 template<class T>
-inline T* TVector<T>::begin() noexcept {
-    return _data;
+inline typename TVector<T>::Iterator TVector<T>::begin() noexcept {
+    return Iterator(this, 0);
 }
 
 template<class T>
-inline T* TVector<T>::end() noexcept {
-    return _data + _capacity;
+inline typename TVector<T>::Iterator TVector<T>::end() noexcept {
+    return Iterator(this, size());
 }
 
 template<class T>

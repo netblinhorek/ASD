@@ -462,3 +462,116 @@ TEST(TestTVector, test_states_after_operations) {
     vec.clear();
     ASSERT_EQ(vec.states()[0], State::empty);
 }
+
+TEST(TestTVectorIterator, test_iterator_increment) {
+    TVector<int> empty_vec;
+    auto empty_it = empty_vec.begin();
+    ASSERT_EQ(empty_it, empty_vec.end());
+    ASSERT_THROW(++empty_it, std::invalid_argument);
+
+    TVector<int> v;
+    v.push_back(1);
+    v.push_back(2);
+    v.push_back(3);
+
+    auto it = v.begin();
+    ASSERT_EQ(*it, 1);
+    ++it;
+    ASSERT_EQ(*it, 2);
+    ++it;
+    ASSERT_EQ(*it, 3);
+    ++it;
+    ASSERT_EQ(it, v.end());
+    ASSERT_THROW(++it, std::invalid_argument);
+}
+
+TEST(TestTVectorIterator, test_iterator_decrement) {
+    TVector<int> empty_vec;
+    auto empty_it = empty_vec.begin();
+    ASSERT_EQ(empty_it, empty_vec.end());
+    ASSERT_THROW(--empty_it, std::invalid_argument);
+
+    TVector<int> v;
+    v.push_back(1);
+    v.push_back(2);
+    v.push_back(3);
+
+    auto it = v.end();
+    --it;
+    ASSERT_EQ(*it, 3);
+    --it;
+    ASSERT_EQ(*it, 2);
+    --it;
+    ASSERT_EQ(*it, 1);
+    ASSERT_THROW(--it, std::invalid_argument);
+}
+
+TEST(TestTVectorIterator, test_iterator_minus_equal) {
+    TVector<int> empty_vec;
+    auto empty_it = empty_vec.begin();
+    ASSERT_EQ(empty_it, empty_vec.end());
+    ASSERT_THROW(empty_it -= 1, std::invalid_argument);
+
+    TVector<int> v;
+    v.push_back(10);
+    v.push_back(20);
+    v.push_back(30);
+
+    auto it = v.end();
+    --it;
+    ASSERT_EQ(*it, 30);
+    it -= 1;
+    ASSERT_EQ(*it, 20);
+    it -= 1;
+    ASSERT_EQ(*it, 10);
+    ASSERT_THROW(it -= 1, std::invalid_argument);
+}
+
+TEST(TestTVectorIterator, test_iterator_postfix_increment) {
+    TVector<int> empty_vec;
+    auto empty_it = empty_vec.begin();
+    ASSERT_EQ(empty_it, empty_vec.end());
+    ASSERT_THROW(empty_it++, std::invalid_argument);
+
+    TVector<int> v;
+    v.push_back(1);
+    v.push_back(2);
+    v.push_back(3);
+
+    auto it = v.begin();
+    ASSERT_EQ(*it, 1);
+    auto old_it = it++;
+    ASSERT_EQ(*old_it, 1);
+    ASSERT_EQ(*it, 2);
+    old_it = it++;
+    ASSERT_EQ(*old_it, 2);
+    ASSERT_EQ(*it, 3);
+    old_it = it++;
+    ASSERT_EQ(*old_it, 3);
+    ASSERT_EQ(it, v.end());
+    ASSERT_THROW(it++, std::invalid_argument);
+}
+
+TEST(TestTVectorIterator, test_iterator_postfix_decrement) {
+    TVector<int> empty_vec;
+    auto empty_it = empty_vec.begin();
+    ASSERT_EQ(empty_it, empty_vec.end());
+    ASSERT_THROW(empty_it--, std::invalid_argument);
+
+    TVector<int> v;
+    v.push_back(1);
+    v.push_back(2);
+    v.push_back(3);
+
+    auto it = v.end();
+    auto old_it = it--;
+    ASSERT_EQ(old_it, v.end());
+    ASSERT_EQ(*it, 3);
+    old_it = it--;
+    ASSERT_EQ(*old_it, 3);
+    ASSERT_EQ(*it, 2);
+    old_it = it--;
+    ASSERT_EQ(*old_it, 2);
+    ASSERT_EQ(*it, 1);
+    ASSERT_THROW(it--, std::invalid_argument);
+}

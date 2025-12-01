@@ -7,14 +7,14 @@ void find_small_neighbor(const Matrix<T>& matrix, size_t& row,
     T current = matrix[row][col];
     T min_neighbor = current;
     size_t best_row = row, best_col = col;
-    size_t n = matrix.rows();
+    size_t count = matrix.rows();
 
     if (row > 0 && matrix[row - 1][col] < min_neighbor) {
         min_neighbor = matrix[row - 1][col];
         best_row = row - 1;
         best_col = col;
     }
-    if (row < n - 1 && matrix[row + 1][col] < min_neighbor) {
+    if (row < count - 1 && matrix[row + 1][col] < min_neighbor) {
         min_neighbor = matrix[row + 1][col];
         best_row = row + 1;
         best_col = col;
@@ -24,7 +24,7 @@ void find_small_neighbor(const Matrix<T>& matrix, size_t& row,
         best_row = row;
         best_col = col - 1;
     }
-    if (col < n - 1 && matrix[row][col + 1] < min_neighbor) {
+    if (col < count - 1 && matrix[row][col + 1] < min_neighbor) {
         min_neighbor = matrix[row][col + 1];
         best_row = row;
         best_col = col + 1;
@@ -38,15 +38,15 @@ template <typename T>
 bool is_local_minimum(const Matrix<T>& matrix, size_t row,
     size_t col) {
     T current = matrix[row][col];
-    size_t n = matrix.rows();
+    size_t count = matrix.rows();
 
     if (row > 0 && matrix[row - 1][col] <= current)
         return false;
-    if (row < n - 1 && matrix[row + 1][col] <= current)
+    if (row < count - 1 && matrix[row + 1][col] <= current)
         return false;
     if (col > 0 && matrix[row][col - 1] <= current)
         return false;
-    if (col < n - 1 && matrix[row][col + 1] <= current)
+    if (col < count - 1 && matrix[row][col + 1] <= current)
         return false;
 
     return true;
@@ -55,13 +55,13 @@ bool is_local_minimum(const Matrix<T>& matrix, size_t row,
 template <typename T>
 bool find_local_minimum(const Matrix<T>& matrix, size_t& row,
     size_t& col) {
-    size_t n = matrix.rows();
-    if (n == 0) return false;
+    size_t count = matrix.rows();
+    if (count == 0) return false;
 
-    row = rand() % n;
-    col = rand() % n;
+    row = rand() % count;
+    col = rand() % count;
 
-    size_t max_steps = n * 3;
+    size_t max_steps = count * 3;
     size_t steps = 0;
 
     while (steps < max_steps) {
