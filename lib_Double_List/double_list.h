@@ -23,6 +23,7 @@ public:
 	Double_List(const Double_List<T>& other);
 	Node<T>* head();
 	Node<T>* tail();
+	size_t count() const;
 	
 	class Iterator {
 		Node<T>* _current;
@@ -145,6 +146,12 @@ template<typename T>
  {
 	 return _tail;
  }
+
+template<typename T>
+size_t Double_List<T>::count() const
+{
+	return _count;
+}
 
 
 template <typename T>
