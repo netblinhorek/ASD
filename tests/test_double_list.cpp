@@ -314,6 +314,10 @@ TEST(DoubleListIterator, test_double_list_prefix_increment_iteration) {
     list.push_back(2);
     list.push_back(3);
 
+    EXPECT_EQ(list.head()->prev, nullptr);
+    EXPECT_EQ(list.head()->next->prev, list.head());
+    EXPECT_EQ(list.tail()->prev, list.head()->next);
+
     int expected = 1;
     auto it = list.begin();
     for (; it != list.end(); ++it) {
@@ -331,6 +335,10 @@ TEST(DoubleListIterator, test_double_list_postfix_increment_iteration) {
     list.push_back(2);
     list.push_back(3);
 
+    EXPECT_EQ(list.head()->prev, nullptr);
+    EXPECT_EQ(list.head()->next->prev, list.head());
+    EXPECT_EQ(list.tail()->prev, list.head()->next);
+
     int expected = 1;
     auto it = list.begin();
     for (; it != list.end(); it++) {
@@ -346,6 +354,10 @@ TEST(DoubleListIterator, test_double_list_postfix_decrement_iteration) {
     list.push_back(1);
     list.push_back(2);
     list.push_back(3);
+
+    EXPECT_EQ(list.head()->prev, nullptr);
+    EXPECT_EQ(list.head()->next->prev, list.head());
+    EXPECT_EQ(list.tail()->prev, list.head()->next);
 
     int expected = 3;
     auto it = Double_List<int>::Iterator(list.tail());
@@ -365,6 +377,10 @@ TEST(DoubleListIterator, test_double_list_prefix_decrement_iteration) {
     list.push_back(2);
     list.push_back(3);
 
+    EXPECT_EQ(list.head()->prev, nullptr);
+    EXPECT_EQ(list.head()->next->prev, list.head());
+    EXPECT_EQ(list.tail()->prev, list.head()->next);
+
     int expected = 3;
     auto it = Double_List<int>::Iterator(list.tail());
     for (; it != list.begin(); --it) {
@@ -382,6 +398,10 @@ TEST(DoubleListIterator, test_double_list_minus_equal_iteration) {
     list.push_back(10);
     list.push_back(20);
     list.push_back(30);
+
+    EXPECT_EQ(list.head()->prev, nullptr);
+    EXPECT_EQ(list.head()->next->prev, list.head());
+    EXPECT_EQ(list.tail()->prev, list.head()->next);
 
     int expected = 30;
     auto it = Double_List<int>::Iterator(list.tail());
