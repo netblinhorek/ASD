@@ -123,6 +123,7 @@ TEST(TestDSU, test_DSU_find_recurtion_branching_tree) {
     dsu.union_set(1, 4);
     dsu.union_set(2, 5);
 
+
     int root = dsu.find_recurtion(3);
 
     ASSERT_EQ(root, dsu.find_recurtion(0));
@@ -155,8 +156,20 @@ TEST(TestDSU, unionn_rank) {
 
   
     EXPECT_EQ(dsu.find(3), dsu.find(2));
-
     EXPECT_EQ(2, dsu.get_rank(0));
+
+    int root = dsu.find_recurtion(3);
+    ASSERT_EQ(root, dsu.find_recurtion(0));
+    ASSERT_EQ(root, dsu.find_recurtion(1));
+    ASSERT_EQ(root, dsu.find_recurtion(2));
+
+    ASSERT_EQ(root, dsu.find_recurtion(3));
+
+    ASSERT_EQ(dsu.get_rank(root), 1);
+    ASSERT_EQ(dsu.get_rank(1), 0);
+    ASSERT_EQ(dsu.get_rank(2), 0);
+    ASSERT_EQ(dsu.get_rank(3), 0);
+
 }
 
 TEST(TestDSU, test_DSU_find_recurtion_linear_chain) {

@@ -41,12 +41,15 @@ void DSU::union_set(int x, int y) {
 
 	if (_rank[parent_x] < _rank[parent_y]) {
 		_parent[parent_x] = parent_y;
+		_rank[parent_x] = 0;
 	}
 	else if (_rank[parent_x] > _rank[parent_y]) {
 		_parent[parent_y] = parent_x;
+		_rank[parent_y] = 0;
 	}
 	else {
 		_parent[parent_y] = parent_x;
+		_rank[parent_y] = 0;
 		_rank[parent_x]++;
 	}
 }
@@ -66,7 +69,15 @@ int DSU::find_recurtion(int x) {
 	if (_parent[x] == x) {
 		return x;
 	}
-	return _parent[x] = find_recurtion(_parent[x]);
+	int root = find_recurtion(_parent[x]);
+	_parent[x] = root;
+
+	
+	if (_rank[root] > 1) {
+		_rank[root] = 1;
+	}
+
+	return root;
 
 }
 int DSU::get_rank(int x) const {
