@@ -9,8 +9,15 @@ TEST(TestList, test_list_constructor) {
 	EXPECT_EQ(list.tail(), nullptr);
 	EXPECT_EQ(list.head(), nullptr);
 	EXPECT_EQ(list.count(), 0);
-
+	list.push_front(3);
+	list.pop_front();
+	EXPECT_TRUE(list.is_empty());
+	EXPECT_EQ(list.tail(), nullptr);
+	EXPECT_EQ(list.head(), nullptr);
+	EXPECT_EQ(list.count(), 0);
 }
+
+
 TEST(TestList, test_list_push_front) {
 	List <int> list;
 	list.push_front(3);

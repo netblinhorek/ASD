@@ -61,9 +61,7 @@ public:
 			if (_current == nullptr) {
 				throw std::invalid_argument("Cannot decrement end iterator");
 			}
-			if (_current->prev == nullptr) {
-				throw std::invalid_argument("Cannot decrement begin iterator");
-			}
+			
 			_current = _current->prev;
 			return *this;
 		}
@@ -95,6 +93,15 @@ public:
 	Iterator end() {
 		return Iterator(nullptr);
 	}
+
+	Iterator rbegin() {
+		return Iterator(_tail);
+	}
+
+	Iterator rend() {
+		return Iterator(nullptr);
+	}
+
 	bool is_empty();
 	void push_front(const T& value)noexcept;
 	void push_back(const T& value)noexcept;
