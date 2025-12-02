@@ -88,3 +88,93 @@ TEST(TestDSU, test_DSU_negative_indices) {
     ASSERT_THROW(dsu.union_set(0, -1), std::logic_error);
     ASSERT_THROW(dsu.union_set(-1, -2), std::logic_error);
 }
+
+TEST(TestDSU, test_DSU_find_recurtion_path_compression) {
+    DSU dsu(6);
+
+    dsu.union_set(1, 2);
+    dsu.union_set(2, 3);
+    dsu.union_set(3, 4);
+
+    int root_before = dsu.find_recurtion(3);
+    ASSERT_EQ(root_before, dsu.find_recurtion(1));
+
+    ASSERT_EQ(dsu.get_rank(root_before), 1);
+    ASSERT_EQ(dsu.get_rank(2), 0);
+    ASSERT_EQ(dsu.get_rank(3), 0);
+    ASSERT_EQ(dsu.get_rank(4), 0);
+
+    ASSERT_EQ(dsu.find_recurtion(3), root_before);
+}
+
+TEST(TestDSU, test_DSU_find_recurtion_out_of_range) {
+    DSU dsu(3);
+
+    ASSERT_THROW(dsu.find_recurtion(-1), std::logic_error);
+    ASSERT_THROW(dsu.find_recurtion(3), std::logic_error);
+}
+
+TEST(TestDSU, test_DSU_find_recurtion_branching_tree) {
+    DSU dsu(7);
+
+    dsu.union_set(0, 1);
+    dsu.union_set(0, 2);
+    dsu.union_set(1, 3);
+    dsu.union_set(1, 4);
+    dsu.union_set(2, 5);
+
+    int root = dsu.find_recurtion(3);
+
+    ASSERT_EQ(root, dsu.find_recurtion(0));
+    ASSERT_EQ(root, dsu.find_recurtion(1));
+    ASSERT_EQ(root, dsu.find_recurtion(2));
+    ASSERT_EQ(root, dsu.find_recurtion(4));
+    ASSERT_EQ(root, dsu.find_recurtion(5));
+
+    ASSERT_EQ(root, dsu.find_recurtion(3));
+    ASSERT_EQ(root, dsu.find_recurtion(5));
+
+    ASSERT_EQ(dsu.get_rank(root), 1);
+    ASSERT_EQ(dsu.get_rank(1), 0);
+    ASSERT_EQ(dsu.get_rank(2), 0);
+    ASSERT_EQ(dsu.get_rank(3), 0);
+    ASSERT_EQ(dsu.get_rank(4), 0);
+    ASSERT_EQ(dsu.get_rank(5), 0);
+}
+TEST(TestDSU, unionn_rank) {
+    DSU dsu(4);
+
+    dsu.union_set(0, 1);
+    dsu.union_set(2, 3);
+    dsu.union_set(0, 2);
+
+    EXPECT_EQ(0, dsu.find(0));
+    EXPECT_EQ(0, dsu.find(1));
+    EXPECT_EQ(0, dsu.find(2));
+    EXPECT_EQ(0, dsu.find(3));
+
+  
+    EXPECT_EQ(dsu.find(3), dsu.find(2));
+
+    EXPECT_EQ(2, dsu.get_rank(0));
+}
+
+TEST(TestDSU, test_DSU_find_recurtion_linear_chain) {
+    DSU dsu(10);
+
+    for (int i = 0; i < 9; ++i) {
+        dsu.union_set(i, i + 1);
+    }
+
+    int root = dsu.find_recurtion(9);
+
+    for (int i = 0; i < 10; ++i) {
+        ASSERT_EQ(root, dsu.find_recurtion(i));
+    }
+
+    ASSERT_EQ(dsu.get_rank(root), 1);
+    for (int i = 0; i < 10; ++i) {
+        if (i == root) continue;
+        ASSERT_EQ(dsu.get_rank(i), 0);
+    }
+}
