@@ -154,22 +154,8 @@ TEST(TestDSU, unionn_rank) {
     EXPECT_EQ(0, dsu.find(2));
     EXPECT_EQ(0, dsu.find(3));
 
-  
     EXPECT_EQ(dsu.find(3), dsu.find(2));
     EXPECT_EQ(2, dsu.get_rank(0));
-
-    int root = dsu.find_recurtion(3);
-    ASSERT_EQ(root, dsu.find_recurtion(0));
-    ASSERT_EQ(root, dsu.find_recurtion(1));
-    ASSERT_EQ(root, dsu.find_recurtion(2));
-
-    ASSERT_EQ(root, dsu.find_recurtion(3));
-
-    ASSERT_EQ(dsu.get_rank(root), 1);
-    ASSERT_EQ(dsu.get_rank(1), 0);
-    ASSERT_EQ(dsu.get_rank(2), 0);
-    ASSERT_EQ(dsu.get_rank(3), 0);
-
 }
 
 TEST(TestDSU, test_DSU_find_recurtion_linear_chain) {
@@ -190,4 +176,42 @@ TEST(TestDSU, test_DSU_find_recurtion_linear_chain) {
         if (i == root) continue;
         ASSERT_EQ(dsu.get_rank(i), 0);
     }
+}
+
+
+TEST(TestDSU, complex_union_scenario) {
+
+    DSU dsu(8);
+    dsu.union_set(0, 1);  
+    dsu.union_set(1, 2);  
+    dsu.union_set(2, 3);  
+
+    int root1 = dsu.find(0);
+    EXPECT_EQ(root1, dsu.find(1));
+    EXPECT_EQ(root1, dsu.find(2));
+    EXPECT_EQ(root1, dsu.find(3));
+    EXPECT_EQ(dsu.get_rank(root1), 1);  
+    EXPECT_EQ(root1, 0);  
+
+    dsu.union_set(4, 5);  
+    dsu.union_set(6, 7);  
+    dsu.union_set(4, 6);  
+
+    int root2 = dsu.find(4);
+    EXPECT_EQ(root2, dsu.find(5));
+    EXPECT_EQ(root2, dsu.find(6));
+    EXPECT_EQ(root2, dsu.find(7));
+    EXPECT_EQ(dsu.get_rank(root2), 2);  
+    EXPECT_EQ(root2, 4); 
+
+    dsu.union_set(0, 4);  
+
+    int final_root = dsu.find(0);
+
+    for (int i = 0; i < 8; i++) {
+        EXPECT_EQ(final_root, dsu.find(i));
+    }
+
+    EXPECT_EQ(final_root, 4);
+    EXPECT_EQ(dsu.get_rank(final_root), 2);
 }

@@ -15,20 +15,20 @@ public:
 
 };
 
-DSU::DSU(size_t size) : _size(size)  {
-if(size==0){
-	throw std::logic_error("The size cannot be equal to 0");
+DSU::DSU(size_t size) : _size(size) {
+	if (size == 0) {
+		throw std::logic_error("The size cannot be equal to 0");
+	}
+	_parent = new int[size];
+	_rank = new int[size];
+	for (size_t i = 0; i < size; ++i) {
+		_parent[i] = i;
+		_rank[i] = 0;
+	}
 }
-_parent = new int[size];
-_rank = new int[size];
-for (size_t i = 0; i < size; ++i) {
-	_parent[i] = i;
-	_rank[i] = 0;
-}
-}
-DSU::~DSU(){
+DSU::~DSU() {
 	delete[] _parent;
-	delete[] _rank; 
+	delete[] _rank;
 }
 
 void DSU::union_set(int x, int y) {
@@ -41,15 +41,15 @@ void DSU::union_set(int x, int y) {
 
 	if (_rank[parent_x] < _rank[parent_y]) {
 		_parent[parent_x] = parent_y;
-		_rank[parent_x] = 0;
+
 	}
 	else if (_rank[parent_x] > _rank[parent_y]) {
 		_parent[parent_y] = parent_x;
-		_rank[parent_y] = 0;
+
 	}
 	else {
 		_parent[parent_y] = parent_x;
-		_rank[parent_y] = 0;
+
 		_rank[parent_x]++;
 	}
 }
@@ -57,10 +57,8 @@ int DSU::find(int x) {
 	if (x >= _size || x < 0) {
 		throw std::logic_error("Going beyond borders");
 	}
-	while (x != _parent[x]) {
-		x = _parent[x];
-	}
-	return x;
+	
+	return find_recurtion(x);
 }
 int DSU::find_recurtion(int x) {
 	if (x >= _size || x < 0) {
@@ -69,15 +67,7 @@ int DSU::find_recurtion(int x) {
 	if (_parent[x] == x) {
 		return x;
 	}
-	int root = find_recurtion(_parent[x]);
-	_parent[x] = root;
-
-	
-	if (_rank[root] > 1) {
-		_rank[root] = 1;
-	}
-
-	return root;
+	return _parent[x] = find_recurtion(_parent[x]);
 
 }
 int DSU::get_rank(int x) const {
