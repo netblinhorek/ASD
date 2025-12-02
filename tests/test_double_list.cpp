@@ -302,10 +302,43 @@ TEST(TestDoubleList, test_double_list_clear_operations) {
 TEST(DoubleListIterator, test_double_list_empty_throws_iterator) {
     Double_List<int> list;
     EXPECT_EQ(list.begin(), list.end());
-    Double_List<int>::Iterator it1 = list.end();
+    auto it1 = list.end();
     EXPECT_THROW(--it1, std::invalid_argument);
-    Double_List<int>::Iterator it2 = list.begin();
+    auto it2 = list.begin();
     EXPECT_THROW(++it2, std::invalid_argument);
+}
+
+TEST(DoubleListIterator, test_double_list_prefix_increment_iteration) {
+    Double_List<int> list;
+    list.push_back(1);
+    list.push_back(2);
+    list.push_back(3);
+
+    int expected = 1;
+    auto it = list.begin();
+    for (; it != list.end(); ++it) {
+        EXPECT_EQ(*it, expected);
+        expected++;
+    }
+    EXPECT_EQ(expected, 4); 
+    EXPECT_THROW(++it, std::invalid_argument);
+
+}
+
+TEST(DoubleListIterator, test_double_list_postfix_increment_iteration) {
+    Double_List<int> list;
+    list.push_back(1);
+    list.push_back(2);
+    list.push_back(3);
+
+    int expected = 1;
+    auto it = list.begin();
+    for (; it != list.end(); it++) {
+        EXPECT_EQ(*it, expected);
+        expected++;
+    }
+    EXPECT_EQ(expected, 4);
+    EXPECT_THROW(it++, std::invalid_argument);
 }
 
 TEST(DoubleListIterator, test_double_list_postfix_decrement_iteration) {
