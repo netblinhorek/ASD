@@ -177,7 +177,6 @@ TEST(ListHareAndTurtleTest, test_hare_and_turtle) {
 		list_no_loop.push_back(i);
 	}
 
-	ASSERT_NO_THROW(list_no_loop.has_loop_floyd());
 	ASSERT_FALSE(list_no_loop.has_loop_floyd());
 }
 
@@ -191,8 +190,12 @@ TEST(ListHareAndTurtleTest, test_hare_and_turtle_with_floyd) {
 
 	list_with_loop.create_loop(2);
 	ASSERT_TRUE(list_with_loop.has_loop_floyd());
-}
 
+	
+	list_with_loop.remove_loop_if_exists();
+
+	ASSERT_FALSE(list_with_loop.has_loop_floyd());
+}
 TEST(ListIteratorCycleTest, test_pointer_reversal_loop) {
 	List<int> list;
 	ASSERT_FALSE(list.has_loop_pointer_reversal());
@@ -205,4 +208,35 @@ TEST(ListIteratorCycleTest, test_pointer_reversal_loop) {
 	list.create_loop(0);
 
 	ASSERT_TRUE(list.has_loop_pointer_reversal());
+}
+
+
+TEST(ListDistanceMethodTest, test_distance_method_no_loop) {
+	List<int> list_no_loop;
+
+	list_no_loop.push_back(1);
+	list_no_loop.push_back(2);
+	list_no_loop.push_back(3);
+	ASSERT_FALSE(list_no_loop.has_loop_distance());
+
+	list_no_loop.clear();
+	for (int i = 0; i < 14; i++) {
+		list_no_loop.push_back(i);
+	}
+
+	ASSERT_FALSE(list_no_loop.has_loop_distance());
+}
+
+TEST(ListDistanceMethodTest, test_distance_method_with_loop) {
+	List<int> list_with_loop;
+
+	for (int i = 0; i < 5; i++) {
+		list_with_loop.push_back(i);
+	}
+
+	list_with_loop.create_loop(2);
+	ASSERT_TRUE(list_with_loop.has_loop_distance());
+
+	list_with_loop.remove_loop_if_exists();
+	ASSERT_FALSE(list_with_loop.has_loop_distance());
 }
