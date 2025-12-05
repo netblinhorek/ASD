@@ -20,6 +20,7 @@ class List {
 public:
     List();
     List(const List<T>&);
+    List& operator=(const List<T>&);
     ~List();
 
     bool is_empty() const;
@@ -115,6 +116,22 @@ List<T>::List(const List<T>& other) {
         push_back(cur->value);
         cur = cur->next;
     }
+}
+
+template <class T>
+List<T>& List<T>::operator=(const List<T>& other) {
+    if (this == &other) {
+        return *this;
+    }
+
+    clear();
+
+    Node<T>* cur = other._head;
+    while (cur != nullptr) {
+        push_back(cur->value);
+        cur = cur->next;
+    }
+    return *this;
 }
 
 
@@ -459,9 +476,9 @@ bool List<T>::has_loop_distance() const {
     Node<T>* current = _head;
     int steps = 0;
 
-    // Проходим не более _count+1 шагов
+    // РџСЂРѕС…РѕРґРёРј РЅРµ Р±РѕР»РµРµ _count+1 С€Р°РіРѕРІ
     while (current != nullptr && steps <= _count) {
-        // Ищем current с начала списка
+        // РС‰РµРј current СЃ РЅР°С‡Р°Р»Р° СЃРїРёСЃРєР°
         Node<T>* from_start = _head;
         int search_steps = 0;
 
@@ -470,7 +487,7 @@ bool List<T>::has_loop_distance() const {
             search_steps++;
         }
 
-        // Если нашли current быстрее, чем должны были
+        // Р•СЃР»Рё РЅР°С€Р»Рё current Р±С‹СЃС‚СЂРµРµ, С‡РµРј РґРѕР»Р¶РЅС‹ Р±С‹Р»Рё
         if (from_start == current && search_steps < steps) {
             return true;
         }
@@ -479,6 +496,6 @@ bool List<T>::has_loop_distance() const {
         steps++;
     }
 
-    // Если сделали слишком много шагов
+    // Р•СЃР»Рё СЃРґРµР»Р°Р»Рё СЃР»РёС€РєРѕРј РјРЅРѕРіРѕ С€Р°РіРѕРІ
     return (steps > _count);
 }
