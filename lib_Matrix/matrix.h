@@ -52,24 +52,9 @@ public:
         return matrix + value;
     }
 
-    friend Matrix<T> operator-(T value, const Matrix<T>& matrix) {
-        Matrix<T> result(matrix.rows(), matrix.cols());
-        for (size_t i = 0; i < matrix.rows(); ++i) {
-            result[i] = value - matrix[i];
-        }
-        return result;
-    }
 
     friend Matrix<T> operator*(T value, const Matrix<T>& matrix) {
         return matrix * value;
-    }
-
-    friend Matrix<T> operator/(T value, const Matrix<T>& matrix) {
-        Matrix<T> result(matrix.rows(), matrix.cols());
-        for (size_t i = 0; i < matrix.rows(); ++i) {
-            result[i] = value / matrix[i];
-        }
-        return result;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {

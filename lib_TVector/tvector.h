@@ -64,11 +64,16 @@ public:
             return !(*this == other);
         }
 
+        Iterator operator--(int) {
+            Iterator temp = *this;
+            --(*this);
+            return temp;
+        }
+
         Iterator& operator++() {
-            if (_vec == nullptr || _index >= _vec->size()) {
-                throw std::invalid_argument("Cannot increment iterator");
+            if (_vec != nullptr && _index < _vec->size()) {
+                ++_index;
             }
-            ++_index;
             return *this;
         }
 
@@ -79,38 +84,34 @@ public:
         }
 
         Iterator& operator--() {
-            if (_vec == nullptr || _vec->size() == 0 || _index == 0) {
-                throw std::invalid_argument("Cannot decrement iterator");
+            if (_vec != nullptr && _index > 0) {
+                --_index;
             }
-            --_index;
             return *this;
         }
 
-        Iterator operator--(int) {
-            Iterator temp = *this;
-            --(*this);
-            return temp;
-        }
-
         Iterator& operator-=(int count) {
-            if (count < 0) {
+            if (count > 0) {
+                for (int i = 0; i < count; ++i) {
+                    --(*this);
+                }
+            }
+            else if (count < 0) {
                 for (int i = 0; i < -count; ++i) {
                     ++(*this);
                 }
-                return *this;
-            }
-            for (int i = 0; i < count; ++i) {
-                --(*this);
             }
             return *this;
         }
 
         T& operator*() {
-            if (_vec == nullptr || _index >= _vec->size()) {
-                throw std::invalid_argument("Iterator out of range");
+            static T default_value;
+            if (_vec != nullptr && _index < _vec->size()) {
+                return (*_vec)[_index];
             }
-            return (*_vec)[_index];
+            return default_value;
         }
+
     };
 
     TVector();

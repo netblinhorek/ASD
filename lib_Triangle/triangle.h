@@ -23,8 +23,11 @@ public:
     size_t cols() const;
 
     Triangle<T> operator+(const Triangle<T>& other) const;
+    Triangle<T> operator-(const Triangle<T>& other) const;
+    Triangle<T> operator*(const Triangle<T>& other) const;
+    Triangle<T> operator*(const T& scalar) const;
 
-    size_t start_index() const;
+   
 
 private:
     bool is_valid_access(size_t row, size_t col) const;
@@ -36,7 +39,9 @@ Triangle<T>::Triangle() : Matrix<T>(), _type(TriangleType::Lower) {}
 template<typename T>
 Triangle<T>::Triangle(size_t size, const T& value, TriangleType type) : _type(type) {
     for (size_t i = 0; i < size; ++i) {
-        MathVector<T> row(size, value);
+        size_t row_length = i + 1;
+
+        MathVector<T> row(row_length, value);
         this->push_back(row);
     }
 }
@@ -60,10 +65,10 @@ Triangle<T>::Triangle(const Matrix<T>& other, TriangleType type) : _type(type) {
 
 template<typename T>
 bool Triangle<T>::is_valid_access(size_t row, size_t col) const {
-    if (row >= this->size() || col >= this->size()) {
-        return false;
+    if (row >= this->rows() || col >= this->rows()) {
+        return false;  // Выход за границы
     }
-    return col <= row;
+        return col <= row;  // Для нижнего треугольника
 }
 
 template<typename T>
@@ -124,11 +129,52 @@ Triangle<T> Triangle<T>::operator+(const Triangle<T>& other) const {
 }
 
 template<typename T>
-size_t Triangle<T>::start_index() const {
+Triangle<T> Triangle<T>::operator-(const Triangle<T>& other) const {
+    if (this->rows() != other.rows() || _type != other._type) {
+        throw std::invalid_argument("Matrix dimensions and types must match");
+    }
+    Triangle<T> result(this->rows(), T(0), _type);
+
     for (size_t i = 0; i < this->rows(); ++i) {
-        if ((*this)(i, 0) != T(0)) {
-            return i;
+        for (size_t j = 0; j <= i; ++j) {
+            result(i, j) = (*this)(i, j) - other(i, j);
         }
     }
-    return this->rows();
+    return result;
 }
+
+template<typename T>
+Triangle<T> Triangle<T>::operator*(const Triangle<T>& other) const {
+    if (this->rows() != other.rows()) {
+        throw std::invalid_argument("Matrix dimensions must match for multiplication");
+    }
+
+    size_t size = this->rows();
+    Triangle<T> result(size, T(0), TriangleType::Lower); 
+
+    for (size_t i = 0; i < size; ++i) {
+        for (size_t j = 0; j <= i; ++j) {
+            T sum = T(0);
+            for (size_t k = j; k <= i; ++k) {
+                sum += (*this)(i, k) * other(k, j);
+            }
+            result(i, j) = sum;
+        }
+    }
+
+    return result;
+}
+
+template<typename T>
+Triangle<T> Triangle<T>::operator*(const T& scalar) const {
+    Triangle<T> result(this->rows(), T(0), _type);
+
+    for (size_t i = 0; i < this->rows(); ++i) {
+        for (size_t j = 0; j <= i; ++j) {
+            result(i, j) = (*this)(i, j) * scalar;
+        }
+    }
+
+    return result;
+}
+
