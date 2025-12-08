@@ -14,16 +14,7 @@ template <typename T>
 std::ostream& operator<<(std::ostream& os, const MathVector<T>& vec);
 
 template <typename T>
-MathVector<T> operator+(T value, const MathVector<T>& vec);
-
-template <typename T>
 MathVector<T> operator*(T value, const MathVector<T>& vec);
-
-template <typename T>
-MathVector<T> operator-(T value, const MathVector<T>& vec);
-
-template <typename T>
-MathVector<T> operator/(T value, const MathVector<T>& vec);
 
 template <typename T>
 class MathVector : public TVector<T> {
