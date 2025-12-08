@@ -1028,3 +1028,20 @@ TEST(TestMathVector, test_twice_unary_plus) {
     ASSERT_EQ(b[2], 3);
 }
 
+TEST(TestMathVector, test_start_index_without_zeros) {
+    MathVector<int> vec1;
+    vec1.push_back(1);
+    vec1.push_back(2);
+    vec1.push_back(3);
+    EXPECT_EQ(vec1.start_index(), 0);
+}
+
+TEST(TestMathVector, test_start_index_with_zeros) {
+    MathVector<int> vec1;
+    vec1.push_back(0);
+    vec1.push_back(0);
+    vec1.push_back(5);
+    vec1.push_back(6);
+    vec1.push_back(7);
+    EXPECT_EQ(vec1.start_index(), 2);
+}

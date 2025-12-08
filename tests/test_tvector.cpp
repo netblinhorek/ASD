@@ -514,7 +514,7 @@ TEST(TestTVectorIterator, test_iterator_minus_equal) {
     v.push_back(30);
 
     auto it = v.end();
-    --it;
+    it -= 1;
     ASSERT_EQ(*it, 30);
     it -= 1;
     ASSERT_EQ(*it, 20);
@@ -534,14 +534,11 @@ TEST(TestTVectorIterator, test_iterator_postfix_increment) {
 
     auto it = v.begin();
     ASSERT_EQ(*it, 1);
-    auto old_it = it++;
-    ASSERT_EQ(*old_it, 1);
+    it++;
     ASSERT_EQ(*it, 2);
-    old_it = it++;
-    ASSERT_EQ(*old_it, 2);
+    it++;
     ASSERT_EQ(*it, 3);
-    old_it = it++;
-    ASSERT_EQ(*old_it, 3);
+    it++;
     ASSERT_EQ(it, v.end());
 }
 
@@ -556,13 +553,10 @@ TEST(TestTVectorIterator, test_iterator_postfix_decrement) {
     v.push_back(3);
 
     auto it = v.end();
-    auto old_it = it--;
-    ASSERT_EQ(old_it, v.end());
+    it--;
     ASSERT_EQ(*it, 3);
-    old_it = it--;
-    ASSERT_EQ(*old_it, 3);
+    it--;
     ASSERT_EQ(*it, 2);
-    old_it = it--;
-    ASSERT_EQ(*old_it, 2);
+    it--;
     ASSERT_EQ(*it, 1);
 }

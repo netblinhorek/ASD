@@ -105,7 +105,7 @@ public:
         }
 
         T& operator*() {
-            static T default_value;
+             T default_value;
             if (_vec != nullptr && _index < _vec->size()) {
                 return (*_vec)[_index];
             }

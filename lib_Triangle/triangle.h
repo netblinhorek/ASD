@@ -66,9 +66,9 @@ Triangle<T>::Triangle(const Matrix<T>& other, TriangleType type) : _type(type) {
 template<typename T>
 bool Triangle<T>::is_valid_access(size_t row, size_t col) const {
     if (row >= this->rows() || col >= this->rows()) {
-        return false;  // Выход за границы
+        return false;  
     }
-        return col <= row;  // Для нижнего треугольника
+        return col <= row;  
 }
 
 template<typename T>
@@ -90,7 +90,7 @@ const T& Triangle<T>::operator()(size_t row, size_t col) const {
             throw std::out_of_range("Index out of range");
         }
         else {
-            static T zero = T(0);
+             T zero = T(0);
             return zero;
         }
     }

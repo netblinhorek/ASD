@@ -4,6 +4,8 @@
 #include <iomanip>
 #include <stdexcept>
 #include <string>
+#include <cstdlib>
+
 
 //#define EASY_EXAMPLE
 //#define MATHVECTOR
@@ -335,10 +337,12 @@ void show_triangle_info(const Triangle<double>& t, const std::string& name) {
     for (size_t i = 0; i < size; ++i) {
         std::cout << "  ";
         for (size_t j = 0; j < size; ++j) {
-            try {
+            if (j <= i) {
+                // Элементы на и ниже диагонали
                 std::cout << std::setw(8) << t(i, j) << " ";
             }
-            catch (const std::exception&) {
+            else {
+                // Элементы выше диагонали - всегда 0
                 std::cout << std::setw(8) << "0" << " ";
             }
         }
@@ -632,7 +636,7 @@ int main() {
             case 1:
             case 2:
             case 3:
-            case 4:
+       
             {
                 int type;
                 std::cout << "1. Обычные матрицы\n2. Треугольные матрицы\nВыбор: ";
@@ -645,8 +649,8 @@ int main() {
                 }
                 break;
             }
+            case 4:
             case 5:
-            case 6:
             {
                 int type;
                 std::cout << "1. Обычная матрица\n2. Треугольная матрица\nВыбор: ";
@@ -659,8 +663,9 @@ int main() {
                 }
                 break;
             }
-            case 7:
+            case 6:
                 information_about_matrix();
+                
                 break;
             default:
                 std::cout << "Неверный выбор! Попробуйте снова." << std::endl;
@@ -668,8 +673,8 @@ int main() {
             }
 
             std::cout << "\nНажмите Enter для продолжения...";
-            std::cin.ignore();
-            std::cin.get();
+            
+            
         }
     }
     catch (const std::exception& e) {
@@ -679,23 +684,4 @@ int main() {
 }
 
 #endif
-//#ifdef STACK
-//int main() {
-//    setlocale(LC_ALL, "rus");
-//    std::string input;
-//
-//    std::cout << "Введите выражение для проверки скобок: ";
-//    std::getline(std::cin, input);
-//
-//    number_of_brackets(input);
-//
-//    if (check_of_brackets(input)) {
-//        std::cout << "Скобки расставлены правильно!" << std::endl;
-//    }
-//    else {
-//        std::cout << "Ошибка в расстановке скобок!" << std::endl;
-//    }
-//
-//    return 0;
-//}
-//#endif STACK
+
