@@ -33,25 +33,13 @@ public:
     Matrix<T> operator-(const Matrix<T>& other) const;
     Matrix<T> operator*(const Matrix<T>& other) const;
 
-    Matrix<T> operator+(T value) const;
-    Matrix<T> operator-(T value) const;
     Matrix<T> operator*(T value) const;
-    Matrix<T> operator/(T value) const;
 
     Matrix<T>& operator+=(const Matrix<T>& other);
     Matrix<T>& operator-=(const Matrix<T>& other);
     Matrix<T>& operator*=(const Matrix<T>& other);
 
-
-    Matrix<T>& operator+=(T value);
-    Matrix<T>& operator-=(T value);
     Matrix<T>& operator*=(T value);
-    Matrix<T>& operator/=(T value);
-
-    friend Matrix<T> operator+(T value, const Matrix<T>& matrix) {
-        return matrix + value;
-    }
-
 
     friend Matrix<T> operator*(T value, const Matrix<T>& matrix) {
         return matrix * value;
@@ -149,31 +137,12 @@ Matrix<T> Matrix<T>::operator*(const Matrix<T>& other) const {
     }
 
     Matrix<T> result(rows(), other.cols());
-    Matrix<T> other_transposed = other.transpose(); 
+    Matrix<T> other_transposed = other.transpose();
 
     for (size_t i = 0; i < rows(); ++i) {
         for (size_t j = 0; j < other.cols(); ++j) {
             result[i][j] = (*this)[i].the_scalar_product(other_transposed[j]);
         }
-    }
-    return result;
-}
-
-
-template <typename T>
-Matrix<T> Matrix<T>::operator+(T value) const {
-    Matrix<T> result(rows(), cols());
-    for (size_t i = 0; i < rows(); i++) {
-        result[i] = (*this)[i] + value;
-    }
-    return result;
-}
-
-template <typename T>
-Matrix<T> Matrix<T>::operator-(T value) const {
-    Matrix<T> result(rows(), cols());
-    for (size_t i = 0; i < rows(); i++) {
-        result[i] = (*this)[i] - value;
     }
     return result;
 }
@@ -187,17 +156,6 @@ Matrix<T> Matrix<T>::operator*(T value) const {
     return result;
 }
 
-template <typename T>
-Matrix<T> Matrix<T>::operator/(T value) const {
-    if (value == T(0)) {
-        throw std::invalid_argument("Division by zero");
-    }
-    Matrix<T> result(rows(), cols());
-    for (size_t i = 0; i < rows(); i++) {
-        result[i] = (*this)[i] / value;
-    }
-    return result;
-}
 
 template <typename T>
 Matrix<T>& Matrix<T>::operator+=(const Matrix<T>& other) {
@@ -219,22 +177,6 @@ Matrix<T>& Matrix<T>::operator*=(const Matrix<T>& other) {
 
 
 template <typename T>
-Matrix<T>& Matrix<T>::operator+=(T value) {
-    for (size_t i = 0; i < rows(); i++) {
-        (*this)[i] += value;
-    }
-    return *this;
-}
-
-template <typename T>
-Matrix<T>& Matrix<T>::operator-=(T value) {
-    for (size_t i = 0; i < rows(); i++) {
-        (*this)[i] -= value;
-    }
-    return *this;
-}
-
-template <typename T>
 Matrix<T>& Matrix<T>::operator*=(T value) {
     for (size_t i = 0; i < rows(); i++) {
         (*this)[i] *= value;
@@ -242,16 +184,6 @@ Matrix<T>& Matrix<T>::operator*=(T value) {
     return *this;
 }
 
-template <typename T>
-Matrix<T>& Matrix<T>::operator/=(T value) {
-    if (value == T(0)) {
-        throw std::invalid_argument("Division by zero");
-    }
-    for (size_t i = 0; i < rows(); i++) {
-        (*this)[i] /= value;
-    }
-    return *this;
-}
 
 template <typename T>
 Matrix<T> Matrix<T>::transpose() const {

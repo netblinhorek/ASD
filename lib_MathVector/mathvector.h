@@ -29,7 +29,7 @@ template <typename T>
 class MathVector : public TVector<T> {
 public:
     MathVector() : TVector<T>() {}
-    MathVector(size_t size) : TVector<T>(size) {} 
+    MathVector(size_t size) : TVector<T>(size) {}
     MathVector(const T* arr, size_t size) : TVector<T>(arr, size) {}
     MathVector(const MathVector<T>& other) : TVector<T>(other) {}
     MathVector(size_t size, const T& value) : TVector<T>(size) {
@@ -46,8 +46,6 @@ public:
     inline const T& operator[](size_t index) const;
 
     MathVector<T>& operator=(const MathVector<T>& other);
-    bool operator==(const MathVector<T>& other) const;
-    bool operator!=(const MathVector<T>& other) const;
 
     size_t start_index() const;
 
@@ -56,20 +54,14 @@ public:
     MathVector<T> operator*(const MathVector<T>& other) const;
     MathVector<T> operator/(const MathVector<T>& other) const;
 
-    MathVector<T> operator+(T value) const;
-    MathVector<T> operator-(T value) const;
     MathVector<T> operator*(T value) const;
-    MathVector<T> operator/(T value) const;
 
     MathVector<T>& operator+=(const MathVector<T>& other);
     MathVector<T>& operator-=(const MathVector<T>& other);
     MathVector<T>& operator*=(const MathVector<T>& other);
     MathVector<T>& operator/=(const MathVector<T>& other);
 
-    MathVector<T>& operator+=(T value);
-    MathVector<T>& operator-=(T value);
     MathVector<T>& operator*=(T value);
-    MathVector<T>& operator/=(T value);
 
     MathVector<T> operator-() const;
     MathVector<T> operator+() const;
@@ -120,9 +112,6 @@ public:
     }
 };
 
-
-
-
 template <typename T>
 T MathVector<T>::the_scalar_product(const MathVector<T>& other) const {
     if (this->size() != other.size()) {
@@ -164,7 +153,6 @@ const T& MathVector<T>::operator[](size_t index) const {
     return TVector<T>::operator[](index);
 }
 
-
 template <typename T>
 MathVector<T>& MathVector<T>::operator=(const MathVector<T>& other) {
     if (this != &other) {
@@ -173,25 +161,6 @@ MathVector<T>& MathVector<T>::operator=(const MathVector<T>& other) {
     return *this;
 }
 
-template <typename T>
-bool MathVector<T>::operator==(const MathVector<T>& other) const {
-    if (this == &other) 
-        return true;
-
-    if (this->size() != other.size())
-        return false;
-
-    for (size_t i = 0; i < this->size(); ++i) {
-        if (this->get(i) != other.get(i))
-            return false;
-    }
-    return true;
-}
-
-template <typename T>
-bool MathVector<T>::operator!=(const MathVector<T>& other) const {
-    return !(*this == other);
-}
 
 template <typename T>
 MathVector<T> MathVector<T>::operator+(const MathVector<T>& other) const {
@@ -201,15 +170,6 @@ MathVector<T> MathVector<T>::operator+(const MathVector<T>& other) const {
     MathVector<T> result(this->size());
     for (size_t i = 0; i < this->size(); i++) {
         result[i] = (*this)[i] + other[i];
-    }
-    return result;
-}
-
-template <typename T>
-MathVector<T> MathVector<T>::operator+(T value) const {
-    MathVector<T> result(this->size());
-    for (size_t i = 0; i < this->size(); i++) {
-        result[i] = (*this)[i] + value;
     }
     return result;
 }
@@ -226,15 +186,6 @@ MathVector<T> MathVector<T>::operator-(const MathVector<T>& other) const {
     return result;
 }
 
-template <typename T>
-MathVector<T> MathVector<T>::operator-(T value) const {
-    MathVector<T> result(this->size());
-    for (size_t i = 0; i < this->size(); i++) {
-        result[i] = (*this)[i] - value;
-    }
-    return result;
-}
-
 
 template <typename T>
 MathVector<T> MathVector<T>::operator*(const MathVector<T>& other) const {
@@ -247,7 +198,6 @@ MathVector<T> MathVector<T>::operator*(const MathVector<T>& other) const {
     }
     return result;
 }
-
 
 template <typename T>
 MathVector<T> MathVector<T>::operator*(T value) const {
@@ -273,17 +223,6 @@ MathVector<T> MathVector<T>::operator/(const MathVector<T>& other) const {
     return result;
 }
 
-template <typename T>
-MathVector<T> MathVector<T>::operator/(T value) const {
-    MathVector<T> result(this->size());
-    if (value == 0) {
-        throw std::invalid_argument("The divisor cannot be equal to 0");
-    }
-    for (size_t i = 0; i < this->size(); i++) {
-        result[i] = (*this)[i] / value;
-    }
-    return result;
-}
 
 template <typename T>
 MathVector<T>& MathVector<T>::operator+=(const MathVector<T>& other) {
@@ -297,28 +236,12 @@ MathVector<T>& MathVector<T>::operator+=(const MathVector<T>& other) {
 }
 
 template <typename T>
-MathVector<T>& MathVector<T>::operator+=(T value) {
-    for (size_t i = 0; i < this->size(); i++) {
-        (*this)[i] += value;
-    }
-    return *this;
-}
-
-template <typename T>
 MathVector<T>& MathVector<T>::operator-=(const MathVector<T>& other) {
     if (this->size() != other.size()) {
         throw std::invalid_argument("Vectors must have the same size");
     }
     for (size_t i = 0; i < this->size(); i++) {
         (*this)[i] -= other[i];
-    }
-    return *this;
-}
-
-template <typename T>
-MathVector<T>& MathVector<T>::operator-=(T value) {
-    for (size_t i = 0; i < this->size(); i++) {
-        (*this)[i] -= value;
     }
     return *this;
 }
@@ -352,17 +275,6 @@ MathVector<T>& MathVector<T>::operator/=(const MathVector<T>& other) {
             throw std::invalid_argument("Division by zero in vector element at index " + std::to_string(i));
         }
         (*this)[i] /= other[i];
-    }
-    return *this;
-}
-
-template <typename T>
-MathVector<T>& MathVector<T>::operator/=(T value) {
-    if (value == 0) {
-        throw std::invalid_argument("Division by zero");
-    }
-    for (size_t i = 0; i < this->size(); i++) {
-        (*this)[i] /= value;
     }
     return *this;
 }

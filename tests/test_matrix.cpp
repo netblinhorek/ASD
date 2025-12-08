@@ -269,33 +269,6 @@ TEST(TestMatrix, test_operator_mult_dimension_mismatch) {
     EXPECT_THROW(m1 * m2, std::invalid_argument);
 }
 
-
-TEST(TestMatrix, test_operator_add_scalar) {
-    Matrix<int> m1(2, 2);
-    m1[0][0] = 1; m1[0][1] = 2;
-    m1[1][0] = 3; m1[1][1] = 4;
-
-    Matrix<int> result = m1 + 5;
-
-    ASSERT_EQ(result[0][0], 6);
-    ASSERT_EQ(result[0][1], 7);
-    ASSERT_EQ(result[1][0], 8);
-    ASSERT_EQ(result[1][1], 9);
-}
-
-TEST(TestMatrix, test_operator_sub_scalar) {
-    Matrix<int> m1(2, 2);
-    m1[0][0] = 10; m1[0][1] = 8;
-    m1[1][0] = 6; m1[1][1] = 4;
-
-    Matrix<int> result = m1 - 3;
-
-    ASSERT_EQ(result[0][0], 7);
-    ASSERT_EQ(result[0][1], 5);
-    ASSERT_EQ(result[1][0], 3);
-    ASSERT_EQ(result[1][1], 1);
-}
-
 TEST(TestMatrix, test_operator_mult_scalar) {
     Matrix<int> m(2, 2);
     m[0][0] = 1; m[0][1] = 2;
@@ -309,24 +282,6 @@ TEST(TestMatrix, test_operator_mult_scalar) {
     ASSERT_EQ(result[1][1], 12);
 }
 
-TEST(TestMatrix, test_operator_div_scalar) {
-    Matrix<double> m(2, 2);
-    m[0][0] = 6.0; m[0][1] = 9.0;
-    m[1][0] = 12.0; m[1][1] = 15.0;
-
-    Matrix<double> result = m / 3.0;
-
-    ASSERT_DOUBLE_EQ(result[0][0], 2.0);
-    ASSERT_DOUBLE_EQ(result[0][1], 3.0);
-    ASSERT_DOUBLE_EQ(result[1][0], 4.0);
-    ASSERT_DOUBLE_EQ(result[1][1], 5.0);
-}
-
-TEST(TestMatrix, test_operator_div_scalar_by_zero) {
-    Matrix<double> m(2, 2);
-
-    EXPECT_THROW(m / 0.0, std::invalid_argument);
-}
 
 TEST(TestMatrix, test_operator_add_equals_matrix) {
     Matrix<int> m1(2, 2);
@@ -388,33 +343,6 @@ TEST(TestMatrix, test_operator_mult_equals_matrix) {
 
 
 
-
-TEST(TestMatrix, test_operator_plus_equals_scalar) {
-    Matrix<int> m(2, 2);
-    m[0][0] = 1; m[0][1] = 2;
-    m[1][0] = 3; m[1][1] = 4;
-
-    m += 5;
-
-    ASSERT_EQ(m[0][0], 6);
-    ASSERT_EQ(m[0][1], 7);
-    ASSERT_EQ(m[1][0], 8);
-    ASSERT_EQ(m[1][1], 9);
-}
-
-TEST(TestMatrix, test_operator_minus_equals_scalar) {
-    Matrix<int> m(2, 2);
-    m[0][0] = 10; m[0][1] = 8;
-    m[1][0] = 6; m[1][1] = 4;
-
-    m -= 3;
-
-    ASSERT_EQ(m[0][0], 7);
-    ASSERT_EQ(m[0][1], 5);
-    ASSERT_EQ(m[1][0], 3);
-    ASSERT_EQ(m[1][1], 1);
-}
-
 TEST(TestMatrix, test_operator_multiply_equals_scalar) {
     Matrix<int> m(2, 2);
     m[0][0] = 2; m[0][1] = 3;
@@ -428,37 +356,6 @@ TEST(TestMatrix, test_operator_multiply_equals_scalar) {
     ASSERT_EQ(m[1][1], 15);
 }
 
-TEST(TestMatrix, test_operator_div_equals_scalar) {
-    Matrix<double> m(2, 2);
-    m[0][0] = 6.0; m[0][1] = 9.0;
-    m[1][0] = 12.0; m[1][1] = 15.0;
-
-    m /= 3.0;
-
-    ASSERT_DOUBLE_EQ(m[0][0], 2.0);
-    ASSERT_DOUBLE_EQ(m[0][1], 3.0);
-    ASSERT_DOUBLE_EQ(m[1][0], 4.0);
-    ASSERT_DOUBLE_EQ(m[1][1], 5.0);
-}
-
-TEST(TestMatrix, test_operator_div_equals_scalar_by_zero) {
-    Matrix<double> m(2, 2);
-
-    EXPECT_THROW(m /= 0.0, std::invalid_argument);
-}
-
-TEST(TestMatrix, test_add_scalar_left) {
-    Matrix<double> mat(2, 2);
-    mat[0][0] = 6; mat[0][1] = 2;
-    mat[1][0] = 3; mat[1][1] = 7;
-    int a = 7;
-    Matrix<double> result = a + mat;
-    ASSERT_EQ(result[0][0], 13);
-    ASSERT_EQ(result[0][1], 9);
-    ASSERT_EQ(result[1][0], 10);
-    ASSERT_EQ(result[1][1], 14);
-
-}
 
 TEST(TestMatrix, test_mult_scalar_right) {
     Matrix<double> mat(2, 2);
@@ -471,24 +368,8 @@ TEST(TestMatrix, test_mult_scalar_right) {
     ASSERT_EQ(result[1][0], 21);
     ASSERT_EQ(result[1][1], 49);
 }
-TEST(TestMatrix, test_div_scalar_right) {
 
-}
-TEST(TestMatrix, test_add_scalar_right_unar) {
-    Matrix<double> mat(2, 2);
-    mat[0][0] = 6; mat[0][1] = 2;
-    mat[1][0] = 3; mat[1][1] = 7;
-    int a = 7;
-    Matrix<double> result = mat + -a;
-    ASSERT_EQ(result[0][0], -1);
-    ASSERT_EQ(result[0][1], -5);
-    ASSERT_EQ(result[1][0], -4);
-    ASSERT_EQ(result[1][1], 0);
 
-}
-TEST(TestMatrix, test_sub_scalar_right_unar) {
-
-}
 TEST(TestMatrix, test_mult_scalar_right_unar) {
     Matrix<double> mat(2, 2);
     mat[0][0] = 6; mat[0][1] = 2;
@@ -500,19 +381,14 @@ TEST(TestMatrix, test_mult_scalar_right_unar) {
     ASSERT_EQ(result[1][0], -21);
     ASSERT_EQ(result[1][1], -49);
 }
-TEST(TestMatrix, test_div_scalar_right_unar) {
-
-}
-TEST(TestMatrix, test_add_scalar_left_unar) {
-    Matrix<double> mat(2, 2);
-
-}
-TEST(TestMatrix, test_sub_scalar_left_unar) {
-
-}
 TEST(TestMatrix, test_mult_scalar_left_unar) {
-
-}
-TEST(TestMatrix, test_div_scalar_left_unar) {
-
+    Matrix<double> mat(2, 2);
+    mat[0][0] = 6; mat[0][1] = 2;
+    mat[1][0] = 3; mat[1][1] = 7;
+    int a = 7;
+    Matrix<double> result = -a * mat;
+    ASSERT_EQ(result[0][0], -42);
+    ASSERT_EQ(result[0][1], -14);
+    ASSERT_EQ(result[1][0], -21);
+    ASSERT_EQ(result[1][1], -49);
 }
