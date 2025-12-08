@@ -195,6 +195,18 @@ TEST(ListHareAndTurtleTest, test_hare_and_turtle_with_floyd) {
 	list_with_loop.remove_loop_if_exists();
 
 	ASSERT_FALSE(list_with_loop.has_loop_floyd());
+	auto it = list_with_loop.begin();
+	EXPECT_EQ(*it, 0);
+	++it;
+	EXPECT_EQ(*it, 1);
+	++it;
+	EXPECT_EQ(*it, 2);
+	++it;
+	EXPECT_EQ(*it, 3);
+	++it;
+	EXPECT_EQ(*it, 4);
+	++it;
+	EXPECT_EQ(it, list_with_loop.end());
 }
 TEST(ListIteratorCycleTest, test_pointer_reversal_loop) {
 	List<int> list;

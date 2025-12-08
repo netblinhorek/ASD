@@ -476,9 +476,7 @@ bool List<T>::has_loop_distance() const {
     Node<T>* current = _head;
     int steps = 0;
 
-    // Проходим не более _count+1 шагов
     while (current != nullptr && steps <= _count) {
-        // Ищем current с начала списка
         Node<T>* from_start = _head;
         int search_steps = 0;
 
@@ -487,7 +485,6 @@ bool List<T>::has_loop_distance() const {
             search_steps++;
         }
 
-        // Если нашли current быстрее, чем должны были
         if (from_start == current && search_steps < steps) {
             return true;
         }
@@ -496,6 +493,6 @@ bool List<T>::has_loop_distance() const {
         steps++;
     }
 
-    // Если сделали слишком много шагов
+   
     return (steps > _count);
 }
