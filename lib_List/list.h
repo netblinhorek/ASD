@@ -494,5 +494,5 @@ bool List<T>::has_loop_distance() const {
     }
 
    
-    return (steps > _count);
+    return false;
 }
