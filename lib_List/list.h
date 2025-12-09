@@ -471,7 +471,8 @@ void List<T>::create_loop(int pos) {
 
 template <class T>
 bool List<T>::has_loop_distance() const {
-    if (_head == nullptr) return false;
+    if (_head == nullptr) 
+        return false;
 
     Node<T>* current = _head;
     int steps = 0;
