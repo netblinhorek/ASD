@@ -5,250 +5,260 @@
 
 TEST(TestTriangle, test_default_constructor) {
     Triangle<double> t;
+    EXPECT_EQ(t.size(), 0);  
     EXPECT_EQ(t.rows(), 0);
     EXPECT_EQ(t.cols(), 0);
-    EXPECT_EQ(t.get_type(), TriangleType::Lower);
 }
 
-TEST(TestTriangle, test_size_constructor_lower) {
-    Triangle<int> t(3, 0, TriangleType::Lower);
+TEST(TestTriangle, test_size_constructor) {
+    Triangle<int> t(3);
+    EXPECT_EQ(t.size(), 3);  
     EXPECT_EQ(t.rows(), 3);
     EXPECT_EQ(t.cols(), 3);
-    EXPECT_EQ(t.get_type(), TriangleType::Lower);
 
-    for (size_t i = 0; i < 3; ++i) {
-        for (size_t j = 0; j < 3; ++j) {
-            if (j > i) {
-                EXPECT_THROW(t(i, j) = 1, std::invalid_argument);
-            }
-            else {
-                EXPECT_NO_THROW(t(i, j) = i + j);
-            }
+    for (int i = 0; i < 3; ++i) {
+        EXPECT_EQ(t[i].size(), 3);
+    }
+}
+
+TEST(TestTriangle, test_copy_constructor) {
+    Triangle<int> t1(3);
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            t1[i][j] = i * 10 + j;
+        }
+    }
+
+    Triangle<int> t2(t1);
+    EXPECT_EQ(t2.size(), 3);
+    EXPECT_EQ(t2.rows(), 3);
+    EXPECT_EQ(t2.cols(), 3);
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            EXPECT_EQ(t2[i][j], i * 10 + j);
         }
     }
 }
 
+TEST(TestTriangle, test_assignment_operator) {
+    Triangle<int> t1(3);
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            t1[i][j] = i * 10 + j;
+        }
+    }
 
-TEST(TestTriangle, test_value_constructor_lower) {
-    Triangle<double> t(3, 5.5, TriangleType::Lower);
+    Triangle<int> t2(2);
+    t2 = t1;
 
-    for (size_t i = 0; i < 3; ++i) {
-        for (size_t j = 0; j < 3; ++j) {
-            if (j <= i) {
-                EXPECT_DOUBLE_EQ(t(i, j), 5.5);
-            }
-            else {
-                EXPECT_THROW(t(i, j) = 1.0, std::invalid_argument);
-            }
+    EXPECT_EQ(t2.size(), 3);
+    EXPECT_EQ(t2.rows(), 3);
+    EXPECT_EQ(t2.cols(), 3);
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            EXPECT_EQ(t2[i][j], i * 10 + j);
         }
     }
 }
 
-TEST(TestTriangle, test_from_matrix_lower) {
-    Matrix<double> m(3, 3);
-    m[0][0] = 1.0; m[0][1] = 0.0; m[0][2] = 0.0;  
-    m[1][0] = 2.0; m[1][1] = 3.0; m[1][2] = 0.0;
-    m[2][0] = 4.0; m[2][1] = 5.0; m[2][2] = 6.0;
+TEST(TestTriangle, test_addition) {
+    Triangle<int> t1(3);
+    Triangle<int> t2(3);
 
-    Triangle<double> t(m, TriangleType::Lower);
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            t1[i][j] = i * 10 + j;
+            t2[i][j] = (i * 10 + j) * 2;
+        }
+    }
 
-    EXPECT_DOUBLE_EQ(t(0, 0), 1.0);
-    EXPECT_DOUBLE_EQ(t(1, 0), 2.0);
-    EXPECT_DOUBLE_EQ(t(1, 1), 3.0);
-    EXPECT_DOUBLE_EQ(t(2, 0), 4.0);
-    EXPECT_DOUBLE_EQ(t(2, 1), 5.0);
-    EXPECT_DOUBLE_EQ(t(2, 2), 6.0);
+    Triangle<int> result = t1 + t2;
 
-    EXPECT_THROW(t(0, 1), std::invalid_argument);
-    EXPECT_THROW(t(0, 2), std::invalid_argument);
-    EXPECT_THROW(t(1, 2), std::invalid_argument);
+    EXPECT_EQ(result.size(), 3);
+    EXPECT_EQ(result.rows(), 3);
+    EXPECT_EQ(result.cols(), 3);
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            EXPECT_EQ(result[i][j], (i * 10 + j) * 3);
+        }
+    }
 }
 
+TEST(TestTriangle, test_addition_mismatch_sizes) {
+    Triangle<int> t1(2);
+    Triangle<int> t2(3);
 
-TEST(TestTriangle, test_from_matrix_invalid) {
-    Matrix<double> m(2, 3);
-    EXPECT_THROW(Triangle<double> t(m, TriangleType::Lower), std::invalid_argument);
+    EXPECT_THROW(t1 + t2, std::logic_error);
 }
 
+TEST(TestTriangle, test_subtraction) {
+    Triangle<int> t1(3);
+    Triangle<int> t2(3);
 
-TEST(TestTriangle, test_addition_mismatch) {
-    Triangle<int> t1(2, 0, TriangleType::Lower);
-    Triangle<int> t2(3, 0, TriangleType::Lower);
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            t1[i][j] = (i * 10 + j) * 3;
+            t2[i][j] = i * 10 + j;
+        }
+    }
 
-    EXPECT_THROW(t1 + t2, std::invalid_argument);
+    Triangle<int> result = t1 - t2;
+
+    EXPECT_EQ(result.size(), 3);
+    EXPECT_EQ(result.rows(), 3);
+    EXPECT_EQ(result.cols(), 3);
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            EXPECT_EQ(result[i][j], (i * 10 + j) * 2);
+        }
+    }
 }
-
-TEST(TestTriangle, test_out_of_range_access) {
-    Triangle<double> t(2, 0, TriangleType::Lower);
-
-    EXPECT_THROW(t(2, 0), std::out_of_range);
-    EXPECT_THROW(t(0, 2), std::out_of_range);
-    EXPECT_THROW(t(5, 5), std::out_of_range);
-}
-
-
-TEST(TestTriangle, test_edge_cases) {
-    Triangle<double> t1(1, 0, TriangleType::Lower);
-    EXPECT_NO_THROW(t1(0, 0) = 5.0);
-    EXPECT_DOUBLE_EQ(t1(0, 0), 5.0);
-
-    EXPECT_THROW(t1(0, 1), std::out_of_range);
-    EXPECT_THROW(t1(1, 0), std::out_of_range);
-}
-
-TEST(TestTriangle, test_subtraction_lower) {
-    Triangle<double> t1(3, 0, TriangleType::Lower);
-    Triangle<double> t2(3, 0, TriangleType::Lower);
-
-    t1(0, 0) = 5.0;
-    t1(1, 0) = 2.0; t1(1, 1) = 3.0;
-    t1(2, 0) = 1.0; t1(2, 1) = 4.0; t1(2, 2) = 6.0;
-
-    t2(0, 0) = 2.0;
-    t2(1, 0) = 1.0; t2(1, 1) = 1.0;
-    t2(2, 0) = 0.5; t2(2, 1) = 2.0; t2(2, 2) = 3.0;
-
-    Triangle<double> result = t1 - t2;
-
-    EXPECT_DOUBLE_EQ(result(0, 0), 3.0);  
-    EXPECT_DOUBLE_EQ(result(1, 0), 1.0);  
-    EXPECT_DOUBLE_EQ(result(1, 1), 2.0);  
-    EXPECT_DOUBLE_EQ(result(2, 0), 0.5);  
-    EXPECT_DOUBLE_EQ(result(2, 1), 2.0);  
-    EXPECT_DOUBLE_EQ(result(2, 2), 3.0);  
-
-    EXPECT_EQ(result.get_type(), TriangleType::Lower);
-
-    EXPECT_THROW(result(0, 1) = 1.0, std::invalid_argument);
-}
-
-TEST(TestTriangle, test_subtraction_mismatch_sizes) {
-    Triangle<float> t1(2, 0.0f, TriangleType::Lower);
-    Triangle<float> t2(3, 0.0f, TriangleType::Lower);
-
-    EXPECT_THROW(t1 - t2, std::invalid_argument);
-}
-
 
 TEST(TestTriangle, test_subtraction_identity) {
-    Triangle<double> t(3, 0, TriangleType::Lower);
+    Triangle<double> t(3);
 
-    t(0, 0) = 1.5;
-    t(1, 0) = 2.3; t(1, 1) = 3.7;
-    t(2, 0) = 4.1; t(2, 1) = 5.9; t(2, 2) = 6.8;
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            t[i][j] = i * 1.5 + j * 0.5;
+        }
+    }
 
     Triangle<double> result = t - t;
 
-    for (size_t i = 0; i < 3; ++i) {
-        for (size_t j = 0; j <= i; ++j) {
-            EXPECT_DOUBLE_EQ(result(i, j), 0.0);
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            EXPECT_DOUBLE_EQ(result[i][j], 0.0);
         }
     }
 }
-TEST(TestTriangle, test_scalar_multiplication_right) {
-    Triangle<double> t(3, 0, TriangleType::Lower);
 
-    t(0, 0) = 1.0;
-    t(1, 0) = 2.0; t(1, 1) = 3.0;
-    t(2, 0) = 4.0; t(2, 1) = 5.0; t(2, 2) = 6.0;
+TEST(TestTriangle, test_scalar_multiplication) {
+    Triangle<double> t(3);
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            t[i][j] = i * 1.0 + j * 0.5;
+        }
+    }
 
     Triangle<double> result = t * 2.5;
 
-    EXPECT_DOUBLE_EQ(result(0, 0), 2.5);    
-    EXPECT_DOUBLE_EQ(result(1, 0), 5.0);    
-    EXPECT_DOUBLE_EQ(result(1, 1), 7.5);    
-    EXPECT_DOUBLE_EQ(result(2, 0), 10.0);   
-    EXPECT_DOUBLE_EQ(result(2, 1), 12.5);   
-    EXPECT_DOUBLE_EQ(result(2, 2), 15.0);   
-
-    EXPECT_DOUBLE_EQ(t(0, 0), 1.0);
-    EXPECT_DOUBLE_EQ(t(2, 2), 6.0);
-
-    EXPECT_EQ(result.get_type(), TriangleType::Lower);
-}
-
-TEST(TestTriangle, test_scalar_multiplication_zero) {
-    Triangle<double> t(3, 0, TriangleType::Lower);
-
-    t(0, 0) = 1.5;
-    t(1, 0) = 2.5; t(1, 1) = 3.5;
-    t(2, 0) = 4.5; t(2, 1) = 5.5; t(2, 2) = 6.5;
-
-    Triangle<double> result = t * 0.0;
-
-    for (size_t i = 0; i < 3; ++i) {
-        for (size_t j = 0; j <= i; ++j) {
-            EXPECT_DOUBLE_EQ(result(i, j), 0.0);
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            EXPECT_DOUBLE_EQ(result[i][j], (i * 1.0 + j * 0.5) * 2.5);
         }
     }
 }
 
-TEST(TestTriangle, test_scalar_multiplication_negative) {
-    Triangle<double> t(2, 0, TriangleType::Lower);
+TEST(TestTriangle, test_scalar_multiplication_zero) {
+    Triangle<double> t(3);
 
-    t(0, 0) = 2.0;
-    t(1, 0) = 3.0; t(1, 1) = 4.0;
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            t[i][j] = i * 2.0 + j * 3.0;
+        }
+    }
 
-    Triangle<double> result_1 = t * (-2.0);
+    Triangle<double> result = t * 0.0;
 
-    EXPECT_DOUBLE_EQ(result_1(0, 0), -4.0);   
-    EXPECT_DOUBLE_EQ(result_1(1, 0), -6.0);   
-    EXPECT_DOUBLE_EQ(result_1(1, 1), -8.0);  
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            EXPECT_DOUBLE_EQ(result[i][j], 0.0);
+        }
+    }
 }
 
-TEST(TestTriangle, test_scalar_multiraction_chaining) {
-    Triangle<double> t(2, 0, TriangleType::Lower);
+TEST(TestTriangle, test_vector_multiplication_simple) {
+    Triangle<double> t(2);
+    MathVector<double> v(2);
 
-    t(0, 0) = 1.0;
-    t(1, 0) = 2.0; t(1, 1) = 3.0;
+    t[0][0] = 1.0;
+    t[1][0] = 2.0;
+    t[1][1] = 3.0;
 
-    Triangle<double> result1 = (t * 2.0) * 3.0;
-    Triangle<double> result2 = t * 6.0;
+    v[0] = 1.0;
+    v[1] = 2.0;
 
-    for (size_t i = 0; i < 2; ++i) {
-        for (size_t j = 0; j <= i; ++j) {
-            EXPECT_DOUBLE_EQ(result1(i, j), result2(i, j));
+    MathVector<double> result = t * v;
+
+    EXPECT_EQ(result.size(), 2);
+    EXPECT_DOUBLE_EQ(result[0], 1.0);
+    EXPECT_DOUBLE_EQ(result[1], 8.0);
+}
+
+TEST(TestTriangle, test_vector_multiplication_wrong_size) {
+    Triangle<double> t(3);
+    MathVector<double> v(2);
+
+    EXPECT_THROW(t * v, std::logic_error);
+}
+
+TEST(TestTriangle, test_equality_operator) {
+    Triangle<int> t1(3);
+    Triangle<int> t2(3);
+    Triangle<int> t3(2);
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            t1[i][j] = i * 10 + j;
+            t2[i][j] = i * 10 + j;
+        }
+    }
+
+    EXPECT_TRUE(t1 == t2);
+    EXPECT_FALSE(t1 == t3);
+    EXPECT_TRUE(t1 == t1); 
+}
+
+TEST(TestTriangle, test_inequality_operator) {
+    Triangle<int> t1(3);
+    Triangle<int> t2(3);
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            t1[i][j] = i * 10 + j;
+            t2[i][j] = i * 10 + j + 1;
+        }
+    }
+
+    EXPECT_TRUE(t1 != t2);
+    EXPECT_FALSE(t1 != t1);
+}
+
+TEST(TestTriangle, test_multiplication_assignment) {
+    Triangle<double> t(3);
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            t[i][j] = i * 1.0 + j * 0.5;
+        }
+    }
+
+    t *= 2.0;
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3 - i; ++j) {
+            EXPECT_DOUBLE_EQ(t[i][j], (i * 1.0 + j * 0.5) * 2.0);
         }
     }
 }
 
 TEST(TestTriangle, test_mixed_operations) {
-    Triangle<double> A(2, 0, TriangleType::Lower);
-    Triangle<double> B(2, 0, TriangleType::Lower);
+    Triangle<double> A(2);
+    Triangle<double> B(2);
 
-    A(0, 0) = 5.0;
-    A(1, 0) = 2.0; A(1, 1) = 3.0;
+    A[0][0] = 5.0; A[0][1] = 0.5; 
+    A[1][0] = 2.0;                
 
-    B(0, 0) = 1.0;
-    B(1, 0) = 1.0; B(1, 1) = 1.0;
+    B[0][0] = 1.0; B[0][1] = 0.2;
+    B[1][0] = 1.0;
 
     Triangle<double> result = (A * 2.0) - (B * 3.0);
 
-    EXPECT_DOUBLE_EQ(result(0, 0), 7.0);  
-    EXPECT_DOUBLE_EQ(result(1, 0), 1.0);  
-    EXPECT_DOUBLE_EQ(result(1, 1), 3.0);  
-}
-TEST(TestTriangle, test_matrix_multiplication_lower_lower) {
-    Triangle<double> t1(3, 0, TriangleType::Lower);
-    Triangle<double> t2(3, 0, TriangleType::Lower);
-
-    t1(0, 0) = 2.0;
-    t1(1, 0) = 3.0; t1(1, 1) = 4.0;
-    t1(2, 0) = 5.0; t1(2, 1) = 6.0; t1(2, 2) = 7.0;
-
-    t2(0, 0) = 1.0;
-    t2(1, 0) = 2.0; t2(1, 1) = 3.0;
-    t2(2, 0) = 4.0; t2(2, 1) = 5.0; t2(2, 2) = 6.0;
-
-    Triangle<double> result = t1 * t2;
-
-    EXPECT_DOUBLE_EQ(result(0, 0), 2.0);
-    EXPECT_DOUBLE_EQ(result(1, 0), 11.0);
-    EXPECT_DOUBLE_EQ(result(1, 1), 12.0);
-    EXPECT_DOUBLE_EQ(result(2, 0), 45.0);
-    EXPECT_DOUBLE_EQ(result(2, 1), 53.0);
-    EXPECT_DOUBLE_EQ(result(2, 2), 42.0);
-
-    EXPECT_EQ(result.rows(), 3);
-    EXPECT_EQ(result.cols(), 3);
+    EXPECT_DOUBLE_EQ(result[0][0], 7.0);   
+    EXPECT_DOUBLE_EQ(result[0][1], 0.4);   
+    EXPECT_DOUBLE_EQ(result[1][0], 1.0);   
 }

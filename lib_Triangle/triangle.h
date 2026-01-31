@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <stdexcept>
+#include <initializer_list>
+#include <cmath>
 #include "../lib_Matrix/matrix.h"
 
 enum class TriangleType { Lower, Upper };
@@ -9,172 +11,208 @@ template<typename T>
 class Triangle : public Matrix<T> {
 private:
     TriangleType _type;
+    int _n;
 
 public:
     Triangle();
-    Triangle(size_t size, const T& value, TriangleType type = TriangleType::Lower);
-    Triangle(const Matrix<T>& other, TriangleType type = TriangleType::Lower);
+    Triangle(const int size);
+    Triangle(const MathVector<MathVector<T>>& other);
+    Triangle(const Triangle<T>& other_matrix);
 
-    T& operator()(size_t row, size_t col);
-    const T& operator()(size_t row, size_t col) const;
+    Triangle<T> add(const Triangle<T>&) const;
+    Triangle<T> sub(const Triangle<T>&) const;
+    Triangle<T> mult(const Triangle<T>&) const;
+    Triangle<T> mult_by_number(const T&) const;
+    Triangle<T> div_by_number(const T&) const;
 
-    TriangleType get_type() const noexcept;
-    size_t rows() const;
-    size_t cols() const;
+    Triangle<T>& operator+=(const Triangle<T>& second);
+    MathVector<T> operator*(const MathVector<T>& vector) const;
+    Triangle<T>& operator-=(const Triangle<T>& second);
+
+    Triangle<T>& operator*=(const T& value);
+    Triangle<T>& operator/=(const T& value);
+    Triangle<T>& operator=(const Triangle<T>& other_matrix);
+
+    bool operator!=(const Triangle<T>& other_matrix);
+    bool operator==(const Triangle<T>& other_matrix);
 
     Triangle<T> operator+(const Triangle<T>& other) const;
     Triangle<T> operator-(const Triangle<T>& other) const;
     Triangle<T> operator*(const Triangle<T>& other) const;
     Triangle<T> operator*(const T& scalar) const;
-
-   
-
-private:
-    bool is_valid_access(size_t row, size_t col) const;
+    Triangle<T> operator/(const T& scalar) const;
 };
 
-template<typename T>
-Triangle<T>::Triangle() : Matrix<T>(), _type(TriangleType::Lower) {}
+template <class T>
+Triangle<T>::Triangle() : Matrix<T>(), _n(0) {}
 
-template<typename T>
-Triangle<T>::Triangle(size_t size, const T& value, TriangleType type) : _type(type) {
-    for (size_t i = 0; i < size; ++i) {
-        size_t row_length = i + 1;
-
-        MathVector<T> row(row_length, value);
-        this->push_back(row);
-    }
-}
-
-template<typename T>
-Triangle<T>::Triangle(const Matrix<T>& other, TriangleType type) : _type(type) {
-    if (!other.is_square()) {
-        throw std::invalid_argument("Triangle matrix must be square");
-    }
-
-    size_t size = other.rows();
-
-    for (size_t i = 0; i < size; ++i) {
-        MathVector<T> row(i + 1);
-        for (size_t j = 0; j <= i; ++j) {
-            row[j] = other[i][j];
-        }
-        this->push_back(row);
-    }
-}
-
-template<typename T>
-bool Triangle<T>::is_valid_access(size_t row, size_t col) const {
-    if (row >= this->rows() || col >= this->rows()) {
-        return false;  
-    }
-        return col <= row;  
-}
-
-template<typename T>
-T& Triangle<T>::operator()(size_t row, size_t col) {
-    if (row >= this->size() || col >= this->size()) {
-        throw std::out_of_range("Index out of range");
-    }
-
-    if (col > row) {
-        throw std::invalid_argument("Cannot modify zero elements in triangular matrix");
-    }
-    return (*this)[row][col];
-}
-
-template<typename T>
-const T& Triangle<T>::operator()(size_t row, size_t col) const {
-    if (!is_valid_access(row, col)) {
-        if (row >= this->rows() || col >= this->rows()) {
-            throw std::out_of_range("Index out of range");
-        }
-        else {
-             T zero = T(0);
-            return zero;
-        }
-    }
-
-    return (*this)[row][col];
-}
-
-template<typename T>
-TriangleType Triangle<T>::get_type() const noexcept {
-    return _type;
-}
-
-template<typename T>
-size_t Triangle<T>::rows() const {
-    return Matrix<T>::size();
-}
-
-template<typename T>
-size_t Triangle<T>::cols() const {
-    return this->rows();
-}
-
-template<typename T>
-Triangle<T> Triangle<T>::operator+(const Triangle<T>& other) const {
-    if (this->rows() != other.rows() || _type != other._type) {
-        throw std::invalid_argument("Matrix dimensions and types must match");
-    }
-    Triangle<T> result(this->rows(), T(0), _type);
-
-    for (size_t i = 0; i < this->rows(); ++i) {
-        for (size_t j = 0; j <= i; ++j) {
-            result(i, j) = (*this)(i, j) + other(i, j);
-        }
-    }
-    return result;
-}
-
-template<typename T>
-Triangle<T> Triangle<T>::operator-(const Triangle<T>& other) const {
-    if (this->rows() != other.rows() || _type != other._type) {
-        throw std::invalid_argument("Matrix dimensions and types must match");
-    }
-    Triangle<T> result(this->rows(), T(0), _type);
-
-    for (size_t i = 0; i < this->rows(); ++i) {
-        for (size_t j = 0; j <= i; ++j) {
-            result(i, j) = (*this)(i, j) - other(i, j);
-        }
-    }
-    return result;
-}
-
-template<typename T>
-Triangle<T> Triangle<T>::operator*(const Triangle<T>& other) const {
-    if (this->rows() != other.rows()) {
-        throw std::invalid_argument("Matrix dimensions must match for multiplication");
-    }
-
-    size_t size = this->rows();
-    Triangle<T> result(size, T(0), TriangleType::Lower); 
-
-    for (size_t i = 0; i < size; ++i) {
-        for (size_t j = 0; j <= i; ++j) {
-            T sum = T(0);
-            for (size_t k = j; k <= i; ++k) {
-                sum += (*this)(i, k) * other(k, j);
+template <class T>
+Triangle<T>::Triangle(const int size) : Matrix<T>(size, size), _n(size) {
+    this->_type = TriangleType::Lower;
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            if (j > i) {
+                (*this)[i][j] = T(0);
             }
-            result(i, j) = sum;
         }
     }
+}
 
+template <class T>
+Triangle<T>::Triangle(const MathVector<MathVector<T>>& other) : Matrix<T>(other) {
+    this->_n = other.size();
+    this->_type = TriangleType::Lower;
+}
+
+template <class T>
+Triangle<T>::Triangle(const Triangle<T>& other_matrix) : Matrix<T>(other_matrix), 
+_n(other_matrix._n), _type(other_matrix._type) {}
+
+template<class T>
+Triangle<T> Triangle<T>::add(const Triangle<T>& other) const {
+    if (this->_n != other._n)
+        throw std::logic_error("Matrixes have different sizes for addition");
+
+    Triangle<T> result(*this);
+    result.Matrix<T>::operator+=(other);
     return result;
 }
 
-template<typename T>
-Triangle<T> Triangle<T>::operator*(const T& scalar) const {
-    Triangle<T> result(this->rows(), T(0), _type);
+template<class T>
+Triangle<T> Triangle<T>::sub(const Triangle<T>& other) const {
+    if (this->_n != other._n)
+        throw std::logic_error("Matrixes have different sizes for subtraction");
 
-    for (size_t i = 0; i < this->rows(); ++i) {
-        for (size_t j = 0; j <= i; ++j) {
-            result(i, j) = (*this)(i, j) * scalar;
-        }
-    }
-
+    Triangle<T> result(*this);
+    result.Matrix<T>::operator-=(other);
     return result;
 }
 
+template<class T>
+Triangle<T> Triangle<T>::mult(const Triangle<T>& other) const {
+    if (this->cols() != other.rows()) {
+        throw std::logic_error("Triangle matrices dimensions do not match for multiplication!");
+    }
+
+    if (this->_type != other._type) {
+        throw std::logic_error("Triangle matrices must have the same type for multiplication!");
+    }
+
+    const Matrix<T>& this_matrix = *this; 
+    const Matrix<T>& other_matrix = other;
+    Matrix<T> result_matrix = this_matrix * other_matrix;
+
+    return Triangle<T>(result_matrix);
+}
+
+template<class T>
+Triangle<T> Triangle<T>::mult_by_number(const T& value) const {
+    const Matrix<T>& this_matrix = *this;
+
+    Matrix<T> result_matrix = this_matrix * value;
+
+    return Triangle<T>(result_matrix);
+}
+
+template<class T>
+Triangle<T> Triangle<T>::div_by_number(const T& value) const {
+    const Matrix<T>& this_matrix = *this;
+
+    Matrix<T> result_matrix = this_matrix / value;
+
+    return Triangle<T>(result_matrix);
+}
+
+template <class T>
+Triangle<T> Triangle<T>::operator +(const Triangle<T>& second) const {
+    return this->Triangle<T>::add(second);
+}
+
+template <class T>
+Triangle<T>& Triangle<T>::operator+=(const Triangle<T>& second) {
+    *this = *this + second;
+    return *this;
+}
+
+template <class T>
+Triangle<T> Triangle<T>::operator-(const Triangle<T>& second) const {
+    return this->Triangle<T>::sub(second);
+}
+
+template <class T>
+Triangle<T>& Triangle<T>::operator-=(const Triangle<T>& second) {
+    *this = *this - second;
+    return *this;
+}
+
+template <class T>
+Triangle<T> Triangle<T>::operator *(const Triangle<T>& second) const {
+    return this->Triangle<T>::mult(second);
+}
+
+
+template <class T>
+Triangle<T> Triangle<T>::operator*(const T& value) const {
+    return this->Triangle<T>::mult_by_number(value);
+}
+
+template <class T>
+Triangle<T>& Triangle<T>::operator *=(const T& value) {
+    *this = *this * value;
+    return *this;
+}
+
+template <class T>
+Triangle<T> Triangle<T>::operator/(const T& scalar) const {
+    return this->Triangle<T>::div_by_number(scalar);
+}
+
+template <class T>
+Triangle<T>& Triangle<T>::operator/=(const T& value) {
+    *this = *this / value;
+    return *this;
+}
+
+template <class T>
+MathVector<T> Triangle<T>::operator*(const MathVector<T>& vector) const {
+    if (vector.size() != _n)
+        throw std::logic_error("Wrong sizes");
+
+    MathVector<T> result(_n);
+    for (int i = 0; i < _n; i++) {
+        T sum = T(0);
+        for (int j = 0; j <= i; j++) {
+            sum += (*this)[i][j] * vector[j];
+        }
+        result[i] = sum;
+    }
+    return result;
+}
+
+template <class T>
+Triangle<T>& Triangle<T>::operator=(const Triangle<T>& other_matrix) {
+    if (&other_matrix == this)
+        return *this;
+
+    this->_n = other_matrix._n;
+    this->_type = other_matrix._type;
+
+    (*this).MathVector<MathVector<T>>::operator=(other_matrix);
+
+    return *this;
+}
+
+template <class T>
+bool Triangle<T>::operator==(const Triangle<T>& other_matrix) {
+    if (&other_matrix == this)
+        return true;
+    if (this->_n != other_matrix._n)
+        return false;
+
+    return (*this).MathVector<MathVector<T>>::operator==(other_matrix);
+}
+
+template <class T>
+bool Triangle<T>::operator!=(const Triangle<T>& other_matrix) {
+    return !((*this) == other_matrix);
+}

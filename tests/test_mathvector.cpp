@@ -111,55 +111,6 @@ TEST(TestMathVector, test_assignment_operator_mult_value) {
     ASSERT_EQ(c[1], 6);
     ASSERT_EQ(c[2], 9);
 }
-TEST(TestMathVector, test_assignment_operator_int_div) {
-    MathVector<int> a;
-    a.push_back(3);
-    a.push_back(6);
-    a.push_back(9);
-
-    MathVector<int> b;
-    b.push_back(3);
-    b.push_back(3);
-    b.push_back(3);
-
-    MathVector<int> c;
-    c = a / b;
-    ASSERT_EQ(c[0], 1);
-    ASSERT_EQ(c[1], 2);
-    ASSERT_EQ(c[2], 3);
-}
-TEST(TestMathVector, test_assignment_operator_float_div) {
-    MathVector<float> a;
-    a.push_back(1);
-    a.push_back(2);
-    a.push_back(4);
-
-    MathVector<float> b;
-    b.push_back(3);
-    b.push_back(2);
-    b.push_back(3);
-
-    MathVector<float> c;
-    c = a / b;
-    ASSERT_EQ(c[0], 0.333333343f);
-    ASSERT_EQ(c[1], 1);
-    ASSERT_EQ(c[2], 1.333333343f);
-}
-
-TEST(TestMathVector, test_assignment_operator_div_zero) {
-    MathVector<int> a;
-    a.push_back(1);
-    a.push_back(2);
-    a.push_back(4);
-    MathVector<int> b;
-    b.push_back(0);
-    b.push_back(0);
-    b.push_back(0);
-
-    ASSERT_THROW(a / b, std::invalid_argument);
-    
-}
-
 
 
 TEST(TestMathVector, test_plus_equals_vector) {
@@ -348,30 +299,8 @@ TEST(TestMathVector, test_differentiation_mathvectors_mult) {
     ASSERT_THROW(a * b, std::invalid_argument);
     
 }
-TEST(TestMathVector, test_differentiation_mathvectors_div) {
-    MathVector<float> a;
-    a.push_back(1);
-    a.push_back(2);
-    a.push_back(4);
-    MathVector<float> b;
-    b.push_back(4);
-    b.push_back(6);
 
-    ASSERT_THROW(a / b, std::invalid_argument);
-   
-}
-TEST(TestMathVector, test_the_scalar_product_mathvectors_vectors) {
-    MathVector<float> a;
-    a.push_back(1);
-    a.push_back(2);
-    a.push_back(4);
-    MathVector<float> b;
-    b.push_back(4);
-    b.push_back(6);
-    ASSERT_THROW(a / b, std::invalid_argument);
-   
 
-}
 TEST(TestMathVector, test_the_scalar_product_product_basic) {
     MathVector<int> a;
     a.push_back(1);

@@ -17,6 +17,7 @@ public:
     Matrix(size_t rows, size_t cols, const T& value);
     Matrix(const Matrix<T>& other) = default;
     Matrix(Matrix<T>&& other) = default;
+    Matrix(const MathVector<MathVector<T>>& other) : MathVector<MathVector<T>>(other) {}
     Matrix<T>& operator=(const Matrix<T>& other) = default;
     Matrix<T>& operator=(Matrix<T>&& other) = default;
 
@@ -28,18 +29,17 @@ public:
     bool is_square() const;
     bool is_valid() const;
 
-
     Matrix<T> operator+(const Matrix<T>& other) const;
     Matrix<T> operator-(const Matrix<T>& other) const;
     Matrix<T> operator*(const Matrix<T>& other) const;
-
-    Matrix<T> operator*(T value) const;
+    Matrix<T> operator*(const T& other) const;        
+    Matrix<T> operator/(const T& other) const;        
 
     Matrix<T>& operator+=(const Matrix<T>& other);
     Matrix<T>& operator-=(const Matrix<T>& other);
     Matrix<T>& operator*=(const Matrix<T>& other);
-
-    Matrix<T>& operator*=(T value);
+    Matrix<T>& operator*=(const T& other);
+    Matrix<T>& operator/=(const T& other);
 
     friend Matrix<T> operator*(T value, const Matrix<T>& matrix) {
         return matrix * value;
@@ -70,23 +70,21 @@ Matrix<T>::Matrix() : MathVector<MathVector<T>>() {}
 
 template <typename T>
 Matrix<T>::Matrix(size_t rows, size_t cols) : MathVector<MathVector<T>>() {
-    if (rows > 100000 || cols > 100000) {
-        throw std::invalid_argument("Matrix dimensions too large");
-    }
-    this->reserve(rows);
-    for (size_t i = 0; i < rows; ++i) {
-        this->push_back(MathVector<T>(cols));
+    if (rows > 0) {
+        this->reserve(rows);
+        for (size_t i = 0; i < rows; ++i) {
+            this->push_back(MathVector<T>(cols));
+        }
     }
 }
 
 template <typename T>
 Matrix<T>::Matrix(size_t rows, size_t cols, const T& value) : MathVector<MathVector<T>>() {
-    if (rows > 100000 || cols > 100000) {
-        throw std::invalid_argument("Matrix dimensions too large");
-    }
-    this->reserve(rows);
-    for (size_t i = 0; i < rows; i++) {
-        this->push_back(MathVector<T>(cols, value));
+    if (rows > 0) {
+        this->reserve(rows);
+        for (size_t i = 0; i < rows; ++i) {
+            this->push_back(MathVector<T>(cols, value));
+        }
     }
 }
 
@@ -103,59 +101,62 @@ size_t Matrix<T>::cols() const {
 
 template <typename T>
 Matrix<T> Matrix<T>::operator+(const Matrix<T>& other) const {
-    if (rows() != other.rows() || cols() != other.cols()) {
-        throw std::invalid_argument("Matrix dimensions must match for addition");
-    }
-
-    Matrix<T> result(rows(), cols());
-    for (size_t i = 0; i < rows(); ++i) {
-        result[i] = (*this)[i] + other[i];
-    }
-    return result;
+    return this->MathVector<MathVector<T>>::operator+(other);
 }
 
 template <typename T>
 Matrix<T> Matrix<T>::operator-(const Matrix<T>& other) const {
-    if (rows() != other.rows() || cols() != other.cols()) {
-        throw std::invalid_argument("Matrix dimensions must match for subtraction");
-    }
-
-    Matrix<T> result(rows(), cols());
-    for (size_t i = 0; i < rows(); ++i) {
-        result[i] = (*this)[i] - other[i];
-    }
-    return result;
+    return this->MathVector<MathVector<T>>::operator-(other);
 }
 
-template <typename T>
+template<class T>
 Matrix<T> Matrix<T>::operator*(const Matrix<T>& other) const {
-    if (!is_valid() || !other.is_valid()) {
-        throw std::invalid_argument("Matrices are not valid");
+      if (cols() != other.rows()) {
+        throw std::invalid_argument("Matrix dimensions do not match for multiplication!");
     }
-    if (cols() != other.rows()) {
-        throw std::invalid_argument("Matrix dimensions don't match for multiplication");
-    }
-
     Matrix<T> result(rows(), other.cols());
-    Matrix<T> other_transposed = other.transpose();
-
-    for (size_t i = 0; i < rows(); ++i) {
-        for (size_t j = 0; j < other.cols(); ++j) {
-            result[i][j] = (*this)[i].the_scalar_product(other_transposed[j]);
+    Matrix<T> otherT = other.transpose();
+    for (size_t i = 0; i < rows(); i++) {
+        for (size_t j = 0; j < other.cols(); j++) {
+            
+            result[i][j] = (*this)[i].the_scalar_product(otherT[j]);
         }
     }
+
     return result;
 }
 
-template <typename T>
-Matrix<T> Matrix<T>::operator*(T value) const {
+template<class T>
+Matrix<T> Matrix<T>::operator*(const T& other) const {
+    if (!is_valid()) {
+        throw std::invalid_argument("Matrix is not valid");
+    }
     Matrix<T> result(rows(), cols());
     for (size_t i = 0; i < rows(); i++) {
-        result[i] = (*this)[i] * value;
+        result[i] = (*this)[i] * other;
     }
+
     return result;
 }
 
+template<class T>
+Matrix<T> Matrix<T>::operator/(const T& other) const {
+    if (other == T()) {
+        throw std::invalid_argument("Division by zero!");
+    }
+
+    if (!is_valid()) {
+        throw std::invalid_argument("Matrix is not valid");
+    }
+
+    Matrix<T> result(rows(), cols());
+
+    for (size_t i = 0; i < rows(); i++) {
+        result[i] = (*this)[i] / other;
+    }
+
+    return result;
+}
 
 template <typename T>
 Matrix<T>& Matrix<T>::operator+=(const Matrix<T>& other) {
@@ -165,7 +166,7 @@ Matrix<T>& Matrix<T>::operator+=(const Matrix<T>& other) {
 
 template <typename T>
 Matrix<T>& Matrix<T>::operator-=(const Matrix<T>& other) {
-    *this = *this - other;
+    *this = *this - other; 
     return *this;
 }
 
@@ -175,21 +176,25 @@ Matrix<T>& Matrix<T>::operator*=(const Matrix<T>& other) {
     return *this;
 }
 
-
 template <typename T>
-Matrix<T>& Matrix<T>::operator*=(T value) {
-    for (size_t i = 0; i < rows(); i++) {
-        (*this)[i] *= value;
-    }
+Matrix<T>& Matrix<T>::operator*=(const T& other) {
+    *this = *this * other;
     return *this;
 }
 
+template <typename T>
+Matrix<T>& Matrix<T>::operator/=(const T& other) {
+    *this = *this / other;
+    return *this;
+}
 
 template <typename T>
 Matrix<T> Matrix<T>::transpose() const {
     if (!is_valid()) {
         throw std::invalid_argument("Matrix is not valid");
     }
+
+    if (rows() == 0 && cols() == 0) return Matrix<T>();
 
     Matrix<T> result(cols(), rows());
     for (size_t i = 0; i < rows(); ++i) {
@@ -207,7 +212,7 @@ bool Matrix<T>::is_square() const {
 
 template <typename T>
 bool Matrix<T>::is_valid() const {
-    if (this->is_empty()) return true;
+    if (this->is_empty()) return false;
     size_t expected_cols = (*this)[0].size();
     for (size_t i = 1; i < this->size(); ++i) {
         if ((*this)[i].size() != expected_cols) {

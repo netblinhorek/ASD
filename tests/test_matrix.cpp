@@ -76,7 +76,7 @@ TEST(TestMatrix, test_is_valid_false) {
 
 TEST(TestMatrix, test_is_valid_empty) {
     Matrix<int> matrix(0, 0);
-    ASSERT_TRUE(matrix.is_valid());
+    ASSERT_FALSE(matrix.is_valid());
 }
 
 TEST(TestMatrix, test_is_valid_single_row) {
@@ -282,6 +282,18 @@ TEST(TestMatrix, test_operator_mult_scalar) {
     ASSERT_EQ(result[1][1], 12);
 }
 
+TEST(TestMatrix, test_operator_div_scalar) {
+    Matrix<int> m(2, 2);
+    m[0][0] = 3; m[0][1] = 9;
+    m[1][0] = 6; m[1][1] = 18;
+
+    Matrix<int> result = m / 3;
+
+    ASSERT_EQ(result[0][0], 1);
+    ASSERT_EQ(result[0][1], 3);
+    ASSERT_EQ(result[1][0], 2);
+    ASSERT_EQ(result[1][1], 6);
+}
 
 TEST(TestMatrix, test_operator_add_equals_matrix) {
     Matrix<int> m1(2, 2);
