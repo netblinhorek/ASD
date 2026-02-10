@@ -1,13 +1,15 @@
 // Copyright 2024 Marina Usova
 
-#define EASY_EXAMPLE
-#ifdef EASY_EXAMPLE
+//#define EASY_EXAMPLE
 
 #include <iostream>
+
+#ifdef EASY_EXAMPLE
 #include <iomanip>
 #include "../lib_easy_example/easy_example.h"
 
 int main() {
+
   int a, b;
   float result;
 
@@ -34,4 +36,5 @@ int main() {
   return 0;
 }
 
-#endif  // EASY_EXAMPLE
+
+#endif
