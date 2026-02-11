@@ -1,0 +1,2 @@
+create_project_lib(UnsortedTableOnArr)
+add_depend(UnsortedTableOnArr ITable lib_ITable)
