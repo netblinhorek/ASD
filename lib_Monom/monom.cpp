@@ -82,7 +82,6 @@ bool Monom::operator!=(const Monom& other) const {
 }
 
 Monom& Monom::operator+=(const Monom& other) {
-
     if (is_like(other)) {
         _coeff += other._coeff;
     }
@@ -155,6 +154,27 @@ Monom Monom::operator-() const {
     return Monom(-_coeff, _powers[0], _powers[1], _powers[2]);
 }
 
+Monom Monom::operator*(double scalar) const {
+    return Monom(_coeff * scalar, _powers[0], _powers[1], _powers[2]);
+}
+
+Monom& Monom::operator*=(double scalar) {
+    _coeff *= scalar;
+    return *this;
+}
+
+// Деление на число
+Monom Monom::operator/(double scalar) const {
+    if (scalar == 0.0) throw std::invalid_argument("Division by zero");
+    return Monom(_coeff / scalar, _powers[0], _powers[1], _powers[2]);
+}
+
+Monom& Monom::operator/=(double scalar) {
+    if (scalar == 0.0) throw std::invalid_argument("Division by zero");
+    _coeff /= scalar;
+    return *this;
+}
+
 double Monom::evaluate_at_point(double x, double y, double z) const {
     
     double x_pow = 1.0;
@@ -174,4 +194,23 @@ double Monom::evaluate_at_point(double x, double y, double z) const {
     }
 
     return _coeff * x_pow * y_pow * z_pow;
+}
+
+
+bool Monom::operator > (const Monom& other) const{
+    for (int i = 0; i < VARS_COUNT; i++) {
+        if (_powers[i] != other._powers[i]) {
+            return _powers[i] > other._powers[i];
+        }
+    }
+    return false;
+}
+
+bool Monom::operator < (const Monom& other) const{
+    for (int i = 0; i < VARS_COUNT; i++) {
+        if (_powers[i] != other._powers[i]) {
+            return _powers[i] < other._powers[i];
+        }
+    }
+    return false;
 }

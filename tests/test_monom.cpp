@@ -270,6 +270,69 @@ TEST(TestMonom, test_monom_friend_function_div_monom_on_value_with_throw) {
     ASSERT_THROW(a.operator/(value), std::logic_error);
 }
 
+
+TEST(TestMonom, test_monom_mult_scalar) {
+    Monom a(2.5, 1, 1, 1);
+    double scalar = 2.0;
+
+    Monom res = a * scalar;
+    ASSERT_DOUBLE_EQ(res.get_coeff(), 5.0);
+    ASSERT_EQ(res.get_power(0), 1);
+
+    Monom res_left = 4.0 * a;
+    ASSERT_DOUBLE_EQ(res_left.get_coeff(), 10.0);
+}
+
+TEST(TestMonom, test_monom_div_scalar) {
+    Monom a(10.0, 2, 0, 0);
+
+    Monom res = a / 2.5;
+    ASSERT_DOUBLE_EQ(res.get_coeff(), 4.0);
+    ASSERT_EQ(res.get_power(0), 2);
+
+    ASSERT_THROW(a / 0.0, std::invalid_argument);
+}
+
+TEST(TestMonom, test_monom_inplace_scalar_ops) {
+    Monom a(3.0, 1, 2, 3);
+
+    a *= 2.0;
+    ASSERT_DOUBLE_EQ(a.get_coeff(), 6.0);
+
+    a /= 3.0;
+    ASSERT_DOUBLE_EQ(a.get_coeff(), 2.0);
+}
+
+TEST(TestMonom, test_scalar_div_monom_complex) {
+    Monom m(2.0, 2, 0, 0); 
+    double value = 10.0;
+
+    Monom res = value / m;
+
+    ASSERT_DOUBLE_EQ(res.get_coeff(), 5.0);   
+    ASSERT_EQ(res.get_power(0), -2);          
+    ASSERT_EQ(res.get_power(1), 0);
+}
+
+
+TEST(TestMonom, test_monom_comparison_all_vars) {
+    Monom m1(1.0, 2, 2, 2);
+    Monom m2(1.0, 2, 2, 1); 
+
+    EXPECT_TRUE(m1 > m2);
+    EXPECT_FALSE(m1 < m2);
+
+    Monom m3(1.0, 3, 0, 0); 
+    EXPECT_TRUE(m3 > m1);
+}
+
+TEST(TestMonom, test_output_zero_monom) {
+    Monom m(0.0, 5, 5, 5);
+    std::ostringstream oss;
+    oss << m;
+    ASSERT_EQ("0", oss.str());
+}
+
 TEST(TestMonom, test_output_operator_positive) {
     Monom m1(3.0, 2, 1, 0); 
     std::ostringstream oss;
@@ -285,7 +348,7 @@ TEST(TestMonom, test_output_operator_negative_coeff) {
 }
 
 TEST(TestMonom, tetst_input_operator_positive) {
-    std::istringstream iss("3.0 2 1 0"); 
+    std::istringstream iss("3.0x^2y^1z^0"); 
     Monom m;
     iss >> m;
 
@@ -296,7 +359,7 @@ TEST(TestMonom, tetst_input_operator_positive) {
 }
 
 TEST(TestMonom, test_input_operator_negative_coeff) {
-    std::istringstream iss("-2.5 1 3 0"); 
+    std::istringstream iss("-2.5x^1y^3");
     Monom m;
     iss >> m;
 
@@ -304,4 +367,29 @@ TEST(TestMonom, test_input_operator_negative_coeff) {
     ASSERT_EQ(1, m.get_power(0));
     ASSERT_EQ(3, m.get_power(1));
     ASSERT_EQ(0, m.get_power(2));
+}
+TEST(TestMonom, test_operation_greater_true) {
+    Monom monom1(5.0, 2, 1, 0);
+    Monom monom2(3.0, 1, 2, 0 );
+
+    EXPECT_TRUE(monom1 > monom2);
+}
+TEST(TestMonom, test_operation_greater_false) {
+    Monom monom1(2.0, 1, 2, 0);
+    Monom monom2(4.0, 2, 1, 0);
+
+    EXPECT_FALSE(monom1 > monom2);
+}
+
+TEST(TestMonom, test_operation_less_true) {
+    Monom monom1(2.0, 1, 2, 0);
+    Monom monom2(4.0, 2, 1, 0);
+
+    EXPECT_TRUE(monom1 < monom2);
+}
+TEST(TestMonom, test_operation_less_false) {
+    Monom monom1(5.0, 2, 1, 0);
+    Monom monom2(3.0, 1, 2, 0);
+
+    EXPECT_FALSE(monom1 < monom2);
 }

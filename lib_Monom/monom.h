@@ -48,6 +48,16 @@ public:
 
     Monom operator-() const; //+
 
+    Monom operator/(double scalar) const; //+
+    Monom operator*(double scalar) const; //+
+
+    Monom& operator*=(double scalar); //+
+    Monom& operator/=(double scalar); //+
+
+
+    bool operator > (const Monom& other) const; //++
+    bool operator < (const Monom& other) const;//++
+
     double evaluate_at_point(double x, double y, double z) const; //+
 
     friend Monom operator*(double value, const Monom& monom) { // +
@@ -57,7 +67,10 @@ public:
         if (value == 0.0) {
             throw std::logic_error("Division by zero monomial");
         }
-        return monom / value;
+        return Monom(value / monom.get_coeff(),
+            -monom.get_power(0),
+            -monom.get_power(1),
+            -monom.get_power(2));
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Monom& m) { //++
@@ -71,15 +84,44 @@ public:
         os << m.get_variables();
         return os;
     }
+    friend std::istream& operator>>(std::istream& is, Monom& m) { //++
+        is >> std::ws;
+        if (is.peek() == EOF) return is;
 
-    friend std::istream& operator>>(std::istream& os, Monom& m) { //++
-        double coeff;
-        int px, py, pz;
-        if (os >> coeff >> px >> py >> pz) {
-            m = Monom(coeff, px, py, pz);
+        double coeff = 1.0;
+        int p[3] = { 0, 0, 0 };
+        int sign = 1;
+
+        if (is.peek() == '+' || is.peek() == '-') {
+            char s;
+            is >> s;
+            if (s == '-') sign = -1;
+            is >> std::ws;
+        }
+        if (std::isdigit(is.peek())) {
+            is >> coeff;
+        }
+        coeff *= sign;
+
+        char c;
+        while (is >> std::ws && (is.peek() == 'x' || is.peek() == 'y' || is.peek() == 'z')) {
+            is >> c;
+            int idx = (c == 'x') ? 0 : (c == 'y') ? 1 : 2;
+
+            if (is.peek() == '^') {
+                is.ignore();
+                is >> p[idx];
+            }
+            else {
+                p[idx] = 1;
+            }
         }
 
-        return os;
+        m = Monom(coeff, p[0], p[1], p[2]);
+
+        if (is.fail()) is.clear();
+
+        return is;
     }
 };
 
