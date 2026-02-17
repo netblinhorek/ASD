@@ -17,6 +17,9 @@ add_subdirectory(lib_easy_example)    # подключаем дополните�
 add_subdirectory(lib_DSU) 
 add_subdirectory(lib_the_number_of_islands) 
 add_subdirectory(lib_labirint) 
+add_subdirectory(lib_TVector) 
+add_subdirectory(lib_MathVector) 
+add_subdirectory(lib_Matrix) 
 add_subdirectory(main)                # подключаем дополнительный CMakeLists.txt из подкаталога с именем main
 
 option(BTEST "build test?" ON)        # указываем подключаем ли google-тесты (ON или YES) или нет (OFF или NO)

@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <stdexcept>
 
@@ -55,6 +56,7 @@ void DSU::union_set(int x, int y) {
 }
 int DSU::find(int x) {
 	if (x >= _size || x < 0) {
+		std::cerr << "ERROR: x = " << x << ", _size = " << _size << std::endl;
 		throw std::logic_error("Going beyond borders");
 	}
 	
@@ -62,14 +64,15 @@ int DSU::find(int x) {
 }
 int DSU::find_recurtion(int x) {
 	if (x >= _size || x < 0) {
+		std::cerr << "ERROR: x = " << x << ", _size = " << _size << std::endl;
 		throw std::logic_error("Going beyond borders");
 	}
 	if (_parent[x] == x) {
 		return x;
 	}
 	return _parent[x] = find_recurtion(_parent[x]);
-
 }
+
 int DSU::get_rank(int x) const {
 	if (x >= _size || x < 0) {
 		throw std::logic_error("Going beyond borders");
