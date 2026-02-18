@@ -346,8 +346,8 @@ TEST(TestPolynom, test_polynom_operator_mult_complex) {
 
 TEST(TestPolynom, test_polynom_operator_mult_with_constant) {
     Polynom p1("3x^2 - 2xy + y^2");
-    Polynom p2("2");
-    Polynom res = p1 * p2;
+    
+    Polynom res = p1 * 2;
 
     ASSERT_EQ(res.get_size(), 3);
 
@@ -364,46 +364,57 @@ TEST(TestPolynom, test_polynom_operator_mult_with_constant) {
     EXPECT_DOUBLE_EQ((*it).get_coeff(), 2.0);   
     EXPECT_EQ((*it).get_power(1), 2);
 }
+TEST(TestPolynom, test_polynom_operator_div_scalar_int) {
+    Polynom p1("4x^2 + 6x - 8");
+    Polynom res = p1 / 2;
 
-TEST(TestPolynom, test_polynom_operator_mult_same_polynom) {
-    Polynom p1("x + y");
-    Polynom res = p1 * p1;
     ASSERT_EQ(res.get_size(), 3);
 
     auto it = res.begin();
-    EXPECT_DOUBLE_EQ((*it).get_coeff(), 1.0);   
+    EXPECT_DOUBLE_EQ((*it).get_coeff(), 2.0);  
     EXPECT_EQ((*it).get_power(0), 2);
 
     ++it;
-    EXPECT_DOUBLE_EQ((*it).get_coeff(), 2.0);   
+    EXPECT_DOUBLE_EQ((*it).get_coeff(), 3.0);  
     EXPECT_EQ((*it).get_power(0), 1);
-    EXPECT_EQ((*it).get_power(1), 1);
 
     ++it;
-    EXPECT_DOUBLE_EQ((*it).get_coeff(), 1.0);  
-    EXPECT_EQ((*it).get_power(1), 2);
-}
-TEST(TestPolynom, test_polynom_operator_div_success) {
-    Polynom p1("10x^2 + 6x");
-    Polynom p2("2x"); 
-
-    Polynom res = p1 / p2;
-
-    ASSERT_EQ(res.get_size(), 2);
-    auto it = res.begin();
-    EXPECT_DOUBLE_EQ((*it).get_coeff(), 5.0);
-    EXPECT_EQ((*it).get_power(0), 1); 
-
-    ++it;
-    EXPECT_DOUBLE_EQ((*it).get_coeff(), 3.0);
+    EXPECT_DOUBLE_EQ((*it).get_coeff(), -4.0); 
     EXPECT_EQ((*it).get_power(0), 0);
 }
 
-TEST(TestPolynom, test_polynom_operator_div_is_empty) {
-    Polynom p1("5x");
-    Polynom p2(""); 
+TEST(TestPolynom, test_polynom_operator_div_scalar_by_zero) {
+    Polynom p1("5x^2 + 3x - 7");
 
-    EXPECT_THROW(p1 / p2, std::invalid_argument);
+    EXPECT_THROW(p1 / 0, std::invalid_argument);
+    EXPECT_THROW(p1 / 0.0, std::invalid_argument);
+}
+TEST(TestPolynom, test_polynom_operator_div_scalar_fractional_result) {
+    Polynom p1("x^2 + x + 1");
+    Polynom res = p1 / 3;
+
+    ASSERT_EQ(res.get_size(), 3);
+
+    auto it = res.begin();
+    EXPECT_DOUBLE_EQ((*it).get_coeff(), 1.0 / 3.0);  
+    EXPECT_EQ((*it).get_power(0), 2);
+
+    ++it;
+    EXPECT_DOUBLE_EQ((*it).get_coeff(), 1.0 / 3.0);  
+    EXPECT_EQ((*it).get_power(0), 1);
+
+    ++it;
+    EXPECT_DOUBLE_EQ((*it).get_coeff(), 1.0 / 3.0);  
+    EXPECT_EQ((*it).get_power(0), 0);
+}
+
+TEST(TestPolynom, test_polynom_operator_div_str) {
+    Polynom p1("5x");
+    Polynom p2("5"); 
+    Polynom expected_result("x");
+    Polynom actual_result = p1 / p2;
+
+    ASSERT_EQ(actual_result, expected_result);
 }
 
 TEST(TestPolynom, test_polynom_operator_div_on_zero) {

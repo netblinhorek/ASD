@@ -78,7 +78,7 @@ TEST(TestUnsortedOnArr, test_erase_non_existent) {
 	ASSERT_EQ(table.get_size(), 1);
 }
 
-TEST(TestUnsortedOnArr, test_erase_middle_and_find_others) {
+TEST(TestUnsortedOnArr, test_erase_middle_and_found_others) {
 	UnsortedTableM<std::string, int> table;
 	table.insert("1", 10);
 	table.insert("2", 20);
@@ -99,4 +99,75 @@ TEST(TestUnsortedOnArr, test_clear_and_reinsert) {
 	table.insert("b", 2);
 	ASSERT_EQ(table.get_size(), 1);
 	ASSERT_EQ(table.found("b"), 2);
+}
+
+
+
+TEST(TestUnsortedOnArr, test_get_key_and_value_throw) {
+    UnsortedTableM<std::string, int> table;
+
+    EXPECT_TRUE(table.is_tab_ended());
+    EXPECT_EQ(table.get_size(), 0);
+
+    EXPECT_THROW(table.get_key(), std::out_of_range);
+    EXPECT_THROW(table.get_value(), std::out_of_range);
+}
+
+TEST(TestUnsortedOnArr, test_is_tab_ended) {
+    UnsortedTableM<std::string, int> table;
+    table.insert("key1", 100);
+
+    table.reset();
+    EXPECT_FALSE(table.is_tab_ended());
+    EXPECT_EQ(table.get_key(), "key1");
+    EXPECT_EQ(table.get_value(), 100);
+
+    table.go_next();
+    EXPECT_TRUE(table.is_tab_ended());
+}
+
+
+TEST(TestUnsortedOnArr, test_is_tab_ended_false) {
+    UnsortedTableM<std::string, int> table;
+    table.insert("key1", 100);
+    table.insert("key2", 200);
+
+    table.reset();
+    EXPECT_EQ(table.get_key(), "key1");
+    table.go_next();
+    EXPECT_EQ(table.get_key(), "key2");
+    EXPECT_FALSE(table.is_tab_ended());
+
+    table.reset();
+	EXPECT_EQ(table.get_key(), "key1");
+	EXPECT_FALSE(table.is_tab_ended());
+}
+
+TEST(TestUnsortedOnArr, test_reset) {
+    UnsortedTableM<std::string, int> table;
+
+    table.reset();
+    EXPECT_TRUE(table.is_tab_ended());
+
+    table.insert("key1", 100);
+    table.reset();
+    EXPECT_FALSE(table.is_tab_ended());
+
+    table.go_next();
+    EXPECT_TRUE(table.is_tab_ended());
+
+    EXPECT_NO_THROW(table.go_next());
+    EXPECT_TRUE(table.is_tab_ended());
+}
+
+
+TEST(TestUnsortedOnArr, test_function_print) {
+	UnsortedTableM<std::string, std::string> table;
+	table.insert("pol1", "3x^2 + 2y - 5z + 7");
+	table.insert("pol2", "3x^2 + 2y - 5z + 7");
+	table.insert("pol2", "3x^2 + 2y - 5z + 6");
+	table.insert("pol2", "3x^2 + 67898x + 2y - 5z + 7");
+	table.insert("pol89", "3x^20 + 5x^19 - 2x^18 + 7x^17 - 4x^16 + 9x^15");
+		
+	table.print(std::cout);
 }

@@ -239,9 +239,6 @@ Polynom& Polynom::operator*=(double scalar) {
 }
 
 Polynom& Polynom::operator/=(double scalar) {
-    if (scalar == 0.0) {
-        throw std::invalid_argument("Division by zero");
-    }
     for (auto it = _polynom.begin(); it != _polynom.end(); ++it) {
         (*it).operator/=(scalar);
     }

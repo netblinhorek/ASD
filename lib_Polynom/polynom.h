@@ -32,8 +32,8 @@ public:
     Polynom& operator/=(const Monom& other); //+
     Polynom& operator/=(double scalar); //+
 
-    Polynom Polynom::operator*(double scalar) const;
-    Polynom Polynom::operator/(double scalar) const;
+    Polynom Polynom::operator*(double scalar) const; //+
+    Polynom Polynom::operator/(double scalar) const; //+
 
     void add_monom(const Monom& m);
 
