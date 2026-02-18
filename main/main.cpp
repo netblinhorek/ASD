@@ -156,8 +156,7 @@ void print(Matrix<bool> labirint, DSU& logic, size_t N, size_t M, size_t X, size
     }
     std::cout << "\n";
 }
-
-Matrix<bool> generate(size_t N, size_t M, size_t X, size_t Y) {
+void generate(size_t N, size_t M, size_t X, size_t Y) {
     Matrix<bool> labirint(N, M, false);
 
     do {
@@ -187,7 +186,6 @@ Matrix<bool> generate(size_t N, size_t M, size_t X, size_t Y) {
 
     } while (true);
 
-    return labirint;
 }
 
 void user_input(size_t& M, size_t& N, size_t& X, size_t& Y) {
@@ -211,7 +209,7 @@ int main() {
     user_input(M, N, X, Y);
     DSU logic(M * N);
     
-    Matrix<bool> labirint = generate(N, M, X, Y);
+    generate(N, M, X, Y);
 
 
 }
