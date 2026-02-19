@@ -19,6 +19,8 @@ add_subdirectory(lib_Monom)
 add_subdirectory(lib_List)
 add_subdirectory(lib_ITable)
 add_subdirectory(lib_UnsortedTableOnArr)
+add_subdirectory(lib_UnsortedTableOnList)
+add_subdirectory(lib_SkipList)
 add_subdirectory(lib_TVector)
 add_subdirectory(main)                # подключаем дополнительный CMakeLists.txt из подкаталога с именем main
 

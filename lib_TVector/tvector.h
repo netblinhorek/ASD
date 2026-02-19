@@ -135,6 +135,9 @@ public:
     inline Iterator begin() noexcept;
     inline Iterator end() noexcept;
 
+    inline Iterator cbegin() const noexcept ;
+    inline Iterator cend() const noexcept ;
+
 
     inline const T* data() const noexcept;
     inline const State* states() const noexcept;
@@ -319,6 +322,15 @@ inline typename TVector<T>::Iterator TVector<T>::begin() noexcept {
 
 template<class T>
 inline typename TVector<T>::Iterator TVector<T>::end() noexcept {
+    return Iterator(this, size());
+}
+template<class T>
+inline typename TVector<T>::Iterator TVector<T>::cbegin() const noexcept {
+    return Iterator(this, 0);
+}
+
+template<class T>
+inline typename TVector<T>::Iterator TVector<T>::cend() const noexcept {
     return Iterator(this, size());
 }
 

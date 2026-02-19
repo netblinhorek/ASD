@@ -85,6 +85,9 @@ public:
         T& operator*() {
             return (_current->value);
         }
+        Node<T>* get_node() const {
+            return _current; 
+        }
 
     };
 
@@ -95,6 +98,7 @@ public:
     Iterator end() const{
         return Iterator(nullptr);
     }
+   
 
 };
 

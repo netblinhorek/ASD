@@ -17,8 +17,7 @@ public:
     void insert(const TKey& key, const TValue& value) override { //++
         for (int i = 0; i < _rows.size(); ++i) {
             if (_rows[i].key == key) {
-                _rows[i].value = value;
-                return;
+                throw std::logic_error("Such a key is already in the table");
             }
         }
         _rows.push_back({ key, value });
@@ -46,33 +45,23 @@ public:
         return _rows.size() == 0; 
     }
 
-    int get_size() const noexcept override {//++ 
-        return _rows.size(); 
-    } 
-
-    void reset() override {//+
-        curr_pos = 0; 
-    } 
-    bool is_tab_ended() const override {//++
-        return curr_pos >= _rows.size(); 
-    }
-    void go_next() override { //+
-        curr_pos++; 
-    }
-    TKey get_key() const override { //++
-        if (curr_pos >= _rows.size()) {
-            throw std::out_of_range("Iterator is out of range in get_key()");
+    TValue& operator[](const TKey& key) {
+        for (int i = 0; i < _rows.size(); ++i) {
+            if (_rows[i].key == key)
+                return const_cast<TValue&>(_rows[i].value);
         }
-        return _rows[curr_pos].key;
+        throw std::logic_error("Key not found");
     }
 
-    TValue get_value() const override { //++
-        if (curr_pos >= _rows.size()) {
-            throw std::out_of_range("Iterator is out of range in get_value()");
+    const TValue& operator[](const TKey& key) const {
+        for (int i = 0; i < _rows.size(); ++i) {
+            if (_rows[i].key == key)
+                return const_cast<TValue&>(_rows[i].value);
         }
-        return _rows[curr_pos].value;
+        throw std::logic_error("Key not found");
     }
-    void print_line(std::ostream& os, int key_width, int value_width) {
+    
+    void print_line(std::ostream& os, int key_width, int value_width) { 
         os << "+";
         for (int i = 0; i < key_width + 2; i++) os << "-";
         os << "+";
@@ -80,21 +69,25 @@ public:
         os << "+" << std::endl;
     }
 
-    void print(std::ostream& os) override { //+
+    void print() override { //++
         const int KEY_WIDTH = 15;
         const int VALUE_WIDTH = 60;
 
-        os << "\n\t *** Table ***\t\n" << std::endl;
+        std::cout << "\n\t *** Table ***\t\n" << std::endl;
 
-        print_line(os, KEY_WIDTH, VALUE_WIDTH);
+        print_line(std::cout, KEY_WIDTH, VALUE_WIDTH);
 
-        for (reset(); !is_tab_ended(); go_next()) {
-            os << "| " << std::left << std::setw(KEY_WIDTH) << get_key()
-                << " | " << std::left << std::setw(VALUE_WIDTH) << get_value() << " |" << std::endl;
+        std::cout << "| " << std::left << std::setw(KEY_WIDTH) << "Key"
+            << " | " << std::left << std::setw(VALUE_WIDTH) << "Value" << " |" << std::endl;
+
+        print_line(std::cout, KEY_WIDTH, VALUE_WIDTH);
+
+        for (size_t i = 0; i < _rows.size(); i++) {
+            std::cout << "| " << std::left << std::setw(KEY_WIDTH) << _rows[i].key
+                << " | " << std::left << std::setw(VALUE_WIDTH) << _rows[i].value << " |" << std::endl;
         }
 
-        print_line(os, KEY_WIDTH, VALUE_WIDTH);
+        print_line(std::cout, KEY_WIDTH, VALUE_WIDTH);
 
-        reset();
     }
 };

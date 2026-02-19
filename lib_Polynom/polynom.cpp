@@ -289,15 +289,18 @@ List<Monom>::Iterator Polynom::end()
 std::ostream& operator<<(std::ostream& os, const Polynom& p) {
     if (p._polynom.is_empty()) return os << "0";
 
+    std::stringstream ss;
     auto it = p._polynom.begin();
-    os << *it; 
-    for (++it; it != p._polynom.end(); ++it) {
-        if ((*it).get_coeff() > 0) os << " + ";
-        else os << " "; 
+    ss << *it;
 
-        os << *it; 
+    for (++it; it != p._polynom.end(); ++it) {
+        if ((*it).get_coeff() > 0) ss << " + ";
+        else ss << " ";
+
+        ss << *it; 
     }
-    return os;
+
+    return os << ss.str(); 
 }
 std::istream& operator>>(std::istream& is, Polynom& p) {
     p._polynom.clear();

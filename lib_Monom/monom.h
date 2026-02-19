@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <sstream>
 
 const int VARS_COUNT = 3;
 
@@ -72,16 +73,25 @@ public:
             -monom.get_power(1),
             -monom.get_power(2));
     }
-
-    friend std::ostream& operator<<(std::ostream& os, const Monom& m) { //++
+    friend std::ostream& operator<<(std::ostream& os, const Monom& m) {
         if (m._coeff == 0.0) {
             os << "0";
             return os;
         }
+
+        std::stringstream ss;
+
+        // Формируем строку монома
         if (m._coeff != 1.0 || m.get_variables().empty()) {
-            os << m._coeff;
+            ss << m._coeff;
         }
-        os << m.get_variables();
+
+        std::string vars = m.get_variables();
+        if (!vars.empty()) {
+            ss << vars;
+        }
+
+        os << ss.str(); // Выводим всё одной строкой
         return os;
     }
     friend std::istream& operator>>(std::istream& is, Monom& m) { //++
