@@ -1,0 +1,2 @@
+create_project_lib(SortedTableOnArr)
+add_depend(SortedTableOnArr ITable lib_ITable)

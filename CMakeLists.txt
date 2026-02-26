@@ -22,6 +22,7 @@ add_subdirectory(lib_UnsortedTableOnArr)
 add_subdirectory(lib_UnsortedTableOnList)
 add_subdirectory(lib_SkipList)
 add_subdirectory(lib_TVector)
+add_subdirectory(lib_SortedTableOnArr)
 add_subdirectory(main)                # подключаем дополнительный CMakeLists.txt из подкаталога с именем main
 
 option(BTEST "build test?" ON)        # указываем подключаем ли google-тесты (ON или YES) или нет (OFF или NO)

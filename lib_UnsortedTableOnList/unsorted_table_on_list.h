@@ -24,12 +24,16 @@ public:
     }
 
     void erase(const TKey& key) override { //++
+        if (_rows.is_empty()) {
+            throw std::out_of_range("Index out of range");
+        }
         for (auto it = _rows.begin(); it != _rows.end(); ++it) {
             if ((*it).key == key) {
                 _rows.erase(it.get_node());
                 return;
             }
         }
+        throw std::out_of_range("Key not found in table");
     }
 
     TValue& found(const TKey& key) const override { //++

@@ -68,12 +68,13 @@ TEST(TestUnsortedOnList, test_insert_duplicate_key) {
     ASSERT_NE(table.found("pol1"), p2);
 }
 
-TEST(TestUnsortedOnList, test_erase_non_existent) {
+TEST(TestUnsortedOnList, test_erase_with_throw) {
     UnsortedTableL<std::string, Polynom> table;
+    ASSERT_THROW(table.erase("pol1"), std::out_of_range);
     Polynom p("x");
 
     table.insert("pol1", p);
-    ASSERT_NO_THROW(table.erase("pol2"));
+    ASSERT_THROW(table.erase("pol2"), std::out_of_range);
 }
 
 TEST(TestUnsortedOnList, test_erase_middle_and_find_others) {
@@ -88,6 +89,7 @@ TEST(TestUnsortedOnList, test_erase_middle_and_find_others) {
 
     table.erase("1");
     ASSERT_NO_THROW(table.found("3"));
+    ASSERT_THROW(table.found("4"), std::logic_error);
     ASSERT_EQ(table.found("2"), p2);
     ASSERT_EQ(table.found("3"), p3);
 }

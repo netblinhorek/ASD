@@ -28,22 +28,29 @@ Polynom::Polynom(std::string str) {
             i++;
         }
 
-        while (i < n && (str[i] == ' ' || str[i] == '\t')) i++;
+        while (i < n && (str[i] == ' ' || str[i] == '\t')) {
+            i++;
+        }
 
         double coeff = 0;
-        bool has_digit = false;
+        int digit_count = 0;
         while (i < n && str[i] >= '0' && str[i] <= '9') {
             coeff = coeff * 10 + (str[i] - '0');
             i++;
-            has_digit = true;
+            digit_count++;
         }
-        if (!has_digit) coeff = 1.0;
-        coeff *= sign;
+        if (digit_count == 0) {
+            coeff = 1.0;
+        }
+        coeff = coeff * sign;
 
-        int p[3] = { 0, 0, 0 };
+        int powers[3] = { 0, 0, 0 };
+
         while (i < n && (str[i] == 'x' || str[i] == 'y' || str[i] == 'z')) {
-            char var = str[i];
-            int idx = (var == 'x') ? 0 : (var == 'y') ? 1 : 2;
+            int var_index;
+            if (str[i] == 'x') var_index = 0;
+            else if (str[i] == 'y') var_index = 1;
+            else var_index = 2;
             i++;
 
             if (i < n && str[i] == '^') {
@@ -53,17 +60,17 @@ Polynom::Polynom(std::string str) {
                     power = power * 10 + (str[i] - '0');
                     i++;
                 }
-                p[idx] = power;
+                powers[var_index] = power;
             }
             else {
-                p[idx] = 1;
+                powers[var_index] = 1;
             }
         }
 
-        add_monom(Monom(coeff, p[0], p[1], p[2]));
+        Monom m(coeff, powers[0], powers[1], powers[2]);
+        add_monom(m);
     }
 }
-
 Polynom::Polynom(List<Monom> monoms) {
     for (auto it = monoms.begin(); it != monoms.end(); ++it) {
         add_monom(*it);
@@ -97,7 +104,7 @@ Polynom& Polynom::operator*=(const Monom& other) {
 
 
 Polynom& Polynom::operator/=(const Monom& other) {
-    if (other.get_coeff() == 0) {
+    if (other.get_coeff() == 0.0) {
         throw std::invalid_argument("Division by zero");
     }
 
@@ -128,7 +135,7 @@ bool Polynom::operator==(const Monom& other) const {
     return *(_polynom.begin()) == other; 
 }
 
-inline bool Polynom::operator!=(const Monom& other) const {
+bool Polynom::operator!=(const Monom& other) const {
     return !(*this == other);
 }
 
@@ -185,33 +192,36 @@ Polynom Polynom::operator*(const Polynom& other) const {
 
 
 Polynom Polynom::operator/(const Polynom& other) const {
-    if (other._polynom.is_empty())
+    if (other._polynom.is_empty()) {
         throw std::invalid_argument("Division by zero (empty polynomial)");
+    }
 
-    Polynom quotient;          
-    Polynom dividend = *this;  
+    Polynom quotient;           
+    Polynom remainder = *this;  
 
-    Monom divisor_lead = *(other._polynom.begin());
+    Monom divisor_first = *(other._polynom.begin());
 
-    while (!dividend._polynom.is_empty()) {
-        Monom dividend_lead = *(dividend._polynom.begin());
+    while (!remainder._polynom.is_empty()) {
+        Monom remainder_first = *(remainder._polynom.begin());
 
         bool can_divide = true;
-        for (int i = 0; i < 3; ++i) {
-            if (dividend_lead.get_power(i) < divisor_lead.get_power(i)) {
+        for (int i = 0; i < 3; i++) {
+            if (remainder_first.get_power(i) < divisor_first.get_power(i)) {
                 can_divide = false;
                 break;
             }
         }
 
-        if (!can_divide) break; 
+        if (!can_divide) {
+            break;
+        }
 
-        Monom res_monom = dividend_lead / divisor_lead;
+        Monom quotient_term = remainder_first / divisor_first;
 
-        quotient.add_monom(res_monom);
+        quotient.add_monom(quotient_term);
 
-        Polynom subtrahend = other * res_monom;
-        dividend = dividend - subtrahend;
+        Polynom to_subtract = other * quotient_term;
+        remainder = remainder - to_subtract;
     }
 
     return quotient;
@@ -275,6 +285,21 @@ void Polynom::add_monom(const Monom& m) {
     }
 
     _polynom.push_back(m);
+}
+
+bool Polynom::operator<(const Polynom& other) const
+{
+    auto it1 = _polynom.begin();
+    auto it2 = other._polynom.begin();
+
+    while (it1 != _polynom.end() && it2 != other._polynom.end()) {
+        if (*it1 < *it2) return true;
+        if (*it2 < *it1) return false;
+        ++it1;
+        ++it2;
+    }
+
+    return false; 
 }
 
 List<Monom>::Iterator Polynom::begin()

@@ -81,7 +81,6 @@ public:
 
         std::stringstream ss;
 
-        // Формируем строку монома
         if (m._coeff != 1.0 || m.get_variables().empty()) {
             ss << m._coeff;
         }
@@ -91,7 +90,7 @@ public:
             ss << vars;
         }
 
-        os << ss.str(); // Выводим всё одной строкой
+        os << ss.str(); 
         return os;
     }
     friend std::istream& operator>>(std::istream& is, Monom& m) { //++

@@ -1,27 +1,27 @@
 #include <gtest/gtest.h>
-#include "../lib_UnsortedTableOnArr/unsorted_table_on_arr.h"
+#include "../lib_SortedTableOnArr/sorted_table_on_arr.h"
 #include "../lib_Polynom/polynom.h"
 #define EPSILON 0.000001
 
-TEST(TestUnsortedOnArr, test_unsorted_table_on_arr_empty) {
-    UnsortedTableM<std::string, Polynom> table_on_arr;
+TEST(TestSortedOnArr, test_unsorted_table_on_arr_empty) {
+    SortedTableM<std::string, Polynom> table_on_arr;
     ASSERT_TRUE(table_on_arr.is_empty());
 }
 
-TEST(TestUnsortedOnArr, test_unsorted_table_on_arr_erase) {
-    UnsortedTableM<std::string, Polynom> table_on_arr;
+TEST(TestSortedOnArr, test_unsorted_table_on_arr_erase) {
+    SortedTableM<std::string, Polynom> table_on_arr;
     Polynom p1("3x^2 + 2y - 5z + 7");
-    Polynom p2("3x^2 + 2y - 5z + 7");
+    Polynom p2("3x^2 + 2y - 5z");
 
     table_on_arr.insert("pol1", p1);
-    table_on_arr.insert("pol2", p2);
-    table_on_arr.erase("pol2");
-
+    table_on_arr.insert("pol0", p2);
+   
+    table_on_arr.print();
     ASSERT_FALSE(table_on_arr.is_empty());
 }
 
-TEST(TestUnsortedOnArr, test_unsorted_table_on_arr_found) {
-    UnsortedTableM<std::string, Polynom> table_on_arr;
+TEST(TestSortedOnArr, test_unsorted_table_on_arr_found) {
+    SortedTableM<std::string, Polynom> table_on_arr;
     Polynom p1("3x^2 + 2y - 5z + 7");
     Polynom p2("3x^2 + 2y - 5z + 7");
 
@@ -32,8 +32,8 @@ TEST(TestUnsortedOnArr, test_unsorted_table_on_arr_found) {
     EXPECT_EQ(table_on_arr.found("pol2"), p2);
 }
 
-TEST(TestUnsortedOnArr, test_unsorted_table_on_arr_found_with_erase) {
-    UnsortedTableM<std::string, Polynom> table_on_arr;
+TEST(TestSortedOnArr, test_unsorted_table_on_arr_found_with_erase) {
+    SortedTableM<std::string, Polynom> table_on_arr;
     Polynom p1("3x^2 + 2y - 5z + 7");
     Polynom p2("3x^2 + 2y - 5z + 7");
 
@@ -45,8 +45,8 @@ TEST(TestUnsortedOnArr, test_unsorted_table_on_arr_found_with_erase) {
     EXPECT_EQ(table_on_arr.found("pol1"), p1);
 }
 
-TEST(TestUnsortedOnArr, test_unsorted_table_on_arr_found_with_throw) {
-    UnsortedTableM<std::string, Polynom> table_on_arr;
+TEST(TestSortedOnArr, test_unsorted_table_on_arr_found_with_throw) {
+    SortedTableM<std::string, Polynom> table_on_arr;
     Polynom p1("3x^2 + 2y - 5z + 7");
     Polynom p2("3x^2 + 2y - 5z + 7");
 
@@ -57,8 +57,8 @@ TEST(TestUnsortedOnArr, test_unsorted_table_on_arr_found_with_throw) {
     ASSERT_THROW(table_on_arr.found("pol2"), std::logic_error);
 }
 
-TEST(TestUnsortedOnArr, test_insert_duplicate_key) {
-    UnsortedTableM<std::string, Polynom> table;
+TEST(TestSortedOnArr, test_insert_duplicate_key) {
+    SortedTableM<std::string, Polynom> table;
     Polynom p1("x+y");
     Polynom p2("z");
 
@@ -68,8 +68,9 @@ TEST(TestUnsortedOnArr, test_insert_duplicate_key) {
     ASSERT_NE(table.found("pol1"), p2);
 }
 
-TEST(TestUnsortedOnArr, test_erase_with_throw) {
-    UnsortedTableM<std::string, Polynom> table;
+
+TEST(TestSortedOnArr, test_erase_with_throw) {
+    SortedTableM<std::string, Polynom> table;
     ASSERT_THROW(table.erase("pol1"), std::out_of_range);
     Polynom p("x");
 
@@ -77,8 +78,8 @@ TEST(TestUnsortedOnArr, test_erase_with_throw) {
     ASSERT_THROW(table.erase("pol2"), std::out_of_range);
 }
 
-TEST(TestUnsortedOnArr, test_erase_middle_and_find_others) {
-    UnsortedTableM<std::string, Polynom> table;
+TEST(TestSortedOnArr, test_erase_middle_and_find_others) {
+    SortedTableM<std::string, Polynom> table;
     Polynom p1("10");
     Polynom p2("20");
     Polynom p3("30");
@@ -94,8 +95,8 @@ TEST(TestUnsortedOnArr, test_erase_middle_and_find_others) {
     ASSERT_EQ(table.found("3"), p3);
 }
 
-TEST(TestUnsortedOnArr, test_clear_and_reinsert) {
-    UnsortedTableM<std::string, Polynom> table;
+TEST(TestSortedOnArr, test_clear_and_reinsert) {
+    SortedTableM<std::string, Polynom> table;
     Polynom p1("1");
     Polynom p2("2");
 
@@ -107,23 +108,24 @@ TEST(TestUnsortedOnArr, test_clear_and_reinsert) {
     ASSERT_EQ(table.found("b"), p2);
 }
 
-TEST(TestUnsortedOnArr, test_function_print) {
-    UnsortedTableM<std::string, Polynom> table;
+TEST(TestSortedOnArr, test_function_print) {
+    SortedTableM<std::string, Polynom> table;
     Polynom p1("3x^2 + 2y - 5z + 7");
     Polynom p2("3x^2 + 2y - 5z + 7");
     Polynom p3("3x^20 + 5x^19 - 2x^18 + 7x^17 - 4x^16 + 9x^15");
+    Polynom p4("3x^20 + 5x^19 - 2x^18 + 7x^17");
 
     table.insert("pol1", p1);
     table.insert("pol2", p2);
     ASSERT_THROW(table.insert("pol2", Polynom("3x^2 + 2y - 5z + 6")), std::logic_error);
     table.insert("pol89", p3);
-
+    table.insert("pol79", p4);
     table.print();
 }
 
 
-TEST(TestUnsortedOnArr, test_polynom_equality) {
-    UnsortedTableM<Polynom, std::string> table;
+TEST(TestSortedOnArr, test_polynom_equality) {
+    SortedTableM<Polynom, std::string> table;
     Polynom p1("3x^2 + 2y - 5z + 7");
     Polynom p2("3x^2 + 2y - 5z + 7");  
     Polynom p3("x + y - z");           
@@ -136,8 +138,8 @@ TEST(TestUnsortedOnArr, test_polynom_equality) {
     ASSERT_EQ(table.found(p3), "third");
 }
 
-TEST(TestUnsortedOnArr, test_operator_bracket_simple) {
-    UnsortedTableM<std::string, Polynom> table;
+TEST(TestSortedOnArr, test_operator_bracket_simple) {
+    SortedTableM<std::string, Polynom> table;
 
     std::string keys[] = { "k1", "k2", "k3" };
     Polynom values[] = { Polynom("x+1"), Polynom("2y"), Polynom("z-5") };

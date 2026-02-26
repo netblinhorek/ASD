@@ -93,7 +93,7 @@ Monom& Monom::operator+=(const Monom& other) {
 
 Monom Monom::operator+(const Monom& other) const {
     Monom result = *this;
-    result += other;
+    result.operator+=(other);
     return result;
 }
 
@@ -109,7 +109,7 @@ Monom& Monom::operator-=(const Monom& other) {
 
 Monom Monom::operator-(const Monom& other) const {
     Monom result = *this;
-    result -= other;
+    result.operator-=(other);
     return result;
 }
 
@@ -123,7 +123,7 @@ Monom& Monom::operator*=(const Monom& other) {
 
 Monom Monom::operator*(const Monom& other) const {
     Monom result = *this;
-    result *= other;
+    result.operator*=(other);
     return result;
 }
 
@@ -146,7 +146,7 @@ Monom& Monom::operator/=(const Monom& other) {
 
 Monom Monom::operator/(const Monom& other) const {
     Monom result = *this;
-    result /= other;
+    result.operator/=(other);
     return result;
 }
 
@@ -163,9 +163,9 @@ Monom& Monom::operator*=(double scalar) {
     return *this;
 }
 
-// Деление на число
 Monom Monom::operator/(double scalar) const {
-    if (scalar == 0.0) throw std::invalid_argument("Division by zero");
+    if (scalar == 0.0) 
+        throw std::invalid_argument("Division by zero");
     return Monom(_coeff / scalar, _powers[0], _powers[1], _powers[2]);
 }
 
