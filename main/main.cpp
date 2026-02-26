@@ -167,13 +167,13 @@ void generate(size_t N, size_t M, size_t X, size_t Y) {
 
 
                 if (j < M - 1) {
-                    if (rand() % 2 == 0) {
+                    if (rand() % 10 == 0) {
                         logic.union_set(curr, curr + 1);
                         labirint[i][j] = true;
                     }
                 }
                 if (i < N - 1) {
-                    if (rand() % 2 == 0)
+                    if (rand() % 10 == 0)
                         logic.union_set(curr, curr + M);
                 }
             }
