@@ -14,7 +14,7 @@ public:
 
     virtual void insert(const TKey& key, const TValue& value) = 0;
     virtual void erase(const TKey& key) = 0;
-    virtual TValue& found(const TKey& key) const = 0;
+    virtual TValue& found(const TKey& key)  = 0;
     virtual bool is_empty() const noexcept = 0;
 
 

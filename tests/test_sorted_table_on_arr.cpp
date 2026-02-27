@@ -138,17 +138,76 @@ TEST(TestSortedOnArr, test_polynom_equality) {
     ASSERT_EQ(table.found(p3), "third");
 }
 
-TEST(TestSortedOnArr, test_operator_bracket_simple) {
+TEST(TestSortedOnArr, test_keys_stored_in_sorted_order) {
     SortedTableM<std::string, Polynom> table;
 
-    std::string keys[] = { "k1", "k2", "k3" };
-    Polynom values[] = { Polynom("x+1"), Polynom("2y"), Polynom("z-5") };
+    std::string keys_unsorted[] = { "k3", "k1", "k5", "k2", "k4" };
+    Polynom values[] = {
+        Polynom("3"), Polynom("1"), Polynom("5"),
+        Polynom("2"), Polynom("4")
+    };
 
-    for (int i = 0; i < 3; ++i) {
+    int count = 5;
+    for (int i = 0; i < count; ++i) {
+        table.insert(keys_unsorted[i], values[i]);
+    }
+
+    for (size_t i = 1; i < table.size(); ++i) {
+        const auto& prev = table.get_key(i - 1);
+        const auto& curr = table.get_key(i);
+        EXPECT_LT(prev, curr);
+    }
+    std::string expected_order[] = { "k1", "k2", "k3", "k4", "k5" };
+    for (size_t i = 0; i < table.size(); ++i) {
+        EXPECT_EQ(table.get_key(i), expected_order[i]);
+    }
+
+    for (int i = 0; i < count; ++i) {
+        EXPECT_EQ(table[keys_unsorted[i]], values[i]);
+    }
+}
+TEST(TestSortedOnArr, test_found_method) {
+    SortedTableM<std::string, Polynom> table;
+
+    std::string keys[] = { "k3", "k1", "k5", "k2", "k4" };
+    Polynom values[] = {
+        Polynom("3x + 2y"), Polynom("x + y"), Polynom("5z"),
+        Polynom("2x - y"), Polynom("4x + z")
+    };
+
+    for (int i = 0; i < 5; ++i) {
         table.insert(keys[i], values[i]);
     }
 
-    for (int i = 0; i < 3; ++i) {
-        EXPECT_EQ(table[keys[i]], values[i]);
+    EXPECT_EQ(table.found("k1"), values[1]); 
+    EXPECT_EQ(table.found("k3"), values[0]); 
+    EXPECT_EQ(table.found("k5"), values[2]); 
+
+    EXPECT_THROW(table.found("k10"), std::logic_error);
+    EXPECT_THROW(table.found("abc"), std::logic_error);
+}
+
+TEST(TestSortedOnArr, test_erase_basic) {
+    SortedTableM<std::string, Polynom> table;
+
+    std::string keys[] = { "k1", "k2", "k3", "k4", "k5" };
+    Polynom values[] = {
+        Polynom("1x"), Polynom("2y"), Polynom("3z"),
+        Polynom("4x"), Polynom("5y")
+    };
+
+    for (int i = 0; i < 5; ++i) {
+        table.insert(keys[i], values[i]);
+    }
+
+    EXPECT_EQ(table.size(), 5);
+    table.erase("k3");
+    EXPECT_EQ(table.size(), 4);
+
+    EXPECT_THROW(table.found("k3"), std::logic_error);
+
+    std::string expected_order1[] = { "k1", "k2", "k4", "k5" };
+    for (size_t i = 0; i < table.size(); ++i) {
+        EXPECT_EQ(table.get_key(i), expected_order1[i]);
     }
 }

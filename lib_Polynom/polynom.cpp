@@ -1,5 +1,6 @@
 #include "../lib_Polynom/polynom.h"
 #include <cctype>
+#include <stdexcept>
 #include <vector>
 
 Polynom::Polynom() {
@@ -14,6 +15,12 @@ Polynom::Polynom(std::string str) {
     int i = 0;
 
     while (i < n) {
+        auto is_delim = [](unsigned char c) {
+            return std::isspace(c) || c == '+' || c == '-';
+        };
+
+        const int term_begin = i;
+
         while (i < n && (str[i] == ' ' || str[i] == '\t' || str[i] == '\n' || str[i] == '\r')) {
             i++;
         }
@@ -46,6 +53,7 @@ Polynom::Polynom(std::string str) {
 
         int powers[3] = { 0, 0, 0 };
 
+        const int vars_begin = i;
         while (i < n && (str[i] == 'x' || str[i] == 'y' || str[i] == 'z')) {
             int var_index;
             if (str[i] == 'x') var_index = 0;
@@ -65,6 +73,15 @@ Polynom::Polynom(std::string str) {
             else {
                 powers[var_index] = 1;
             }
+        }
+
+
+        if (i == term_begin) {
+            throw std::invalid_argument("Invalid polynomial string: cannot parse term");
+        }
+
+        if (i < n && !is_delim(static_cast<unsigned char>(str[i]))) {
+            throw std::invalid_argument("Invalid polynomial string: unexpected character");
         }
 
         Monom m(coeff, powers[0], powers[1], powers[2]);

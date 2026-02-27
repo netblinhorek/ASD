@@ -36,10 +36,10 @@ public:
         throw std::out_of_range("Key not found in table");
     }
 
-    TValue& found(const TKey& key) const override { //++
+    TValue& found(const TKey& key)  override { //++
         for (auto it = _rows.begin(); it != _rows.end(); ++it) {
             if ((*it).key == key)
-                return const_cast<TValue&>((*it).value);
+                return ((*it).value);
         }
         throw std::logic_error("Key not found");
     }

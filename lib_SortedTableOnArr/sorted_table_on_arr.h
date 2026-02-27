@@ -3,7 +3,8 @@
 
 #include "../lib_TVector/tvector.h"
 #include "../lib_ITable/itable.h"
-#include<iomanip>
+#include <iomanip>
+#include <utility> 
 
 template <class TKey, class TValue>
 class SortedTableM : public ITable<TKey, TValue> {
@@ -11,108 +12,88 @@ private:
     TVector<TPair> _rows;
     int curr_pos;
 
-public:
-    SortedTableM() : curr_pos(0) {}
-
-    void insert(const TKey& key, const TValue& value) override { //+
-        for (int i = 0; i < _rows.size(); ++i) {
-            if (_rows[i].key == key) {
-                throw std::logic_error("Such a key is already in the table");
-            }
-        }
-
-        int pos_insert = 0;
-
-        if (_rows.is_empty() == false) {
-            int left = 0;
-            int right = _rows.size() - 1;
-
-            while (left <= right) {
-                int mid = (left + right) / 2;
-
-                if (_rows[mid].key < key) {
-                    left = mid + 1;
-                    pos_insert = left;
-                }
-                else {
-                    right = mid - 1;
-                    pos_insert = mid;
-                }
-            }
-        }
-
-        _rows.insert({ key, value }, pos_insert);
-    }
-
-    void erase(const TKey& key) override { //++++
-        int pos_insert = 0;
+    std::pair<int, bool> binary_search_pos(const TKey& key) const {
         if (_rows.is_empty()) {
-            throw std::out_of_range("Index out of range");
-        }
-        else{
-            int left = 0;
-            int right = _rows.size() - 1;
-
-            while (left <= right) {
-                int mid = (left + right) / 2;
-
-                if (_rows[mid].key < key) {
-                    left = mid + 1;
-                    pos_insert = left;
-                }
-                else {
-                    right = mid - 1;
-                    pos_insert = mid;
-                }
-            }
+            return { 0, false };
         }
 
-        _rows.erase(pos_insert);
-
-    }
-
-
-    TValue& found(const TKey& key) const override {
         int left = 0;
-        int right = _rows.size() - 1;
+        int right = static_cast<int>(_rows.size() - 1);
+        int pos = 0;
 
         while (left <= right) {
             int mid = (left + right) / 2;
 
             if (_rows[mid].key == key) {
-                return const_cast<TValue&>(_rows[mid].value);
+                return { mid, true }; 
             }
             else if (_rows[mid].key < key) {
                 left = mid + 1;
+                pos = left; 
             }
             else {
                 right = mid - 1;
+                pos = mid; 
             }
         }
-
-        throw std::logic_error("Key not found");
+        return { pos, false };
     }
 
-    bool is_empty() const noexcept override {//+ 
+public:
+
+    SortedTableM() : curr_pos(0) {}
+
+    void insert(const TKey& key, const TValue& value) override {
+        auto [pos, found] = binary_search_pos(key);
+        if (found) {
+            throw std::logic_error("Such a key is already in the table");
+        }
+        _rows.insert({ key, value }, pos);
+    }
+
+    void erase(const TKey& key) override {
+        auto [pos, found] = binary_search_pos(key);
+        if (!found) {
+            throw std::out_of_range("Key not found");
+        }
+        _rows.erase(pos);
+    }
+
+    TValue& found(const TKey& key) override {
+        auto [pos, found] = binary_search_pos(key);
+        if (!found) {
+            throw std::logic_error("Key not found");
+        }
+        return _rows[pos].value;
+    }
+
+    bool is_empty() const noexcept override {
         return _rows.size() == 0;
     }
 
     TValue& operator[](const TKey& key) {
-        for (int i = 0; i < _rows.size(); ++i) {
-            if (_rows[i].key == key)
-                return const_cast<TValue&>(_rows[i].value);
+        
+        auto [pos, found] = binary_search_pos(key);
+        if (!found) {
+            throw std::logic_error("Key not found");
         }
-        throw std::logic_error("Key not found");
+        return _rows[pos].value;
     }
 
     const TValue& operator[](const TKey& key) const {
-        for (int i = 0; i < _rows.size(); ++i) {
-            if (_rows[i].key == key)
-                return const_cast<TValue&>(_rows[i].value);
+        auto [pos, found] = binary_search_pos(key);
+        if (!found) {
+            throw std::logic_error("Key not found");
         }
-        throw std::logic_error("Key not found");
+        return _rows[pos].value;
     }
-
+    const TKey& get_key(size_t index) const {
+        if (index >= _rows.size()) throw std::out_of_range("Index out of range");
+        return _rows[index].key;
+    }
+    size_t size() const {
+        return _rows.size();
+    }
     void print_line(std::ostream& os, int key_width, int value_width) {
         os << "+";
         for (int i = 0; i < key_width + 2; i++) os << "-";
@@ -121,12 +102,11 @@ public:
         os << "+" << std::endl;
     }
 
-    void print() override { //++
+    void print() override {
         const int KEY_WIDTH = 15;
         const int VALUE_WIDTH = 60;
 
         std::cout << "\n\t *** Table ***\t\n" << std::endl;
-
         print_line(std::cout, KEY_WIDTH, VALUE_WIDTH);
 
         std::cout << "| " << std::left << std::setw(KEY_WIDTH) << "Key"
@@ -140,6 +120,5 @@ public:
         }
 
         print_line(std::cout, KEY_WIDTH, VALUE_WIDTH);
-
     }
 };

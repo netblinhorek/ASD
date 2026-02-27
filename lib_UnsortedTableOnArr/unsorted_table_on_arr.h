@@ -39,10 +39,10 @@ public:
         throw std::out_of_range("Key not found in table");
     }
 
-    TValue& found(const TKey& key) const override { //++++
+    TValue& found(const TKey& key)  override { //++++
         for (int i = 0; i < _rows.size(); ++i) {
             if (_rows[i].key == key)
-                return const_cast<TValue&>(_rows[i].value);
+                return _rows[i].value;
         }
         throw std::logic_error("Key not found");
     }
@@ -54,7 +54,7 @@ public:
     TValue& operator[](const TKey& key) {
         for (int i = 0; i < _rows.size(); ++i) {
             if (_rows[i].key == key)
-                return const_cast<TValue&>(_rows[i].value);
+                return _rows[i].value;
         }
         throw std::logic_error("Key not found");
     }
@@ -62,7 +62,7 @@ public:
     const TValue& operator[](const TKey& key) const {
         for (int i = 0; i < _rows.size(); ++i) {
             if (_rows[i].key == key)
-                return const_cast<TValue&>(_rows[i].value);
+                return _rows[i].value;
         }
         throw std::logic_error("Key not found");
     }
