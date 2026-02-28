@@ -56,161 +56,189 @@ int main() {
 
 #endif  // PLAY_GAME
 
+
 #ifdef LABIRINT
 #include <iostream>
-#include "../lib_DSU/DSU.h"
 #include <ctime>
+#include <algorithm>
 #include "../lib_Matrix/matrix.h"
+#include "../lib_TVector/tvector.h"
+#include "../lib_DSU/DSU.h"
 
 
+bool are_connected(size_t N, size_t M,
+    const Matrix<bool>& right,
+    const Matrix<bool>& down,
+    size_t X, size_t Y)
+{
+    DSU dsu(N * M);
 
+    for (size_t i = 0; i < N; ++i)
+        for (size_t j = 0; j < M; ++j) {
+            if (j + 1 < M && !right[i][j])
+                dsu.union_set(i * M + j, i * M + j + 1);
+            if (i + 1 < N && !down[i][j])
+                dsu.union_set(i * M + j, i * M + M + j);
+        }
 
-bool check_path(size_t M, size_t N, DSU& logic, size_t X, size_t Y) {
-    int start_cell = X - 1;  
-    int end_cell = (N - 1) * M + (Y - 1); 
-
-    return logic.find(start_cell) == logic.find(end_cell);
+    return dsu.find(X - 1) == dsu.find(N * M - M + Y - 1);
 }
 
-void print(Matrix<bool> labirint, DSU& logic, size_t N, size_t M, size_t X, size_t Y) {
-    std::cout << "\nЋабиринт:\n";
+void shuffle_walls(Matrix<bool>& right, Matrix<bool>& down) {
+    TVector<bool> walls;
 
-    for (int p = 1; p <= M; p++) {
-        if (p == X) {
-            std::cout << "   X    ";
+    for (size_t i = 0; i < right.rows(); ++i)
+        for (size_t j = 0; j < right.cols(); ++j)
+            walls.push_back(right[i][j]);
+
+    for (size_t i = 0; i < down.rows(); ++i)
+        for (size_t j = 0; j < down.cols(); ++j)
+            walls.push_back(down[i][j]);
+
+    for (size_t i = walls.size() - 1; i > 0; --i) {
+        size_t j = rand() % (i + 1); 
+        bool tmp = walls[i];
+        walls[i] = walls[j];
+        walls[j] = tmp;
+    }
+
+    size_t idx = 0;
+    for (size_t i = 0; i < right.rows(); ++i)
+        for (size_t j = 0; j < right.cols(); ++j)
+            right[i][j] = walls[idx++];
+
+    for (size_t i = 0; i < down.rows(); ++i)
+        for (size_t j = 0; j < down.cols(); ++j)
+            down[i][j] = walls[idx++];
+}
+
+void print_lab(size_t N, size_t M, size_t X, size_t Y,
+    const Matrix<bool>& right, const Matrix<bool>& down)
+{
+    std::cout << "\n=== Labirint " << N << "x" << M << " ===\n";
+
+    std::cout << "    ";
+    for (size_t j = 0; j < M; ++j) {
+        if (j == X) std::cout << "   X ";
+        else std::cout << "   ";
+    }
+    std::cout << "\n    +";
+    for (size_t j = 0; j < M; ++j) {
+        if (j + 1 == X) {
+            std::cout << "   +";
         }
         else {
-            std::cout << "        ";
+            std::cout << "---+";
         }
     }
     std::cout << "\n";
 
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < M; j++) {
-            if (i == 0) {
-                if (j + 1 == X) {
-                    std::cout << "---  ---";
-                }
-                else {
-                    std::cout << "--------";
-                }
+    for (size_t i = 0; i < N; ++i) {
+        std::cout << "    |";
+        for (size_t j = 0; j < M; ++j) {
+            size_t num = i * M + j + 1;
+            if (num < 10) {
+                std::cout << " ";
             }
-            else {
-                int curr = i * M + j;
-                if (logic.find(curr) != logic.find(curr - M)) {
-                    std::cout << "--------"; 
-                }
-                else {
-                    std::cout << "        "; 
-                }
-            }
-        }
-        std::cout << "\n";
+            std::cout << num << " ";
 
-        for (int j = 0; j < M; j++) {
-            if (j == 0) {
-                std::cout << "|";
-            }
-            int curr = i * M + j;
-            if (curr < 10) {
-                std::cout << "   " << curr << "   ";
-            }
-            else if (curr < 100) {
-                std::cout << "   " << curr << "  ";
-            }
-            else if(curr < 1000) {
-                std::cout << "   " << curr << " ";
-            }
-            else {
-                std::cout << "  " << curr << " ";
-         
-            }
             if (j < M - 1) {
-                if (logic.find(curr) != logic.find(curr + 1)) std::cout << "|";
-                else std::cout << " ";
-            }
-            else {
-                std::cout << "|"; 
-            }
+                if (right[i][j]) {
+                    std::cout << "|";
+                }
+                else {
+                    std::cout << " ";
+                }
+            } 
         }
-        std::cout << "\n";
+        std::cout << "|\n";
+
+        if (i < N - 1) {
+            std::cout << "    +";
+            for (size_t j = 0; j < M; ++j) {
+                if (down[i][j]) {
+                    std::cout << "---+";
+                }
+                else {
+                    std::cout << "   +";
+                }
+            }
+            std::cout << "\n";
+        }
     }
 
-    for (int j = 0; j < M; j++) {
+    std::cout << "    +";
+    for (size_t j = 0; j < M; ++j) {
         if (j + 1 == Y) {
-            std::cout << "---  ---";
+            std::cout << "   +";
         }
         else {
-            std::cout << "--------";
+            std::cout << "---+";
         }
     }
-    std::cout << "\n";
-
-    for (int p = 1; p <= M; p++) {
-        if (p == Y) {
-            std::cout << "   Y    ";
+    std::cout << "\n    ";
+    for (size_t j = 0; j < M; ++j) {
+        if (j - 1 == Y) {
+            std::cout << "   Y ";
         }
         else {
-            std::cout << "        ";
+            std::cout << "   ";
         }
     }
     std::cout << "\n";
 }
 void generate(size_t N, size_t M, size_t X, size_t Y) {
-    Matrix<bool> labirint(N, M, false);
+    Matrix<bool> right(N, M - 1, true);
+    Matrix<bool> down(N - 1, M, true);
 
-    do {
-        DSU logic(M * N);
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                int curr = i * M + j;
-
-
-                if (j < M - 1) {
-                    if (rand() % 10 == 0) {
-                        logic.union_set(curr, curr + 1);
-                        labirint[i][j] = true;
-                    }
-                }
-                if (i < N - 1) {
-                    if (rand() % 10 == 0)
-                        logic.union_set(curr, curr + M);
-                }
+    for (size_t i = 0; i < right.rows(); ++i) {
+        for (size_t j = 0; j < right.cols(); ++j) {
+            if (rand() % 2 == 0) {
+                right[i][j] = false;
             }
         }
-        
-        if (check_path(M, N, logic, X, Y)) {
-            print(labirint, logic, N, M, X, Y);
-            break;
+    }
+
+    for (size_t i = 0; i < down.rows(); ++i) {
+        for (size_t j = 0; j < down.cols(); ++j) {
+            if (rand() % 2 == 0) {
+                down[i][j] = false;
+            }
         }
+    }
+            
 
-    } while (true);
+    std::cout << "\n--- Initial maze ---\n";
+    print_lab(N, M, X, Y, right, down);
 
+    std::cout << "\n--- Searching path ---\n";
+    while (!are_connected(N, M, right, down, X, Y)) {
+        shuffle_walls(right, down);
+    }
+
+    print_lab(N, M, X, Y, right, down);
 }
 
 void user_input(size_t& M, size_t& N, size_t& X, size_t& Y) {
-    std::cout << "¬ведите ширину M и высоту N: ";
+    std::cout << "Columns M and rows N: ";
     std::cin >> M >> N;
-    std::cout << "¬ведите точку входа X и выхода Y (от 1 до " << M << "): ";
+    if (M == 0 || N == 0)
+        throw std::logic_error("M and N must be > 0");
+
+    std::cout << "Start column X and end column Y (1.." << M << "): ";
     std::cin >> X >> Y;
-    if (X < 1 || X > M) {
-        throw std::logic_error("Going beyond borders");
-    }
-    if (Y < 1 || Y > M) {
-        throw std::logic_error("Going beyond borders");
-    }
+    if (X < 1 || X > M || Y < 1 || Y > M)
+        throw std::logic_error("X or Y out of bounds");
 }
 
 int main() {
     size_t M, N, X, Y;
-    
-    setlocale(LC_ALL, "rus");
-    srand(time(0));
+    setlocale(LC_ALL, "ru");
+
     user_input(M, N, X, Y);
-    DSU logic(M * N);
-    
     generate(N, M, X, Y);
-
-
+    
+    
+    return 0;
 }
 #endif
