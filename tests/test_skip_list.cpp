@@ -236,7 +236,6 @@ TEST(TestSkipList, test_skip_list_check_with_for) {
 
     EXPECT_FALSE(list.is_empty());
 
-    // Проверка поиска всех ключей
     int keys[] = { -10, -5, -1, 0, 5 };
     std::string values[] = { "minus ten", "minus five", "minus one",
         "zero", "five" };
@@ -248,11 +247,9 @@ TEST(TestSkipList, test_skip_list_check_with_for) {
         EXPECT_EQ(*(node->data), values[i]);
     }
 
-    // Проверка несуществующих ключей
     EXPECT_EQ(list.find_nearest(100), nullptr);
     EXPECT_EQ(list.find_nearest(-100), nullptr);
 
-    // Проверка порядка обхода
     TVector<int> expected;
     expected.push_back(-10);
     expected.push_back(-5);
