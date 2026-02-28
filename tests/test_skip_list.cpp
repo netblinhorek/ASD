@@ -149,31 +149,26 @@ TEST(TestSkipList, test_insert_the_back) {
     list.print();
 }
 
-TEST(TestSkipList, test_find_nearest_the_front) {
-    SkipList<int, std::string> list(10);
+TEST(TestSkipList, test_find_simple) {
+    SkipList<int, std::string> list(5);
 
-    list.insert(2, "2");
-    list.insert(3, "3");
-    list.insert(4, "4");
-    list.insert(5, "5");
-    list.insert(6, "6");
-    list.insert(1, "1");
+    list.insert(1, "one");
+    list.insert(2, "two");
+    list.insert(3, "three");
 
-    Node<int, std::string>* node1 = list.find_nearest(1);
-    ASSERT_NE(node1, nullptr);
-    EXPECT_EQ(node1->key, 1);
+    EXPECT_NE(list.find_nearest(1), nullptr);
+    EXPECT_NE(list.find_nearest(2), nullptr);
+    EXPECT_NE(list.find_nearest(3), nullptr);
 
-    Node<int, std::string>* node2 = list.find_nearest(2);
-    ASSERT_NE(node2, nullptr);
-    EXPECT_EQ(node2->key, 2);
+    EXPECT_EQ(list.find_nearest(0), nullptr);
+    EXPECT_EQ(list.find_nearest(4), nullptr);
 
-    Node<int, std::string>* node6 = list.find_nearest(6);
-    ASSERT_NE(node6, nullptr);
-    EXPECT_EQ(node6->key, 6);
 
-    EXPECT_EQ(list.find_nearest(7), nullptr);
-
-    list.print();
+    auto keys = list.get_keys();
+    EXPECT_EQ(keys.size(), 3);
+    EXPECT_EQ(keys[0], 1);
+    EXPECT_EQ(keys[1], 2);
+    EXPECT_EQ(keys[2], 3);
 }
 
 TEST(TestSkipList, test_find_nearest_duplicates_keep_first) {
@@ -226,5 +221,49 @@ TEST(TestSkipList, test_skip_list_coin_distribution) {
     for (int i = 0; i < 5; i++) {
         std::cout << "Уровень " << i << ": "
             << 100.0 * counts[i] / ITERATIONS << "%\n";
+    }
+}
+TEST(TestSkipList, test_skip_list_check_with_for) {
+    SkipList<int, std::string> list(5);
+
+    EXPECT_TRUE(list.is_empty());
+
+    list.insert(-5, "minus five");
+    list.insert(-10, "minus ten");
+    list.insert(0, "zero");
+    list.insert(-1, "minus one");
+    list.insert(5, "five");
+
+    EXPECT_FALSE(list.is_empty());
+
+    // Проверка поиска всех ключей
+    int keys[] = { -10, -5, -1, 0, 5 };
+    std::string values[] = { "minus ten", "minus five", "minus one",
+        "zero", "five" };
+
+    for (int i = 0; i < 5; i++) {
+        Node<int, std::string>* node = list.find_nearest(keys[i]);
+        EXPECT_NE(node, nullptr);
+        EXPECT_EQ(node->key, keys[i]);
+        EXPECT_EQ(*(node->data), values[i]);
+    }
+
+    // Проверка несуществующих ключей
+    EXPECT_EQ(list.find_nearest(100), nullptr);
+    EXPECT_EQ(list.find_nearest(-100), nullptr);
+
+    // Проверка порядка обхода
+    TVector<int> expected;
+    expected.push_back(-10);
+    expected.push_back(-5);
+    expected.push_back(-1);
+    expected.push_back(0);
+    expected.push_back(5);
+
+    TVector<int> actual = list.get_keys();
+
+    EXPECT_EQ(actual.size(), expected.size());
+    for (size_t i = 0; i < expected.size(); i++) {
+        EXPECT_EQ(actual[i], expected[i]);
     }
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "../lib_TVector/tvector.h"
 #include "../lib_ITable/itable.h"
+#include <iomanip>
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
@@ -61,6 +62,16 @@ public:
         clear();
     }
 
+    TVector<TKey> get_keys() const {
+        TVector<TKey> keys;
+        Node<TKey, TValue>* current = _heads[0];
+        while (current != nullptr) {
+            keys.push_back(current->key);
+            current = current->next[0];
+        }
+        return keys;
+    }
+
     void clear() {
         if (_heads[0] == nullptr) return;
 
@@ -71,9 +82,10 @@ public:
             current = next;
         }
 
-        for (int i = 0; i <= _lvl; i++) {
+        for (size_t i = 0; i < _Max_LVLs; i++) {  
             _heads[i] = nullptr;
         }
+        _lvl = 0;  
     }
 
     void insert(const TKey& key, const TValue& value) {
@@ -118,24 +130,29 @@ public:
         delete[] update;
     }
 
-    void print() const noexcept {
-        setlocale(LC_ALL, "rus");
-        std::cout << "\n=== Skip List Contents ===" << std::endl;
-        std::cout << "Max Levels: " << _Max_LVLs << ", Current Levels: " << _lvl + 1 << std::endl;
 
+    void print() const noexcept {
         if (is_empty()) {
-            std::cout << "List is empty" << std::endl;
+            std::cout << "SkipList: (empty)\n";
+            return;
         }
-        else {
-            std::cout << "Keys: ";
-            Node<TKey, TValue>* current = _heads[0];
+
+        for (int level = static_cast<int>(_lvl); level >= 0; --level) {
+            std::cout << "Level " << level << ":";
+
+            Node<TKey, TValue>* current = _heads[level];
             while (current != nullptr) {
-                std::cout << current->key << " ";
-                current = current->next[0];
+                std::cout << " " << std::setw(3) << current->key;
+                if (current->next[level] != nullptr) {
+                    std::cout << " -> ";
+                }
+                else {
+                    std::cout << "    ";  
+                }
+                current = current->next[level];
             }
-            std::cout << std::endl;
+            std::cout << "\n";
         }
-        std::cout << "=========================" << std::endl;
     }
 
     bool is_empty() const noexcept {
@@ -156,38 +173,43 @@ public:
         return level;
     }
 
-    Node<TKey, TValue>* find_nearest(const TKey& key, Node<TKey, TValue>** update = nullptr) const noexcept {
-        if (_heads[0] == nullptr) {
+    Node<TKey, TValue>* find_nearest(const TKey& key, Node<TKey,
+        TValue>** update = nullptr) const noexcept {
+        if (_heads[0] == nullptr)
             return nullptr;
-        }
 
         Node<TKey, TValue>* current = nullptr;
 
         for (int i = static_cast<int>(_lvl); i >= 0; i--) {
+            Node<TKey, TValue>* start;
             if (current == nullptr) {
-                current = _heads[i];
+                start = _heads[i];        
+            }
+            else {
+                start = current->next[i]; 
+            }
+            while (start != nullptr && start->key < key) {
+                current = start;
+                start = current->next[i];
             }
 
-            while (current != nullptr && current->key < key) {
-                if (update != nullptr) {
-                    update[i] = current;
-                }
-                current = current->next[i];
-            }
-
-            if (i > 0) {
-                if (update != nullptr && update[i] != nullptr) {
-                    current = update[i];
-                }
-                else {
-                    current = _heads[i - 1];
-                }
+            if (update != nullptr) {
+                update[i] = current;
             }
         }
-        if (current != nullptr && current->key == key) {
-            return current;
+
+        Node<TKey, TValue>* result;
+        if (current == nullptr) {
+            result = _heads[0]; 
+        }
+        else {
+            result = current->next[0];
+        }
+        if (result != nullptr && result->key == key) {
+            return result;
         }
 
         return nullptr;
     }
+
 };
