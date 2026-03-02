@@ -1,6 +1,7 @@
 // Copyright 2024 Marina Usova
 //#define EASY_EXAMPLE
 //#define PLAY_GAME
+#include <iomanip>
 #define  LABIRINT
 
 #ifdef EASY_EXAMPLE
@@ -117,76 +118,113 @@ void print_lab(size_t N, size_t M, size_t X, size_t Y,
 {
     std::cout << "\n=== Labirint " << N << "x" << M << " ===\n";
 
-    std::cout << "    ";
+    X = X - 1;
+    Y = Y - 1;
+
+    size_t max_num = N * M;
+    int width = 1;
+    if (max_num >= 100) width = 3;
+    else if (max_num >= 10) width = 2;
+
+    for (int k = 0; k < width; ++k) std::cout << ' ';
+
     for (size_t j = 0; j < M; ++j) {
-        if (j == X) std::cout << "   X ";
-        else std::cout << "   ";
-    }
-    std::cout << "\n    +";
-    for (size_t j = 0; j < M; ++j) {
-        if (j + 1 == X) {
-            std::cout << "   +";
+        if (j == X) {
+            std::cout << ' ';
+            for (int k = 0; k < width; ++k) std::cout << ' ';
+            std::cout << 'X';
         }
         else {
-            std::cout << "---+";
+            for (int k = 0; k < width; ++k) std::cout << ' ';
         }
     }
-    std::cout << "\n";
+    std::cout << '\n';
+
+    std::cout << ' ';
+    for (int k = 0; k < width; ++k) std::cout << ' ';
+
+    std::cout << '+';
+    for (size_t j = 0; j < M; ++j) {
+        if (j == X) {
+            for (int k = 0; k < width; ++k) std::cout << ' ';
+        }
+        else {
+            for (int k = 0; k < width; ++k) std::cout << '-';
+        }
+        std::cout << '+';
+    }
+    std::cout << '\n';
 
     for (size_t i = 0; i < N; ++i) {
-        std::cout << "    |";
+        std::cout << ' ';
+        for (int k = 0; k < width; ++k) std::cout << ' ';
+        std::cout << '|';
+
         for (size_t j = 0; j < M; ++j) {
             size_t num = i * M + j + 1;
-            if (num < 10) {
-                std::cout << " ";
-            }
-            std::cout << num << " ";
+            std::cout << std::setw(width) << num;
 
             if (j < M - 1) {
                 if (right[i][j]) {
-                    std::cout << "|";
+                    std::cout << '|';
                 }
                 else {
-                    std::cout << " ";
+                    std::cout << ' ';
                 }
-            } 
+            }
         }
         std::cout << "|\n";
 
         if (i < N - 1) {
-            std::cout << "    +";
+            std::cout << ' ';
+            for (int k = 0; k < width; ++k) std::cout << ' ';
+            std::cout << '+';
+
             for (size_t j = 0; j < M; ++j) {
-                if (down[i][j]) {
-                    std::cout << "---+";
+                if (i == N - 2 && j == Y) {
+                    for (int k = 0; k < width; ++k) std::cout << ' ';
+                }
+                else if (down[i][j]) {
+                    for (int k = 0; k < width; ++k) std::cout << '-';
                 }
                 else {
-                    std::cout << "   +";
+                    for (int k = 0; k < width; ++k) std::cout << ' ';
                 }
+                std::cout << '+';
             }
-            std::cout << "\n";
+            std::cout << '\n';
         }
     }
 
-    std::cout << "    +";
+    std::cout << ' ';
+    for (int k = 0; k < width; ++k) std::cout << ' ';
+    std::cout << '+';
     for (size_t j = 0; j < M; ++j) {
-        if (j + 1 == Y) {
-            std::cout << "   +";
+        if (j == Y) {
+            for (int k = 0; k < width; ++k) std::cout << ' ';
         }
         else {
-            std::cout << "---+";
+            for (int k = 0; k < width; ++k) std::cout << '-';
         }
+        std::cout << '+';
     }
-    std::cout << "\n    ";
+    std::cout << '\n';
+
+    std::cout << ' ';
+    for (int k = 0; k < width; ++k) std::cout << ' ';
+
     for (size_t j = 0; j < M; ++j) {
-        if (j - 1 == Y) {
-            std::cout << "   Y ";
+        if (j == Y) {
+            for (int k = 0; k < width-1; ++k) std::cout << ' ';
+            std::cout << 'Y';
         }
         else {
-            std::cout << "   ";
+            for (int k = 0; k < width+1; ++k) std::cout << ' ';
         }
     }
-    std::cout << "\n";
+    std::cout << '\n';
 }
+
 void generate(size_t N, size_t M, size_t X, size_t Y) {
     Matrix<bool> right(N, M - 1, true);
     Matrix<bool> down(N - 1, M, true);
