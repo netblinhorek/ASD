@@ -180,7 +180,7 @@ public:
 
         Node<TKey, TValue>* current = nullptr;
 
-        for (int i = static_cast<int>(_lvl); i >= 0; i--) {
+        for (size_t i = (_lvl); i >= 0; i--) {
             Node<TKey, TValue>* start;
             if (current == nullptr) {
                 start = _heads[i];        
