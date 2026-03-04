@@ -6,6 +6,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <vector>
+#include <stdexcept>
 
 template <typename TKey, typename TValue>
 struct Node {
@@ -45,10 +46,16 @@ class SkipList {
 
 public:
 
-    SkipList(size_t maxLevels) {
+public:
+    SkipList(size_t maxLevels = -1) {
+        if (maxLevels == -1) {
+            maxLevels = 1000000;  
+        }
+
         if (maxLevels == 0) {
             throw std::invalid_argument("The maximum number of levels must be greater than 0");
         }
+
         _Max_LVLs = maxLevels;
         _lvl = 0;
 
@@ -82,10 +89,10 @@ public:
             current = next;
         }
 
-        for (size_t i = 0; i < _Max_LVLs; i++) {  
+        for (size_t i = 0; i < _Max_LVLs; i++) {
             _heads[i] = nullptr;
         }
-        _lvl = 0;  
+        _lvl = 0;
     }
 
     void insert(const TKey& key, const TValue& value) {
@@ -94,42 +101,84 @@ public:
             update[i] = nullptr;
         }
 
-        Node<TKey, TValue>* nearest = find_nearest(key, update);
-        Node<TKey, TValue>* next_node;
-        if (nearest != nullptr) {
-            next_node = nearest->next[0];
-        }
-        else {
-            next_node = _heads[0];
-        }
+        Node<TKey, TValue>* current = nullptr;
 
-        if (next_node == nullptr || next_node->key != key) {
-            size_t new_level = _coin();
+        for (size_t i = _lvl + 1; i-- > 0; ) {
+            Node<TKey, TValue>* start = (current == nullptr) ? _heads[i] : current;
 
-            if (new_level > _lvl) {
-                for (size_t i = _lvl + 1; i <= new_level; i++) {
-                    update[i] = nullptr;
-                }
-                _lvl = new_level;
+            while (start != nullptr && start->key < key) {
+                current = start;
+                start = start->next[i];
             }
 
-            Node<TKey, TValue>* new_node = new Node<TKey, TValue>(key, value, new_level);
+            update[i] = current;
+        }
 
-            for (size_t i = 0; i <= new_level; i++) {
-                if (update[i] == nullptr) {
-                    new_node->next[i] = _heads[i];
-                    _heads[i] = new_node;
+        Node<TKey, TValue>* existing_node = nullptr;
+        if (current == nullptr) {
+            existing_node = _heads[0];
+        }
+        else {
+            existing_node = current->next[0];
+        }
+
+        if (existing_node != nullptr && existing_node->key == key) {
+            if (existing_node->is_owner) {
+                *(existing_node->data) = value;
+            }
+            else {
+                size_t new_level = _coin();
+
+                if (new_level > _lvl) {
+                    _lvl = new_level;
                 }
-                else {
-                    new_node->next[i] = update[i]->next[i];
-                    update[i]->next[i] = new_node;
+
+                Node<TKey, TValue>* new_node = new Node<TKey, TValue>(key, value, new_level);
+
+                for (size_t i = 0; i <= new_level; i++) {
+                    if (update[i] == nullptr) {
+                        if (_heads[i] == existing_node) {
+                            _heads[i] = new_node;
+                            new_node->next[i] = existing_node->next[i];
+                        }
+                    }
+                    else if (update[i]->next[i] == existing_node) {
+                        update[i]->next[i] = new_node;
+                        new_node->next[i] = existing_node->next[i];
+                    }
                 }
+
+                delete existing_node;
+            }
+
+            delete[] update;
+            return;
+        }
+
+        size_t new_level = _coin();
+
+        if (new_level > _lvl) {
+            for (size_t i = _lvl + 1; i <= new_level; i++) {
+                update[i] = nullptr;
+            }
+            _lvl = new_level;
+        }
+
+        Node<TKey, TValue>* new_node = new Node<TKey, TValue>(key, value, new_level);
+
+        for (size_t i = 0; i <= new_level; i++) {
+            if (update[i] == nullptr) {
+                new_node->next[i] = _heads[i];
+                _heads[i] = new_node;
+            }
+            else {
+                new_node->next[i] = update[i]->next[i];
+                update[i]->next[i] = new_node;
             }
         }
 
         delete[] update;
     }
-
 
     void print() const noexcept {
         if (is_empty()) {
@@ -137,7 +186,7 @@ public:
             return;
         }
 
-        for (int level = static_cast<int>(_lvl); level >= 0; --level) {
+        for (size_t level = _lvl + 1; level-- > 0; ) {
             std::cout << "Level " << level << ":";
 
             Node<TKey, TValue>* current = _heads[level];
@@ -147,7 +196,7 @@ public:
                     std::cout << " -> ";
                 }
                 else {
-                    std::cout << "    ";  
+                    std::cout << "    ";
                 }
                 current = current->next[level];
             }
@@ -173,24 +222,17 @@ public:
         return level;
     }
 
-    Node<TKey, TValue>* find_nearest(const TKey& key, Node<TKey,
-        TValue>** update = nullptr) const noexcept {
+    Node<TKey, TValue>* find_nearest(const TKey& key, Node<TKey, TValue>** update = nullptr) const noexcept {
         if (_heads[0] == nullptr)
             return nullptr;
 
-        Node<TKey, TValue>* current = nullptr;
+        Node<TKey, TValue>* current;
 
-        for (size_t i = (_lvl); i >= 0; i--) {
-            Node<TKey, TValue>* start;
-            if (current == nullptr) {
-                start = _heads[i];        
-            }
-            else {
-                start = current->next[i]; 
-            }
-            while (start != nullptr && start->key < key) {
-                current = start;
-                start = current->next[i];
+        for (size_t i = _lvl + 1; i-- > 0; ) {
+            current = _heads[i];
+
+            while (current != nullptr && current->next[i] != nullptr && current->next[i]->key < key) {
+                current = current->next[i];
             }
 
             if (update != nullptr) {
@@ -198,15 +240,12 @@ public:
             }
         }
 
-        Node<TKey, TValue>* result;
-        if (current == nullptr) {
-            result = _heads[0]; 
+        if (current != nullptr && current->key == key) {
+            return current;
         }
-        else {
-            result = current->next[0];
-        }
-        if (result != nullptr && result->key == key) {
-            return result;
+
+        if (current != nullptr && current->next[0] != nullptr && current->next[0]->key == key) {
+            return current->next[0];
         }
 
         return nullptr;
