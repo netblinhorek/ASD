@@ -14,12 +14,13 @@ struct Node {
     TKey key;
     TValue* data;
     Node<TKey, TValue>** next;
+    size_t level; 
 
-    Node(const TKey& k, const TValue& value, size_t level)
-        : Node(k, new TValue(value), level, true) {}
+    Node(const TKey& k, const TValue& value, size_t lvl)
+        : Node(k, new TValue(value), lvl, true) {}
 
-    Node(const TKey& k, TValue* existing_data, size_t level)
-        : Node(k, existing_data, level, false) {}
+    Node(const TKey& k, TValue* existing_data, size_t lvl)
+        : Node(k, existing_data, lvl, false) {}
 
     ~Node() {
         if (is_owner) {
@@ -29,8 +30,8 @@ struct Node {
     }
 
 private:
-    Node(const TKey& k, TValue* data_ptr, size_t level, bool owner)
-        : key(k), data(data_ptr), is_owner(owner) {
+    Node(const TKey& k, TValue* data_ptr, size_t lvl, bool owner)
+        : key(k), data(data_ptr), is_owner(owner), level(lvl) {  
         next = new Node<TKey, TValue>* [level + 1];
         for (size_t i = 0; i <= level; i++) {
             next[i] = nullptr;
@@ -49,7 +50,7 @@ public:
 public:
     SkipList(size_t maxLevels = -1) {
         if (maxLevels == -1) {
-            maxLevels = 1000000;  
+            maxLevels = 100000;  
         }
 
         if (maxLevels == 0) {
@@ -100,33 +101,21 @@ public:
         for (size_t i = 0; i < _Max_LVLs; i++) {
             update[i] = nullptr;
         }
-
-        Node<TKey, TValue>* current = nullptr;
-
-        for (size_t i = _lvl + 1; i-- > 0; ) {
-            Node<TKey, TValue>* start = (current == nullptr) ? _heads[i] : current;
-
-            while (start != nullptr && start->key < key) {
-                current = start;
-                start = start->next[i];
-            }
-
-            update[i] = current;
-        }
-
-        Node<TKey, TValue>* existing_node = nullptr;
-        if (current == nullptr) {
-            existing_node = _heads[0];
-        }
-        else {
-            existing_node = current->next[0];
-        }
+        Node<TKey, TValue>* existing_node = find_nearest(key, update);
 
         if (existing_node != nullptr && existing_node->key == key) {
             if (existing_node->is_owner) {
-                *(existing_node->data) = value;
+                delete[] update;
+                throw std::runtime_error("Key already exists");
             }
             else {
+                size_t existing_level = 0;
+                for (size_t i = 0; i < _Max_LVLs; i++) {
+                    if (_heads[i] == existing_node) {
+                        existing_level = i;
+                    }
+                }
+
                 size_t new_level = _coin();
 
                 if (new_level > _lvl) {
@@ -136,15 +125,29 @@ public:
                 Node<TKey, TValue>* new_node = new Node<TKey, TValue>(key, value, new_level);
 
                 for (size_t i = 0; i <= new_level; i++) {
+                    new_node->next[i] = existing_node->next[i];
+                }
+
+                for (size_t i = 0; i <= existing_level; i++) {
                     if (update[i] == nullptr) {
                         if (_heads[i] == existing_node) {
-                            _heads[i] = new_node;
-                            new_node->next[i] = existing_node->next[i];
+                            if (i <= new_level) {
+                                _heads[i] = new_node;
+                            }
+                            else {
+                                _heads[i] = existing_node->next[i];
+                            }
                         }
                     }
-                    else if (update[i]->next[i] == existing_node) {
-                        update[i]->next[i] = new_node;
-                        new_node->next[i] = existing_node->next[i];
+                    else {
+                        if (update[i]->next[i] == existing_node) {
+                            if (i <= new_level) {
+                                update[i]->next[i] = new_node;
+                            }
+                            else {
+                                update[i]->next[i] = existing_node->next[i];
+                            }
+                        }
                     }
                 }
 

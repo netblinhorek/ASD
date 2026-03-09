@@ -39,7 +39,7 @@ TEST(TestSkipList, InsertIntoEmpty) {
     list.print();
 }
 
-TEST(TestSkipList, InsertInMiddle) {
+TEST(TestSkipList, test_insert_in_middle) {
     SkipList<int, std::string> list(12);
 
     list.insert(1, "one");
@@ -53,20 +53,18 @@ TEST(TestSkipList, InsertInMiddle) {
     list.print();
 }
 
-TEST(TestSkipList, InsertDuplicates) {
+TEST(TestSkipList, test_find_nearest_duplicates_keep_first) {
     SkipList<int, std::string> list(50);
 
-    list.insert(5, "five");
-    list.print();
-    list.insert(5, "FIVE");  
-    list.print();
-    list.insert(5, "5");     
-    list.print();
+    EXPECT_NO_THROW(list.insert(5, "five"));
+    EXPECT_THROW(list.insert(5, "FIVE"), std::runtime_error);
+    Node<int, std::string>* node = list.find_nearest(5);
+    ASSERT_NE(node, nullptr);
+    EXPECT_EQ(*(node->data), "five");
 
-    SUCCEED();
 }
 
-TEST(TestSkipList, InsertReverseOrder) {
+TEST(TestSkipList, test_insert_reverse_order) {
     SkipList<int, std::string> list(10);
 
 
@@ -78,7 +76,7 @@ TEST(TestSkipList, InsertReverseOrder) {
     }
 }
 
-TEST(TestSkipList, InsertRandom) {
+TEST(TestSkipList, test_insert_random) {
     SkipList<int, std::string> list(15);
     srand(42);
 
@@ -95,7 +93,7 @@ TEST(TestSkipList, InsertRandom) {
 
 
 
-TEST(TestSkipList, NegativeNumbers) {
+TEST(TestSkipList, test_negative_numbers) {
     SkipList<int, std::string> list(5);
 
     list.insert(-5, "minus five");
@@ -150,7 +148,6 @@ TEST(TestSkipList, test_insert_the_back) {
 }
 
 TEST(TestSkipList, test_find_simple) {
-    srand(42); // Фиксируем seed для детерминированного поведения
     SkipList<int, std::string> list(5);
 
     list.insert(1, "one");
@@ -164,79 +161,88 @@ TEST(TestSkipList, test_find_simple) {
     EXPECT_EQ(list.find_nearest(0), nullptr);
     EXPECT_EQ(list.find_nearest(4), nullptr);
 
-    auto keys = list.get_keys();
+    TVector<int> keys = list.get_keys();
     EXPECT_EQ(keys.size(), 3);
     EXPECT_EQ(keys[0], 1);
     EXPECT_EQ(keys[1], 2);
     EXPECT_EQ(keys[2], 3);
 }
 
-TEST(TestSkipList, test_skip_list_check_with_for) {
-    srand(42); // Тот же seed для согласованности
-    SkipList<int, std::string> list(5);
-
-    EXPECT_TRUE(list.is_empty());
-
-    list.insert(-5, "minus five");
-    list.insert(-10, "minus ten");
-    list.insert(0, "zero");
-    list.insert(-1, "minus one");
-    list.insert(5, "five");
-
-    EXPECT_FALSE(list.is_empty());
-
-    int keys[] = { -10, -5, -1, 0, 5 };
-    std::string values[] = { "minus ten", "minus five", "minus one",
-        "zero", "five" };
-
-    for (int i = 0; i < 5; i++) {
-        Node<int, std::string>* node = list.find_nearest(keys[i]);
-        EXPECT_NE(node, nullptr);
-        EXPECT_EQ(node->key, keys[i]);
-        EXPECT_EQ(*(node->data), values[i]);
-    }
-
-    EXPECT_EQ(list.find_nearest(100), nullptr);
-    EXPECT_EQ(list.find_nearest(-100), nullptr);
-
-    TVector<int> expected;
-    expected.push_back(-10);
-    expected.push_back(-5);
-    expected.push_back(-1);
-    expected.push_back(0);
-    expected.push_back(5);
-
-    TVector<int> actual = list.get_keys();
-
-    EXPECT_EQ(actual.size(), expected.size());
-    for (size_t i = 0; i < expected.size(); i++) {
-        EXPECT_EQ(actual[i], expected[i]);
-    }
-}
 
 TEST(TestSkipList, test_default_parameter_safe_behavior) {
     SkipList<int, std::string> list;  
     
     EXPECT_TRUE(list.is_empty());
 
-    list.insert(42, "answer");
+    list.insert(42, "123");
     EXPECT_FALSE(list.is_empty());
 
-    auto keys = list.get_keys();
+    TVector<int> keys = list.get_keys();
     EXPECT_EQ(keys.size(), 1);
     EXPECT_EQ(keys[0], 42);
 }
+TEST(TestSkipList, test_pointers_levels_2_and_3) {
 
-TEST(TestSkipList, test_find_nearest_duplicates_keep_first) {
-    SkipList<int, std::string> list(10);
+    SkipList<int, std::string> list(4);
 
-    list.insert(5, "first");
-    list.insert(5, "second");
-
-    EXPECT_NE(list.find_nearest(5), nullptr);
-
+    list.insert(5, "five");
+    list.insert(15, "fifteen");
+    list.insert(10, "ten");
     list.print();
+    Node<int, std::string>* node5 = list.find_nearest(5);
+    Node<int, std::string>* node10 = list.find_nearest(10);
+    Node<int, std::string>* node15 = list.find_nearest(15);
+
+    ASSERT_NE(node5, nullptr);
+    ASSERT_NE(node10, nullptr);
+    ASSERT_NE(node15, nullptr);
+
+    if (node5->level >= 2) {
+        if (node5->next[2] != nullptr) {
+            EXPECT_GT(node5->next[2]->key, node5->key);
+            EXPECT_TRUE(node5->next[2] == node10 || node5->next[2] == node15);
+        }
+    }
+    if (node10->level >= 2) {
+        if (node10->next[2] != nullptr) {
+            EXPECT_GT(node10->next[2]->key, node10->key);
+            EXPECT_EQ(node10->next[2], node15);
+        }
+    }
+    if (node15->level >= 2) {
+        EXPECT_EQ(node15->next[2], nullptr);
+    }
+
+    if (node5->level >= 3) {
+        if (node5->next[3] != nullptr) {
+            EXPECT_GT(node5->next[3]->key, node5->key);
+            EXPECT_TRUE(node5->next[3] == node10 || node5->next[3] == node15);
+        }
+    }
+    if (node10->level >= 3) {
+        if (node10->next[3] != nullptr) {
+            EXPECT_GT(node10->next[3]->key, node10->key);
+            EXPECT_EQ(node10->next[3], node15);
+        }
+    }
+    if (node15->level >= 3) {
+        EXPECT_EQ(node15->next[3], nullptr);
+    }
+
+    if (node5->level >= 3) {
+        EXPECT_GE(node5->level, 2);
+        EXPECT_NE(node5->next[2], nullptr);
+    }
+    if (node10->level >= 3) {
+        EXPECT_GE(node10->level, 2);
+        EXPECT_NE(node10->next[2], nullptr);
+    }
+
+    EXPECT_EQ(list.find_nearest(5), node5);
+    EXPECT_EQ(list.find_nearest(10), node10);
+    EXPECT_EQ(list.find_nearest(15), node15);
 }
+
 
 TEST(TestSkipList, test_find_nearest_after_clear) {
     SkipList<int, std::string> list(10);

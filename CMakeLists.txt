@@ -23,6 +23,7 @@ add_subdirectory(lib_UnsortedTableOnList)
 add_subdirectory(lib_SkipList)
 add_subdirectory(lib_TVector)
 add_subdirectory(lib_Tree)
+add_subdirectory(lib_Queue)
 add_subdirectory(lib_SortedTableOnArr)
 add_subdirectory(main)                # подключаем дополнительный CMakeLists.txt из подкаталога с именем main
 
