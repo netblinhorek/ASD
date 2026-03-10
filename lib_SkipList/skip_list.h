@@ -14,7 +14,7 @@ struct Node {
     TKey key;
     TValue* data;
     Node<TKey, TValue>** next;
-    size_t level; 
+    size_t level;
 
     Node(const TKey& k, const TValue& value, size_t lvl)
         : Node(k, new TValue(value), lvl, true) {}
@@ -31,7 +31,7 @@ struct Node {
 
 private:
     Node(const TKey& k, TValue* data_ptr, size_t lvl, bool owner)
-        : key(k), data(data_ptr), is_owner(owner), level(lvl) {  
+        : key(k), data(data_ptr), is_owner(owner), level(lvl) {
         next = new Node<TKey, TValue>* [level + 1];
         for (size_t i = 0; i <= level; i++) {
             next[i] = nullptr;
@@ -50,7 +50,7 @@ public:
 public:
     SkipList(size_t maxLevels = -1) {
         if (maxLevels == -1) {
-            maxLevels = 100000;  
+            maxLevels = 100000;
         }
 
         if (maxLevels == 0) {
