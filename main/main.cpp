@@ -162,7 +162,7 @@ void print_lab(size_t N, size_t M, size_t X, size_t Y,
 
         for (size_t j = 0; j < M; ++j) {
             size_t num = i * M + j + 1;
-            std::cout << std::setw(width) << num;
+            std::cout << std::setw(width) << " ";
 
             if (j < M - 1) {
                 if (right[i][j]) {
