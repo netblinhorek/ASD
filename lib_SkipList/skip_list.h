@@ -50,7 +50,7 @@ public:
 public:
     SkipList(size_t maxLevels = -1) {
         if (maxLevels == -1) {
-            maxLevels = 100000;
+            maxLevels = 10;
         }
 
         if (maxLevels == 0) {
@@ -104,10 +104,9 @@ public:
         Node<TKey, TValue>* existing_node = find_nearest(key, update);
 
         if (existing_node != nullptr && existing_node->key == key) {
-            if (existing_node->is_owner) {
-                delete[] update;
-                throw std::runtime_error("Key already exists");
-            }
+            delete[] update;
+            throw std::runtime_error("Key already exists");
+        }
             else {
                 size_t existing_level = 0;
                 for (size_t i = 0; i < _Max_LVLs; i++) {
@@ -149,7 +148,7 @@ public:
                             }
                         }
                     }
-                }
+                
 
                 delete existing_node;
             }
