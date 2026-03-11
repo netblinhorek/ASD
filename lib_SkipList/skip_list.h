@@ -46,8 +46,6 @@ class SkipList {
     TVector<Node<TKey, TValue>*> _heads;
 
 public:
-
-public:
     SkipList(size_t maxLevels = -1) {
         if (maxLevels == -1) {
             maxLevels = 10;
@@ -81,7 +79,8 @@ public:
     }
 
     void clear() {
-        if (_heads[0] == nullptr) return;
+        if (_heads[0] == nullptr) 
+            return;
 
         Node<TKey, TValue>* current = _heads[0];
         while (current != nullptr) {
@@ -101,60 +100,27 @@ public:
         for (size_t i = 0; i < _Max_LVLs; i++) {
             update[i] = nullptr;
         }
-        Node<TKey, TValue>* existing_node = find_nearest(key, update);
 
-        if (existing_node != nullptr && existing_node->key == key) {
+        Node<TKey, TValue>* current = nullptr;
+
+        for (int i = _lvl; i >= 0; i--) {
+            Node<TKey, TValue>* next_node = _heads[i];
+            if (current) next_node = current->next[i];
+
+            while (next_node && next_node->key < key) {
+                current = next_node;
+                next_node = current->next[i];
+            }
+            update[i] = current;
+        }
+
+        Node<TKey, TValue>* candidate = _heads[0];
+        if (current != nullptr)
+            candidate = current->next[0];
+
+        if (candidate && candidate->key == key) {
             delete[] update;
             throw std::runtime_error("Key already exists");
-        }
-            else {
-                size_t existing_level = 0;
-                for (size_t i = 0; i < _Max_LVLs; i++) {
-                    if (_heads[i] == existing_node) {
-                        existing_level = i;
-                    }
-                }
-
-                size_t new_level = _coin();
-
-                if (new_level > _lvl) {
-                    _lvl = new_level;
-                }
-
-                Node<TKey, TValue>* new_node = new Node<TKey, TValue>(key, value, new_level);
-
-                for (size_t i = 0; i <= new_level; i++) {
-                    new_node->next[i] = existing_node->next[i];
-                }
-
-                for (size_t i = 0; i <= existing_level; i++) {
-                    if (update[i] == nullptr) {
-                        if (_heads[i] == existing_node) {
-                            if (i <= new_level) {
-                                _heads[i] = new_node;
-                            }
-                            else {
-                                _heads[i] = existing_node->next[i];
-                            }
-                        }
-                    }
-                    else {
-                        if (update[i]->next[i] == existing_node) {
-                            if (i <= new_level) {
-                                update[i]->next[i] = new_node;
-                            }
-                            else {
-                                update[i]->next[i] = existing_node->next[i];
-                            }
-                        }
-                    }
-                
-
-                delete existing_node;
-            }
-
-            delete[] update;
-            return;
         }
 
         size_t new_level = _coin();
@@ -225,16 +191,21 @@ public:
     }
 
     Node<TKey, TValue>* find_nearest(const TKey& key, Node<TKey, TValue>** update = nullptr) const noexcept {
-        if (_heads[0] == nullptr)
+        if (_heads[0] == nullptr) {
             return nullptr;
+        }
 
-        Node<TKey, TValue>* current;
+        Node<TKey, TValue>* current = nullptr;
 
-        for (size_t i = _lvl + 1; i-- > 0; ) {
-            current = _heads[i];
+        for (int i = _lvl; i >= 0; i--) {
+            Node<TKey, TValue>* next_node = _heads[i];
+            if (current) next_node = current->next[i];
 
-            while (current != nullptr && current->next[i] != nullptr && current->next[i]->key < key) {
-                current = current->next[i];
+            while (next_node && next_node->key < key) {
+                current = next_node;
+                next_node = _heads[i];
+                if (current != nullptr)
+                    next_node = current->next[i];
             }
 
             if (update != nullptr) {
@@ -242,15 +213,13 @@ public:
             }
         }
 
-        if (current != nullptr && current->key == key) {
-            return current;
-        }
+        Node<TKey, TValue>* candidate = _heads[0];
+        if (current) candidate = current->next[0];
 
-        if (current != nullptr && current->next[0] != nullptr && current->next[0]->key == key) {
-            return current->next[0];
+        if (candidate && candidate->key == key) {
+            return candidate;
         }
 
         return nullptr;
     }
-
 };
