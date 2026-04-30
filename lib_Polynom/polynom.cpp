@@ -145,24 +145,11 @@ Polynom& Polynom::operator/=(const Monom& other) {
     return *this;
 }
 
-
-
-bool Polynom::operator==(const Monom& other) const {
-    if (_polynom.count() != 1) return false;
-    return *(_polynom.begin()) == other; 
-}
-
-bool Polynom::operator!=(const Monom& other) const {
-    return !(*this == other);
-}
-
-bool Polynom::operator==(const Polynom& other) const
-{
+bool Polynom::operator==(const Polynom& other) const {
     if (_polynom.count() != other._polynom.count())
         return false;
     auto it1 = _polynom.begin();
     auto it2 = other._polynom.begin();
-
     while (it1 != _polynom.end()) {
         if (*it1 != *it2)
             return false;
@@ -172,11 +159,18 @@ bool Polynom::operator==(const Polynom& other) const
     return true;
 }
 
-bool Polynom::operator!=(const Polynom& other) const
-{
+bool Polynom::operator!=(const Polynom& other) const {
     return !(*this == other);
 }
 
+bool Polynom::operator==(const Monom& other) const {
+    if (_polynom.count() != 1) return false;
+    return *(_polynom.begin()) == other;
+}
+
+bool Polynom::operator!=(const Monom& other) const {
+    return !(*this == other);
+}
 Polynom Polynom::operator+(const Polynom& other) const {
     Polynom result = *this;
     for (auto it = other._polynom.begin(); it != other._polynom.end(); ++it) {
@@ -303,7 +297,9 @@ void Polynom::add_monom(const Monom& m) {
 
     _polynom.push_back(m);
 }
-
+bool Polynom::operator>(const Polynom& other) const {
+    return other < *this;
+}
 bool Polynom::operator<(const Polynom& other) const
 {
     auto it1 = _polynom.begin();

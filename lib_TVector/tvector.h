@@ -925,7 +925,9 @@ void TVector<T>::print_states() {
 }
 
 template<class T>
-inline bool TVector<T>::is_full() const noexcept { return (_size - deleted_count_) >= _capacity; }
+inline bool TVector<T>::is_full() const noexcept {
+    return _size >= _capacity; 
+}
 
 template<class T>
 void TVector<T>::allocate(size_t new_capacity) {

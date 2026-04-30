@@ -94,18 +94,14 @@ public:
         }
         _lvl = 0;
     }
-
-    void insert(const TKey& key, const TValue& value) {
-        Node<TKey, TValue>** update = new Node<TKey, TValue>* [_Max_LVLs];
-        for (size_t i = 0; i < _Max_LVLs; i++) {
-            update[i] = nullptr;
-        }
-
+    void saving_and_searching_nodes(const TKey& key, Node<TKey, TValue>** update) const noexcept {
         Node<TKey, TValue>* current = nullptr;
 
         for (int i = _lvl; i >= 0; i--) {
             Node<TKey, TValue>* next_node = _heads[i];
-            if (current) next_node = current->next[i];
+            if (current) {
+                next_node = current->next[i];
+            }
 
             while (next_node && next_node->key < key) {
                 current = next_node;
@@ -113,11 +109,17 @@ public:
             }
             update[i] = current;
         }
+    }
+
+    void insert(const TKey& key, const TValue& value) {
+        Node<TKey, TValue>** update = new Node<TKey, TValue>* [_Max_LVLs];
+
+        saving_and_searching_nodes(key, update);
 
         Node<TKey, TValue>* candidate = _heads[0];
-        if (current != nullptr)
-            candidate = current->next[0];
-
+        if (update[0] != nullptr) {
+            candidate = update[0]->next[0];
+        }
         if (candidate && candidate->key == key) {
             delete[] update;
             throw std::runtime_error("Key already exists");
@@ -195,31 +197,26 @@ public:
             return nullptr;
         }
 
-        Node<TKey, TValue>* current = nullptr;
-
-        for (int i = _lvl; i >= 0; i--) {
-            Node<TKey, TValue>* next_node = _heads[i];
-            if (current) next_node = current->next[i];
-
-            while (next_node && next_node->key < key) {
-                current = next_node;
-                next_node = _heads[i];
-                if (current != nullptr)
-                    next_node = current->next[i];
-            }
-
-            if (update != nullptr) {
-                update[i] = current;
-            }
+        bool local_update = (update == nullptr);
+        if (local_update) {
+            update = new Node<TKey, TValue>* [_Max_LVLs];
         }
+
+        saving_and_searching_nodes(key, update);
 
         Node<TKey, TValue>* candidate = _heads[0];
-        if (current) candidate = current->next[0];
-
+        if (update[0] != nullptr) {
+            candidate = update[0]->next[0];
+        }
+        Node<TKey, TValue>* result = nullptr;
         if (candidate && candidate->key == key) {
-            return candidate;
+            result = candidate;
         }
 
-        return nullptr;
+        if (local_update) {
+            delete[] update;
+        }
+
+        return result;
     }
 };

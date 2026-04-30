@@ -36,6 +36,7 @@ public:
     Polynom Polynom::operator/(double scalar) const; //+
 
     void add_monom(const Monom& m);
+    bool operator>(const Polynom& other) const;
     bool operator<(const Polynom& other) const;
     bool operator==(const Monom& other) const;
     bool operator!=(const Monom& other) const;

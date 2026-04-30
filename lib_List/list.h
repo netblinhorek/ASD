@@ -2,19 +2,20 @@
 #include <iostream>
 #include <algorithm> 
 #include <unordered_set>
+#include <stdexcept>
 
 template <typename T>
-struct Node {
+struct ListNode {
     T value;
-    Node<T>* next;
+    ListNode<T>* next;
 public:
-    Node(T value_, Node<T>* next_ = nullptr) : value(value_), next(next_) {}
-   
+    ListNode(T value_, ListNode<T>* next_ = nullptr) : value(value_), next(next_) {}
 };
 
 template <class T>
 class List {
-    Node<T>* _head, * _tail;
+    ListNode<T>* _head;
+    ListNode<T>* _tail;
     size_t _count;
 
 public:
@@ -26,26 +27,26 @@ public:
     bool is_empty() const;
     void clear();
     size_t count() const;
-    Node<T>* head() const {
+    ListNode<T>* head() const {
         return _head;
     }
 
-    Node<T>* tail() const {
+    ListNode<T>* tail() const {
         return _tail;
     }
 
     void push_front(const T& value) noexcept;
     void push_back(const T& value) noexcept;
     void insert(size_t pos, const T& value);
-    void insert(Node<T>* node, const T& value);
+    void insert(ListNode<T>* node, const T& value);  // Переименовано: node вместо ListNode
     void pop_front();
     void pop_back();
     void erase(size_t pos);
-    void erase(Node<T>* node);
-
+    void erase(ListNode<T>* node);  // Переименовано: node вместо ListNode
+    T* find(const std::string& key);
     bool has_loop_floyd() const;
     bool has_loop_pointer_reversal();
-    Node<T>* find_loop() const;
+    ListNode<T>* find_loop() const;
     void create_loop(int pos);
     void remove_loop_if_exists();
     bool has_loop_distance() const;
@@ -54,10 +55,10 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const List<U>& list);
 
     class Iterator {
-        Node<T>* _current;  
+        ListNode<T>* _current;
     public:
         Iterator() : _current(nullptr) {}
-        Iterator(Node<T>* node) : _current(node) {}
+        Iterator(ListNode<T>* node) : _current(node) {}
 
         Iterator& operator=(const Iterator& other) noexcept {
             if (this != &other) {
@@ -102,7 +103,7 @@ public:
             return _current->value;
         }
 
-        Node<T>* get_node() const {
+        ListNode<T>* get_node() const {
             return _current;
         }
     };
@@ -121,7 +122,7 @@ List<T>::List() : _head(nullptr), _tail(nullptr), _count(0) {}
 
 template <class T>
 List<T>::List(const List<T>& other) : _head(nullptr), _tail(nullptr), _count(0) {
-    Node<T>* cur = other._head;
+    ListNode<T>* cur = other._head;
     while (cur != nullptr) {
         push_back(cur->value);
         cur = cur->next;
@@ -132,7 +133,7 @@ template <class T>
 List<T>& List<T>::operator=(const List<T>& other) {
     if (this != &other) {
         clear();
-        Node<T>* cur = other._head;
+        ListNode<T>* cur = other._head;
         while (cur != nullptr) {
             push_back(cur->value);
             cur = cur->next;
@@ -149,7 +150,7 @@ List<T>::~List() {
 template <class T>
 void List<T>::clear() {
     while (_head != nullptr) {
-        Node<T>* temp = _head;
+        ListNode<T>* temp = _head;
         _head = _head->next;
         delete temp;
     }
@@ -162,8 +163,6 @@ size_t List<T>::count() const {
     return _count;
 }
 
-
-
 template <class T>
 bool List<T>::is_empty() const {
     return _head == nullptr;
@@ -171,7 +170,7 @@ bool List<T>::is_empty() const {
 
 template <class T>
 void List<T>::push_front(const T& val) noexcept {
-    Node<T>* node = new Node<T>(val);
+    ListNode<T>* node = new ListNode<T>(val);
     if (is_empty()) {
         _head = node;
         _tail = node;
@@ -185,7 +184,7 @@ void List<T>::push_front(const T& val) noexcept {
 
 template <class T>
 void List<T>::push_back(const T& val) noexcept {
-    Node<T>* node = new Node<T>(val);
+    ListNode<T>* node = new ListNode<T>(val);
     if (is_empty()) {
         _head = node;
         _tail = node;
@@ -198,12 +197,12 @@ void List<T>::push_back(const T& val) noexcept {
 }
 
 template <class T>
-void List<T>::insert(Node<T>* node, const T& val) {
+void List<T>::insert(ListNode<T>* node, const T& val) {
     if (is_empty() || node == nullptr) {
         throw std::invalid_argument("Position is wrong");
     }
 
-    Node<T>* new_node = new Node<T>(val);
+    ListNode<T>* new_node = new ListNode<T>(val);
     new_node->next = node->next;
     node->next = new_node;
 
@@ -229,7 +228,7 @@ void List<T>::insert(size_t pos, const T& val) {
         return;
     }
 
-    Node<T>* cur = _head;
+    ListNode<T>* cur = _head;
     for (size_t i = 0; i < pos - 1; i++) {
         cur = cur->next;
     }
@@ -242,7 +241,7 @@ void List<T>::pop_front() {
         throw std::runtime_error("Cannot pop from empty list");
     }
 
-    Node<T>* temp = _head;
+    ListNode<T>* temp = _head;
     _head = _head->next;
 
     if (_head == nullptr) {
@@ -267,7 +266,7 @@ void List<T>::pop_back() {
         return;
     }
 
-    Node<T>* cur = _head;
+    ListNode<T>* cur = _head;
     while (cur->next != _tail) {
         cur = cur->next;
     }
@@ -279,7 +278,7 @@ void List<T>::pop_back() {
 }
 
 template <class T>
-void List<T>::erase(Node<T>* node) {
+void List<T>::erase(ListNode<T>* node) {
     if (is_empty() || node == nullptr) {
         throw std::invalid_argument("Cannot erase null node or from empty list");
     }
@@ -289,7 +288,7 @@ void List<T>::erase(Node<T>* node) {
         return;
     }
 
-    Node<T>* cur = _head;
+    ListNode<T>* cur = _head;
     while (cur != nullptr && cur->next != node) {
         cur = cur->next;
     }
@@ -307,6 +306,7 @@ void List<T>::erase(Node<T>* node) {
     _count--;
 }
 
+
 template <class T>
 void List<T>::erase(size_t pos) {
     if (pos >= _count) {
@@ -318,7 +318,7 @@ void List<T>::erase(size_t pos) {
         return;
     }
 
-    Node<T>* cur = _head;
+    ListNode<T>* cur = _head;
     for (size_t i = 0; i < pos - 1; i++) {
         cur = cur->next;
     }
@@ -331,8 +331,8 @@ bool List<T>::has_loop_floyd() const {
         return false;
     }
 
-    Node<T>* slow = _head;
-    Node<T>* fast = _head;
+    ListNode<T>* slow = _head;
+    ListNode<T>* fast = _head;
 
     while (fast != nullptr && fast->next != nullptr) {
         slow = slow->next;
@@ -346,13 +346,13 @@ bool List<T>::has_loop_floyd() const {
 }
 
 template <class T>
-Node<T>* List<T>::find_loop() const {
+ListNode<T>* List<T>::find_loop() const {
     if (_head == nullptr) {
         return nullptr;
     }
 
-    Node<T>* slow = _head;
-    Node<T>* fast = _head;
+    ListNode<T>* slow = _head;
+    ListNode<T>* fast = _head;
 
     while (fast != nullptr && fast->next != nullptr) {
         slow = slow->next;
@@ -378,12 +378,12 @@ Node<T>* List<T>::find_loop() const {
 
 template <class T>
 void List<T>::remove_loop_if_exists() {
-    Node<T>* loop_start = find_loop();
+    ListNode<T>* loop_start = find_loop();
     if (loop_start == nullptr) {
         return;
     }
 
-    Node<T>* current = loop_start;
+    ListNode<T>* current = loop_start;
     while (current->next != loop_start) {
         current = current->next;
     }
@@ -401,7 +401,7 @@ void List<T>::create_loop(int pos) {
         throw std::logic_error("Cannot create loop in an empty list");
     }
 
-    Node<T>* loop_start = _head;
+    ListNode<T>* loop_start = _head;
     for (int i = 0; i < pos; ++i) {
         loop_start = loop_start->next;
     }
@@ -411,7 +411,7 @@ void List<T>::create_loop(int pos) {
 
 template <class T>
 bool List<T>::has_loop_pointer_reversal() {
-    return has_loop_floyd(); 
+    return has_loop_floyd();
 }
 
 template <class T>
@@ -420,12 +420,12 @@ bool List<T>::has_loop_distance() const {
         return false;
     }
 
-    Node<T>* current = _head;
+    ListNode<T>* current = _head;
     int steps = 0;
-    const int max_steps = 1000; 
+    const int max_steps = 1000;
 
     while (current != nullptr && steps < max_steps) {
-        Node<T>* from_start = _head;
+        ListNode<T>* from_start = _head;
         int search_steps = 0;
 
         while (from_start != current && search_steps < steps) {
@@ -434,7 +434,7 @@ bool List<T>::has_loop_distance() const {
         }
 
         if (from_start == current && search_steps < steps) {
-            return true; 
+            return true;
         }
 
         current = current->next;
@@ -447,7 +447,7 @@ bool List<T>::has_loop_distance() const {
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const List<T>& list) {
     os << "[";
-    Node<T>* cur = list.head();
+    ListNode<T>* cur = list.head();
     while (cur != nullptr) {
         os << cur->value;
         if (cur->next != nullptr) {

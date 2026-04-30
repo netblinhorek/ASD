@@ -5,6 +5,7 @@
 
 TEST(TestUnsortedOnArr, test_unsorted_table_on_arr_empty) {
     UnsortedTableM<std::string, Polynom> table_on_arr;
+    table_on_arr.print();
     ASSERT_TRUE(table_on_arr.is_empty());
 }
 
@@ -92,6 +93,7 @@ TEST(TestUnsortedOnArr, test_erase_middle_and_find_others) {
     ASSERT_THROW(table.found("4"), std::logic_error);
     ASSERT_EQ(table.found("2"), p2);
     ASSERT_EQ(table.found("3"), p3);
+    table.print();
 }
 
 TEST(TestUnsortedOnArr, test_clear_and_reinsert) {
