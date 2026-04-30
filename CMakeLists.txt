@@ -36,6 +36,8 @@ add_subdirectory(lib_TableHashOA)
 add_subdirectory(lib_TableHashC)
 add_subdirectory(lib_ListGraph)
 add_subdirectory(lib_RBTree)
+add_subdirectory(lib_labirint)
+add_subdirectory(lib_DSU)
 add_subdirectory(lib_algorithms)
 add_subdirectory(lib_Dijkstra_algorithm)
 add_subdirectory(main)                # подключаем дополнительный CMakeLists.txt из подкаталога с именем main
