@@ -180,17 +180,3 @@ TVector<NodeHeap<TKey, TValue>> heapSort(const TVector<NodeHeap<TKey, TValue>>& 
     }
     return result;
 }
-template <typename TKey, typename TValue>
-TVector<NodeTr<TKey, TValue>> BSTSort(const TVector<NodeHeap<TKey, TValue>>& data) {
-    BSTree<TKey, TValue> bst;
-
-    for (size_t i = 0; i < data.size(); i++) {
-        bst.insert(data[i].data.first, data[i].data.second);
-    }
-
-    TVector<NodeTr<TKey, TValue>> result;
-
-    bypassingHeap<TKey, TValue>(bst.get_root_ptr(), result);
-
-    return result;
-}

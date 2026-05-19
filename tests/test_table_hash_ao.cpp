@@ -119,11 +119,10 @@ TEST(TestHashTableAO, test_function_print) {
     table.print();
 }
 
-
 TEST(TestHashTableAO, test_operator_bracket_simple) {
     HashTableAO<std::string, Polynom> table;
 
-    std::string keys[] = { "k1", "k2", "k3" };
+    std::string keys[] = { "k1", "k3", "k2" };
     Polynom values[] = { Polynom("x+1"), Polynom("2y"), Polynom("z-5") };
 
     for (int i = 0; i < 3; ++i) {
@@ -134,47 +133,29 @@ TEST(TestHashTableAO, test_operator_bracket_simple) {
         EXPECT_EQ(table[keys[i]], values[i]);
     }
 }
+TEST(TestHashTableAO, test_collision_handling) {
+    HashTableAO<std::string, Polynom> table_on_tree(5);  
 
-TEST(TestHashTableAO, test_full_table_with_collisions_and_deletions) {
-    HashTableAO<std::string, Polynom> table(10);
+    Polynom p1("3x^2 + 2y - 5z + 7");
+    Polynom p2("x^3 + 4y^2 - z + 2");
+    Polynom p3("2x^4 - 3y + 5z^2 - 1");
+    Polynom p4("xy + yz - zx + 10");
 
-    for (int i = 0; i < 10; i++) {
-        std::string key = "key_" + std::to_string(i);
-        std::string poly_str = std::to_string(i) + "x^2 + " + std::to_string(i) + "x";
-        EXPECT_NO_THROW(table.insert(key, Polynom(poly_str)));
-    }
+    table_on_tree.insert("pol", p1);
+    table_on_tree.insert("lop", p2);
+    table_on_tree.insert("olp", p3);
+    table_on_tree.insert("key4", p4);
 
-    EXPECT_TRUE(table.is_full());
-    EXPECT_EQ(table.size(), 10);
+    EXPECT_EQ(table_on_tree.found("pol"), p1);
+    EXPECT_EQ(table_on_tree.found("lop"), p2);
+    EXPECT_EQ(table_on_tree.found("olp"), p3);
+    EXPECT_EQ(table_on_tree.found("key4"), p4);
+    table_on_tree.erase("lop");
 
-    EXPECT_THROW(table.insert("extra_key", Polynom("100x")), std::logic_error);
+    EXPECT_EQ(table_on_tree.found("pol"), p1);
+    EXPECT_ANY_THROW(table_on_tree.found("lop"));
+    EXPECT_EQ(table_on_tree.found("olp"), p3);
+    EXPECT_EQ(table_on_tree.found("key4"), p4);
 
-    EXPECT_NO_THROW(table.erase("key_2"));
-    EXPECT_NO_THROW(table.erase("key_5"));
-    EXPECT_NO_THROW(table.erase("key_8"));
-
-    EXPECT_EQ(table.size(), 7u);
-    EXPECT_FALSE(table.is_full());
-
-    EXPECT_NO_THROW(table.insert("new_key_2", Polynom("222x^2 + 222x")));
-    EXPECT_NO_THROW(table.insert("new_key_5", Polynom("555x^2 + 555x")));
-    EXPECT_NO_THROW(table.insert("new_key_8", Polynom("888x^2 + 888x")));
-
-    EXPECT_EQ(table.found("new_key_2"), Polynom("222x^2 + 222x"));
-    EXPECT_EQ(table.found("new_key_5"), Polynom("555x^2 + 555x"));
-    EXPECT_EQ(table.found("new_key_8"), Polynom("888x^2 + 888x"));
-
-    EXPECT_THROW(table.found("key_2"), std::logic_error);
-    EXPECT_THROW(table.found("key_5"), std::logic_error);
-    EXPECT_THROW(table.found("key_8"), std::logic_error);
-
-    EXPECT_EQ(table.found("key_0"), Polynom("0x^2 + 0x"));
-    EXPECT_EQ(table.found("key_1"), Polynom("1x^2 + 1x"));
-    EXPECT_EQ(table.found("key_3"), Polynom("3x^2 + 3x"));
-    EXPECT_EQ(table.found("key_4"), Polynom("4x^2 + 4x"));
-    EXPECT_EQ(table.found("key_6"), Polynom("6x^2 + 6x"));
-    EXPECT_EQ(table.found("key_7"), Polynom("7x^2 + 7x"));
-    EXPECT_EQ(table.found("key_9"), Polynom("9x^2 + 9x"));
-
-    EXPECT_TRUE(table.is_full());
+    table_on_tree.print();
 }

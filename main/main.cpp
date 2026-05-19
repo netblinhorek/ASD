@@ -1,7 +1,7 @@
 // Copyright 2024 Marina Usova
 
 //#define EASY_EXAMPLE
-
+#define LABIRINT
 #include <iostream>
 
 #ifdef EASY_EXAMPLE
@@ -45,6 +45,7 @@ int main() {
 #include "../lib_Matrix/matrix.h"
 #include "../lib_TVector/tvector.h"
 #include "../lib_DSU/DSU.h"
+#include "../lib_ListGraph/list_graph.h"
 
 
 bool are_connected(size_t N, size_t M,
@@ -92,150 +93,111 @@ void shuffle_walls(Matrix<bool>& right, Matrix<bool>& down) {
         for (size_t j = 0; j < down.cols(); ++j)
             down[i][j] = walls[idx++];
 }
-
-void print_lab(size_t N, size_t M, size_t X, size_t Y,
-    const Matrix<bool>& right, const Matrix<bool>& down)
+void print_lab_with_path(size_t N, size_t M, size_t X, size_t Y,
+    const Matrix<bool>& right, const Matrix<bool>& down,
+    const TVector<int>& path_in_graph_indices, const ListGraph<int>& graph)
 {
-    std::cout << "\n=== Labirint " << N << "x" << M << " ===\n";
-
-    X = X - 1;
-    Y = Y - 1;
-
-    size_t max_num = N * M;
-    int width = 1;
-    if (max_num >= 100) width = 3;
-    else if (max_num >= 10) width = 2;
-
-    for (int k = 0; k < width; ++k) std::cout << ' ';
-
-    for (size_t j = 0; j < M; ++j) {
-        if (j == X) {
-            std::cout << ' ';
-            for (int k = 0; k < width; ++k) std::cout << ' ';
-            std::cout << 'X';
-        }
-        else {
-            for (int k = 0; k < width; ++k) std::cout << ' ';
-        }
+    TVector<int> real_cell_indices;
+    for (size_t i = 0; i < path_in_graph_indices.size(); ++i) {
+        real_cell_indices.push_back(graph.vertices[path_in_graph_indices[i]]->data);
     }
-    std::cout << '\n';
 
-    std::cout << ' ';
-    for (int k = 0; k < width; ++k) std::cout << ' ';
-
-    std::cout << '+';
+    std::cout << "    +";
     for (size_t j = 0; j < M; ++j) {
-        if (j == X) {
-            for (int k = 0; k < width; ++k) std::cout << ' ';
-        }
-        else {
-            for (int k = 0; k < width; ++k) std::cout << '-';
-        }
-        std::cout << '+';
+        if (j == X - 1) std::cout << "   +";
+        else std::cout << "---+";
     }
-    std::cout << '\n';
+    std::cout << "\n";
 
     for (size_t i = 0; i < N; ++i) {
-        std::cout << ' ';
-        for (int k = 0; k < width; ++k) std::cout << ' ';
-        std::cout << '|';
-
+        std::cout << "    |";
         for (size_t j = 0; j < M; ++j) {
-            size_t num = i * M + j + 1;
-            std::cout << std::setw(width) << " ";
+            int curr_cell = (i * M + j);
+            bool is_path = false;
+            for (size_t p = 0; p < real_cell_indices.size(); ++p) {
+                if (real_cell_indices[p] == curr_cell) {
+                    is_path = true;
+                    break;
+                }
+            }
+
+            if (is_path) std::cout << " * ";
+            else std::cout << "   ";
 
             if (j < M - 1) {
-                if (right[i][j]) {
-                    std::cout << '|';
-                }
-                else {
-                    std::cout << ' ';
-                }
+                if (right[i][j]) std::cout << "|";
+                else std::cout << " ";
             }
         }
         std::cout << "|\n";
 
         if (i < N - 1) {
-            std::cout << ' ';
-            for (int k = 0; k < width; ++k) std::cout << ' ';
-            std::cout << '+';
-
+            std::cout << "    +";
             for (size_t j = 0; j < M; ++j) {
-                if (i == N - 2 && j == Y) {
-                    for (int k = 0; k < width; ++k) std::cout << ' ';
-                }
-                else if (down[i][j]) {
-                    for (int k = 0; k < width; ++k) std::cout << '-';
-                }
-                else {
-                    for (int k = 0; k < width; ++k) std::cout << ' ';
-                }
-                std::cout << '+';
+                if (down[i][j]) std::cout << "---+";
+                else std::cout << "   +";
             }
-            std::cout << '\n';
+            std::cout << "\n";
         }
     }
 
-    std::cout << ' ';
-    for (int k = 0; k < width; ++k) std::cout << ' ';
-    std::cout << '+';
+    std::cout << "    +";
     for (size_t j = 0; j < M; ++j) {
-        if (j == Y) {
-            for (int k = 0; k < width; ++k) std::cout << ' ';
-        }
-        else {
-            for (int k = 0; k < width; ++k) std::cout << '-';
-        }
-        std::cout << '+';
+        if (j == Y - 1) std::cout << "   +";
+        else std::cout << "---+";
     }
-    std::cout << '\n';
-
-    std::cout << ' ';
-    for (int k = 0; k < width; ++k) std::cout << ' ';
-
-    for (size_t j = 0; j < M; ++j) {
-        if (j == Y) {
-            for (int k = 0; k < width - 1; ++k) std::cout << ' ';
-            std::cout << 'Y';
-        }
-        else {
-            for (int k = 0; k < width + 1; ++k) std::cout << ' ';
-        }
-    }
-    std::cout << '\n';
+    std::cout << "\n";
 }
-
+void print_lab(size_t N, size_t M, size_t X, size_t Y, const Matrix<bool>& right, const Matrix<bool>& down) {
+    TVector<int> empty_path;
+    TVector<std::pair<std::pair<int, int>, int>> empty_edges;
+    ListGraph<int> temp_graph(empty_edges, false);
+    print_lab_with_path(N, M, X, Y, right, down, empty_path, temp_graph);
+}
 void generate(size_t N, size_t M, size_t X, size_t Y) {
+
     Matrix<bool> right(N, M - 1, true);
     Matrix<bool> down(N - 1, M, true);
 
-    for (size_t i = 0; i < right.rows(); ++i) {
-        for (size_t j = 0; j < right.cols(); ++j) {
-            if (rand() % 2 == 0) {
+    for (size_t i = 0; i < right.rows(); ++i)
+        for (size_t j = 0; j < right.cols(); ++j)
+            if (rand() % 2 == 0)
                 right[i][j] = false;
-            }
-        }
-    }
 
-    for (size_t i = 0; i < down.rows(); ++i) {
-        for (size_t j = 0; j < down.cols(); ++j) {
-            if (rand() % 2 == 0) {
+    for (size_t i = 0; i < down.rows(); ++i)
+        for (size_t j = 0; j < down.cols(); ++j)
+            if (rand() % 2 == 0)
                 down[i][j] = false;
-            }
-        }
-    }
 
-
-    std::cout << "\n--- Initial maze ---\n";
-    print_lab(N, M, X, Y, right, down);
-
-    std::cout << "\n--- Searching path ---\n";
     while (!are_connected(N, M, right, down, X, Y)) {
         shuffle_walls(right, down);
     }
 
-    print_lab(N, M, X, Y, right, down);
+    TVector<std::pair<std::pair<int, int>, int>> edges;
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < M; ++j) {
+            int u = i * M + j;
+
+            if (j + 1 < M && !right[i][j]) {
+                int v = i * M + (j + 1);
+                edges.push_back(std::make_pair(std::make_pair(u, v), 1));
+            }
+            if (i + 1 < N && !down[i][j]) {
+                int v = (i + 1) * M + j;
+                edges.push_back(std::make_pair(std::make_pair(u, v), 1));
+            }
+        }
+    }
+
+    ListGraph<int> graph(edges, false);
+    int start_val = (0 * M + (X - 1));
+    int end_val = ((N - 1) * M + (Y - 1));
+
+    TVector<int> path = graph.get_dijkstra_path(start_val, end_val);
+
+    print_lab_with_path(N, M, X, Y, right, down, path, graph);
 }
+
 
 void user_input(size_t& M, size_t& N, size_t& X, size_t& Y) {
     std::cout << "Columns M and rows N: ";
@@ -259,3 +221,4 @@ int main() {
 
     return 0;
 }
+#endif

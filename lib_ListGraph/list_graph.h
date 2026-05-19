@@ -5,7 +5,6 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
-#include <windows.h>
 #define MAX_SIZE 1000000000
 
 template <class T>
@@ -27,27 +26,26 @@ public:
     TVector<Vertex<T>*> vertices;
     TVector<List<Edge<T>>> adj;
 
-    ListGraph(TVector<std::pair<std::pair<T, T>, int> > edges, bool is_directed);
-    ListGraph(TVector<std::pair<T, T> > edges, bool is_directed);
+    ListGraph(TVector<std::pair<std::pair<T, T>, int>> edges, bool is_directed);
+    ListGraph(TVector<std::pair<T, T>> edges, bool is_directed);
 
     ~ListGraph() { clear(); }
 
-  
+    TVector<int> get_dijkstra_path(const T& start_val, const T& end_val);
     int find_index(const T& val) const;
     void add_edge(const T& from, const T& to, int weight);
     void delete_vertex(const T& val);
     void clear() noexcept;
     void print() const noexcept;
-    TVector<int> dijkstra(const T& start_val);
+    TVector<int> dijkstra(const T& start_val, TVector<int>& parent);
+
 private:
-   
-    TVector<T> ListGraph<T>::get_unique_vertices(const TVector<std::pair<T, T> >& edges) const;
-    void ListGraph<T>::init_graph(const TVector<T>& unique);
+    TVector<T> get_unique_vertices(const TVector<std::pair<T, T>>& edges) const;
+    void init_graph(const TVector<T>& unique);
 };
 
-
 template<class T>
-TVector<T> ListGraph<T>::get_unique_vertices(const TVector<std::pair<T, T> >& edges) const {
+TVector<T> ListGraph<T>::get_unique_vertices(const TVector<std::pair<T, T>>& edges) const {
     TVector<T> unique;
     for (int i = 0; i < (int)edges.size(); i++) {
         T vals[2];
@@ -64,20 +62,23 @@ TVector<T> ListGraph<T>::get_unique_vertices(const TVector<std::pair<T, T> >& ed
     }
     return unique;
 }
+
 template<class T>
 void ListGraph<T>::init_graph(const TVector<T>& unique) {
-    vertices = TVector<Vertex<T>*>(unique.size());
-    adj = TVector<List<Edge<T>>>(unique.size());
+    vertices = TVector<Vertex<T>*>();
+    adj = TVector<List<Edge<T>>>();
+
     for (int i = 0; i < (int)unique.size(); i++) {
-        vertices[i] = new Vertex<T>(unique[i]);
+        vertices.push_back(new Vertex<T>(unique[i]));
+        adj.push_back(List<Edge<T>>());
     }
 }
 
 template<class T>
 ListGraph<T>::ListGraph(TVector<std::pair<std::pair<T, T>, int>> edges, bool is_directed) {
-    TVector<std::pair<T, T>> simple_edges(edges.size());
+    TVector<std::pair<T, T>> simple_edges;
     for (int i = 0; i < (int)edges.size(); ++i) {
-        simple_edges[i] = edges[i].first;
+        simple_edges.push_back(edges[i].first);
     }
     init_graph(get_unique_vertices(simple_edges));
     for (int i = 0; i < (int)edges.size(); i++) {
@@ -117,6 +118,7 @@ void ListGraph<T>::clear() noexcept {
     vertices.clear();
     adj.clear();
 }
+
 template<class T>
 int ListGraph<T>::find_index(const T& val) const {
     for (int i = 0; i < (int)vertices.size(); i++)
@@ -158,45 +160,69 @@ void ListGraph<T>::delete_vertex(const T& val) {
     vertices.erase(idx);
     adj.erase(idx);
 }
-template<class T>
-TVector<int> ListGraph<T>::dijkstra(const T& start_val) {
-    int start_idx = find_index(start_val);
 
-    if (start_idx == -1)
-        throw std::logic_error("Vertex not found");
+template<class T>
+TVector<int> ListGraph<T>::dijkstra(const T& start_val, TVector<int>& parent) {
+    int start_idx = find_index(start_val);
+    if (start_idx == -1) throw std::logic_error("Vertex not found");
 
     int n = (int)vertices.size();
-    TVector<int> dist(n);
-    TVector<bool> visited(n);
+    TVector<int> dist;
+    TVector<bool> visited;
 
     for (int i = 0; i < n; i++) {
-        dist[i] = MAX_SIZE;
-        visited[i] = false;
+        dist.push_back(MAX_SIZE);
+        visited.push_back(false);
+        parent.push_back(-1);
     }
-    dist[start_idx] = 0;
 
-    PriorityQueue<int> pq;  
+    dist[start_idx] = 0;
+    PriorityQueue<int> pq;
     pq.push(start_idx, 0);
 
     while (!pq.is_empty()) {
         int u = pq.pop();
-
-        if (visited[u]) 
-            continue;
-
+        if (visited[u]) continue;
         visited[u] = true;
 
         for (typename List<Edge<T>>::Iterator it = adj[u].begin(); it != adj[u].end(); ++it) {
-            Edge<T>& edge = *it;
-            int v = edge.to;
-            int weight = edge.weight;
+            int v = (*it).to;
+            int weight = (*it).weight;
 
             if (dist[u] + weight < dist[v]) {
                 dist[v] = dist[u] + weight;
+                parent[v] = u;
                 pq.push(v, dist[v]);
             }
         }
     }
-
     return dist;
+}
+
+template<class T>
+TVector<int> ListGraph<T>::get_dijkstra_path(const T& start_val, const T& end_val) {
+    TVector<int> parent;
+    dijkstra(start_val, parent);
+
+    int end_idx = find_index(end_val);
+    if (end_idx == -1) 
+        throw std::logic_error("End vertex not found");
+
+    int start_idx = find_index(start_val);
+    TVector<int> path;
+
+    if (parent[end_idx] == -1 && start_idx != end_idx) {
+        return path;
+    }
+
+    for (int curr = end_idx; curr != -1; curr = parent[curr]) {
+        path.push_back(curr);
+    }
+
+    TVector<int> reversed_path;
+    for (int i = (int)path.size() - 1; i >= 0; i--) {
+        reversed_path.push_back(path[i]);
+    }
+
+    return reversed_path;
 }

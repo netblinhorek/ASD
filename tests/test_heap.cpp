@@ -129,7 +129,11 @@ TEST(HeapMinTest, node_heap_sort) {
     data.push_back(NodeHeap<int, std::string>(2, "two"));
     data.push_back(NodeHeap<int, std::string>(8, "eight"));
     data.push_back(NodeHeap<int, std::string>(1, "one"));
-
+  /*     1
+        / \
+       2   8
+      /
+     5               */
     TVector<NodeHeap<int, std::string>> sorted = heapSort(data);
 
     EXPECT_EQ(sorted.size(), 4);
@@ -139,38 +143,7 @@ TEST(HeapMinTest, node_heap_sort) {
     EXPECT_EQ(sorted[3].data.first, 8);
 }
 
-TEST(HeapMinTest, bst_sort_test) {
-    TVector<NodeHeap<int, std::string>> data;
-    data.push_back(NodeHeap<int, std::string>(5, "five"));
-    data.push_back(NodeHeap<int, std::string>(2, "two"));
-    data.push_back(NodeHeap<int, std::string>(8, "eight"));
-    data.push_back(NodeHeap<int, std::string>(1, "one"));
-    data.push_back(NodeHeap<int, std::string>(3, "three"));
-    data.push_back(NodeHeap<int, std::string>(7, "seven"));
-    data.push_back(NodeHeap<int, std::string>(4, "four"));
-    data.push_back(NodeHeap<int, std::string>(6, "six"));
 
-    TVector<NodeTr<int, std::string>> sorted = BSTSort(data);
-
-    EXPECT_EQ(sorted.size(), 8);
-    EXPECT_EQ(sorted[0].key, 1);
-    EXPECT_EQ(sorted[1].key, 2);
-    EXPECT_EQ(sorted[2].key, 3);
-    EXPECT_EQ(sorted[3].key, 4);
-    EXPECT_EQ(sorted[4].key, 5);
-    EXPECT_EQ(sorted[5].key, 6);
-    EXPECT_EQ(sorted[6].key, 7);
-    EXPECT_EQ(sorted[7].key, 8);
-
-    EXPECT_EQ(sorted[0].value, "one");
-    EXPECT_EQ(sorted[1].value, "two");
-    EXPECT_EQ(sorted[2].value, "three");
-    EXPECT_EQ(sorted[3].value, "four");
-    EXPECT_EQ(sorted[4].value, "five");
-    EXPECT_EQ(sorted[5].value, "six");
-    EXPECT_EQ(sorted[6].value, "seven");
-    EXPECT_EQ(sorted[7].value, "eight");
-}
 TEST(HeapMinTest, bypassing_heap_test) {
     BSTree<int, std::string> tree;
 
@@ -181,6 +154,11 @@ TEST(HeapMinTest, bypassing_heap_test) {
     tree.insert(40, "forty");
     tree.insert(70, "seventy");
 
+//        50
+//       /  \
+//     30    80
+//     / \   /
+//   20  40 70
     TVector<NodeTr<int, std::string>> result;
     bypassingHeap(tree.get_root_ptr(), result);
 

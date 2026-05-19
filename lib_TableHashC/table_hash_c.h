@@ -1,5 +1,4 @@
-#pragma once
-
+#pragma once  
 #include "../lib_ITable/itable.h"
 #include "../lib_TVector/tvector.h"
 #include "../lib_List/list.h"  
@@ -44,7 +43,6 @@ public:
         if (found != nullptr) {
             throw std::logic_error("Such a key is already in the table");
         }
-
         _rows[hash].push_back(HashData(key, value));
         _count++;
     }

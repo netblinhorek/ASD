@@ -161,7 +161,7 @@ TEST(TestHashTableC, test_full_table_with_collisions_and_deletions) {
 TEST(TestHashTableC, test_operator_bracket_simple) {
     HashTableC<std::string, Polynom> table;
 
-    std::string keys[] = { "k1", "k2", "k3" };
+    std::string keys[] = { "k1", "k3", "k2" };
     Polynom values[] = { Polynom("x+1"), Polynom("2y"), Polynom("z-5") };
 
     for (int i = 0; i < 3; ++i) {
@@ -171,4 +171,22 @@ TEST(TestHashTableC, test_operator_bracket_simple) {
     for (int i = 0; i < 3; ++i) {
         EXPECT_EQ(table[keys[i]], values[i]);
     }
+}
+TEST(TestHashTableC, test_collision_handling) {
+    HashTableC<std::string, Polynom> table_on_tree(5);
+
+    Polynom p1("3x^2 + 2y - 5z + 7");
+    Polynom p2("x^3 + 4y^2 - z + 2");
+    Polynom p3("2x^4 - 3y + 5z^2 - 1");
+    Polynom p4("xy + yz - zx + 10");
+
+    table_on_tree.insert("pol", p1);
+    table_on_tree.insert("lop", p2);
+    table_on_tree.insert("olp", p3);
+    table_on_tree.insert("key4", p4);
+
+    EXPECT_EQ(table_on_tree.found("pol"), p1);
+    EXPECT_EQ(table_on_tree.found("lop"), p2);
+    EXPECT_EQ(table_on_tree.found("olp"), p3);
+    EXPECT_EQ(table_on_tree.found("key4"), p4);
 }

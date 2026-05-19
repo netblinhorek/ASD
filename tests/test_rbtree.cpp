@@ -1,174 +1,368 @@
-//#include <gtest/gtest.h>
-//#include "../lib_TableHashC/table_hash_c.h"
-//#include "../lib_Polynom/polynom.h"
-//#define EPSILON 0.000001
-//
-//TEST(TestHashTableC, test_unsorted_table_on_tree_empty) {
-//    HashTableC<std::string, Polynom> table_ao;
-//    table_ao.print();
-//    ASSERT_TRUE(table_ao.is_empty());
-//}
-//
-//TEST(TestHashTableC, test_unsorted_table_on_tree_erase) {
-//    HashTableC<std::string, Polynom> table_on_tree;
-//    Polynom p1("3x^2 + 2y - 5z + 7");
-//    Polynom p2("3x^2 + 2y - 5z + 7");
-//
-//    table_on_tree.insert("pol1", p1);
-//    table_on_tree.insert("pol2", p2);
-//    table_on_tree.erase("pol2");
-//
-//    ASSERT_FALSE(table_on_tree.is_empty());
-//}
-//
-//TEST(TestHashTableC, test_unsorted_table_on_tree_found) {
-//    HashTableC<std::string, Polynom> table_on_tree;
-//    Polynom p1("3x^2 + 2y - 5z + 7");
-//    Polynom p2("3x^2 + 2y - 5z + 7");
-//
-//    table_on_tree.insert("pol1", p1);
-//    table_on_tree.insert("pol2", p2);
-//
-//    ASSERT_NO_THROW(table_on_tree.found("pol2"));
-//    EXPECT_EQ(table_on_tree.found("pol2"), p2);
-//}
-//
-//TEST(TestHashTableC, test_unsorted_table_on_tree_found_with_erase) {
-//    HashTableC<std::string, Polynom> table_on_tree;
-//    Polynom p1("3x^2 + 2y - 5z + 7");
-//    Polynom p2("3x^2 + 2y - 5z + 7");
-//
-//    table_on_tree.insert("pol1", p1);
-//    table_on_tree.insert("pol2", p2);
-//    table_on_tree.erase("pol2");
-//
-//    ASSERT_NO_THROW(table_on_tree.found("pol1"));
-//    EXPECT_EQ(table_on_tree.found("pol1"), p1);
-//}
-//
-//TEST(TestHashTableC, test_unsorted_table_on_tree_found_with_throw) {
-//    HashTableC<std::string, Polynom> table_on_tree;
-//    Polynom p1("3x^2 + 2y - 5z + 7");
-//    Polynom p2("3x^2 + 2y - 5z + 7");
-//
-//    table_on_tree.insert("pol1", p1);
-//    table_on_tree.insert("pol2", p2);
-//    table_on_tree.erase("pol2");
-//
-//    ASSERT_THROW(table_on_tree.found("pol2"), std::logic_error);
-//}
-//
-//TEST(TestHashTableC, test_insert_duplicate_key) {
-//    HashTableC<std::string, Polynom> table;
-//    Polynom p1("x+y");
-//    Polynom p2("z");
-//
-//    table.insert("pol1", p1);
-//    ASSERT_THROW(table.insert("pol1", p2), std::logic_error);
-//    ASSERT_EQ(table.found("pol1"), p1);
-//    ASSERT_NE(table.found("pol1"), p2);
-//}
-//
-//TEST(TestHashTableC, test_erase_with_throw) {
-//    HashTableC<std::string, Polynom> table;
-//    ASSERT_THROW(table.erase("pol1"), std::logic_error);
-//    Polynom p("x");
-//}
-//
-//TEST(TestHashTableC, test_erase_middle_and_find_others) {
-//    HashTableC<std::string, Polynom> table;
-//    Polynom p1("10");
-//    Polynom p2("20");
-//    Polynom p3("30");
-//
-//    table.insert("1", p1);
-//    table.insert("2", p2);
-//    table.insert("3", p3);
-//
-//    table.erase("1");
-//    ASSERT_NO_THROW(table.found("3"));
-//    ASSERT_THROW(table.found("4"), std::logic_error);
-//    ASSERT_EQ(table.found("2"), p2);
-//    ASSERT_EQ(table.found("3"), p3);
-//}
-//
-//TEST(TestHashTableC, test_clear_and_reinsert) {
-//    HashTableC<std::string, Polynom> table;
-//    Polynom p1("1");
-//    Polynom p2("2");
-//
-//    table.insert("a", p1);
-//    table.erase("a");
-//    ASSERT_TRUE(table.is_empty());
-//
-//    table.insert("b", p2);
-//    ASSERT_EQ(table.found("b"), p2);
-//}
-//
-//TEST(TestHashTableC, test_function_print) {
-//    HashTableC<std::string, Polynom> table;
-//    Polynom p1("3x^2 + 2y - 5z + 7");
-//    Polynom p2("3x^2 + 2y - 5z + 7");
-//    Polynom p3("3x^20 + 5x^19 - 2x^18 + 7x^17 - 4x^16 + 9x^15");
-//
-//    table.insert("pol1", p1);
-//    table.insert("pol2", p2);
-//    ASSERT_THROW(table.insert("pol2", Polynom("3x^2 + 2y - 5z + 6")), std::logic_error);
-//    table.insert("pol89", p3);
-//
-//    table.print();
-//}
-//
-//TEST(TestHashTableC, test_full_table_with_collisions_and_deletions) {
-//    HashTableC<std::string, Polynom> table(10);
-//
-//    for (int i = 0; i < 10; i++) {
-//        std::string key = "key_" + std::to_string(i);
-//        std::string poly_str = std::to_string(i) + "x^2 + " + std::to_string(i) + "x";
-//        EXPECT_NO_THROW(table.insert(key, Polynom(poly_str)));
-//    }
-//
-//    EXPECT_EQ(table.size(), 10);
-//
-//    EXPECT_NO_THROW(table.erase("key_2"));
-//    EXPECT_NO_THROW(table.erase("key_5"));
-//    EXPECT_NO_THROW(table.erase("key_8"));
-//
-//    EXPECT_EQ(table.size(), 7);
-//
-//    EXPECT_NO_THROW(table.insert("new_key_2", Polynom("222x^2 + 222x")));
-//    EXPECT_NO_THROW(table.insert("new_key_5", Polynom("555x^2 + 555x")));
-//    EXPECT_NO_THROW(table.insert("new_key_8", Polynom("888x^2 + 888x")));
-//
-//    EXPECT_EQ(table.found("new_key_2"), Polynom("222x^2 + 222x"));
-//    EXPECT_EQ(table.found("new_key_5"), Polynom("555x^2 + 555x"));
-//    EXPECT_EQ(table.found("new_key_8"), Polynom("888x^2 + 888x"));
-//
-//    EXPECT_THROW(table.found("key_2"), std::logic_error);
-//    EXPECT_THROW(table.found("key_5"), std::logic_error);
-//    EXPECT_THROW(table.found("key_8"), std::logic_error);
-//
-//    EXPECT_EQ(table.found("key_0"), Polynom("0x^2 + 0x"));
-//    EXPECT_EQ(table.found("key_1"), Polynom("1x^2 + 1x"));
-//    EXPECT_EQ(table.found("key_3"), Polynom("3x^2 + 3x"));
-//    EXPECT_EQ(table.found("key_4"), Polynom("4x^2 + 4x"));
-//    EXPECT_EQ(table.found("key_6"), Polynom("6x^2 + 6x"));
-//    EXPECT_EQ(table.found("key_7"), Polynom("7x^2 + 7x"));
-//    EXPECT_EQ(table.found("key_9"), Polynom("9x^2 + 9x"));
-//
-//}
-//
-//TEST(TestHashTableC, test_operator_bracket_simple) {
-//    HashTableC<std::string, Polynom> table;
-//
-//    std::string keys[] = { "k1", "k2", "k3" };
-//    Polynom values[] = { Polynom("x+1"), Polynom("2y"), Polynom("z-5") };
-//
-//    for (int i = 0; i < 3; ++i) {
-//        table.insert(keys[i], values[i]);
-//    }
-//
-//    for (int i = 0; i < 3; ++i) {
-//        EXPECT_EQ(table[keys[i]], values[i]);
-//    }
-//}
+#include <gtest/gtest.h>
+#include <string>
+#include "../lib_RBTree/rbtree.h" 
+#include "../lib_BaseBSTree/base_bstree.h" 
+
+TEST(TestRBTree, test_default_constructor_empty_tree) {
+    RBTree<int, std::string> tree;
+    EXPECT_TRUE(tree.is_empty());
+    EXPECT_EQ(tree.get_root_ptr(), nullptr);
+}
+
+TEST(TestRBTree, test_insert_no_throw_and_color_rules) {
+    RBTree<int, std::string> tree;
+
+    EXPECT_NO_THROW({
+        tree.insert(10, "ten");
+        tree.insert(20, "twenty");
+        tree.insert(30, "thirty");
+        tree.insert(15, "fifteen");
+        });
+
+    EXPECT_FALSE(tree.is_empty());
+
+    auto root = tree.get_root_ptr();
+    ASSERT_NE(root, nullptr);
+    EXPECT_EQ(root->_color, Color::Black);
+}
+
+TEST(TestRBTree, test_clear_empty_tree) {
+    RBTree<int, std::string> tree;
+    EXPECT_NO_THROW(tree.clear());
+    EXPECT_TRUE(tree.is_empty());
+}
+
+TEST(TestRBTree, test_clear_single_element) {
+    RBTree<int, std::string> tree;
+    tree.insert(10, "ten");
+    tree.clear();
+    EXPECT_TRUE(tree.is_empty());
+    EXPECT_EQ(tree.get_root_ptr(), nullptr);
+}
+
+TEST(TestRBTree, test_find_empty_throws) {
+    RBTree<int, std::string> tree;
+    EXPECT_THROW(tree.find(42), std::out_of_range);
+    EXPECT_TRUE(tree.is_empty());
+}
+
+TEST(TestRBTree, test_find_negative_keys) {
+    RBTree<int, std::string> tree;
+    tree.insert(-5, "minus five");
+    tree.insert(0, "zero");
+    tree.insert(5, "five");
+
+    EXPECT_THROW(tree.find(10), std::out_of_range);
+
+    std::string* value_ptr = tree.find(5);
+    ASSERT_NE(value_ptr, nullptr);
+    EXPECT_EQ(*value_ptr, "five");
+}
+
+TEST(TestRBTree, Erase_Empty_Throws) {
+    RBTree<int, std::string> tree;
+    EXPECT_THROW(tree.erase(42), std::out_of_range);
+}
+
+TEST(TestRBTree, erase_root_single_element_empty) {
+    RBTree<int, std::string> tree;
+    tree.insert(42, "answer");
+
+    EXPECT_NO_THROW(tree.erase(42));
+    EXPECT_TRUE(tree.is_empty());
+}
+
+TEST(TestRBTree, test_erase_root) {
+    RBTree<int, std::string> tree;
+    tree.insert(10, "ten");
+    tree.insert(20, "twenty");
+    tree.insert(30, "thirty");
+
+    /*
+              20(Black)
+             /         \
+          10(Red)     30(Red)
+
+    */
+
+    EXPECT_NO_THROW(tree.erase(10));
+    /*
+     
+              20(Black)
+                       \
+                      30(Red) 
+    */
+    EXPECT_THROW(tree.find(10), std::out_of_range);
+
+    auto root = tree.get_root_ptr();
+    ASSERT_NE(root, nullptr);
+    EXPECT_EQ(root->_color, Color::Black);
+}
+
+TEST(TestRBTree, test_erase_red_leaf_no_rotation) {
+    RBTree<int, std::string> tree;
+    tree.insert(20, "twenty");
+    tree.insert(10, "ten");
+    tree.insert(30, "thirty");
+    tree.insert(25, "twenty five");
+
+    /*
+                     20(Black)
+                    /         \
+                10(Black)    30(Black)
+                             /
+                          25(Red)
+    */
+
+    EXPECT_NO_THROW(tree.erase(25));
+    /*
+                     20(Black)
+                    /         \
+                10(Black)    30(Black)
+    */
+    EXPECT_THROW(tree.find(25), std::out_of_range);
+}
+
+TEST(TestRBTree, test_erase_node_with_one_red_child) {
+    RBTree<int, std::string> tree;
+    tree.insert(20, "twenty");
+    tree.insert(10, "ten");
+    tree.insert(30, "thirty");
+    tree.insert(25, "twenty five");
+
+    /*
+                     20(Black)
+                    /         \
+                10(Black)    30(Black)
+                             /
+                          25(Red)
+    */
+
+    EXPECT_NO_THROW(tree.erase(30));
+    /*
+                     20(Black)
+                    /         \
+                10(Black)    25(Black)
+    */
+    EXPECT_THROW(tree.find(30), std::out_of_range);
+
+    auto node25 = tree.find_node(25);
+    ASSERT_NE(node25, nullptr);
+    EXPECT_EQ(node25->_color, Color::Black);
+}
+TEST(TestRBTree, test_erase_complex_double_black_two_rotations) {
+    RBTree<int, std::string> tree;
+
+    tree.insert(50, "root");
+    tree.insert(25, "left sibling");
+    tree.insert(85, "target to delete"); 
+    tree.insert(75, "right brother");
+    tree.insert(65, "brother-left");
+    tree.insert(60, "inner red child");
+    tree.insert(15, "left-left");
+    tree.insert(35, "left-right");
+
+    /*
+                           50 (Черный)
+                         /             \
+                  25 (Черный)         75 (Черный)
+                  /        \          /         \
+            15 (Черный)  35 (Ч)   65 (Черный)  85 (Черный) 
+                                  /
+                               60 (Красный)
+    */
+    auto root = tree.get_root_ptr();
+    ASSERT_NE(root, nullptr);
+    EXPECT_EQ(root->_color, Color::Black);
+
+    EXPECT_NO_THROW(tree.erase(85));
+    EXPECT_EQ(tree.find_node(85), nullptr);
+    /*
+                           50 (Черный)
+                         /             \
+                  25 (Черный)         65 (Черный)
+                  /        \          /         \
+            15 (Черный)  35 (Ч)   60 (Черный)  75 (Черный)
+    */
+    root = tree.get_root_ptr();
+    ASSERT_NE(root, nullptr);
+
+    EXPECT_EQ(root->_color, Color::Black);
+
+}
+
+TEST(TestRBTree, test_erase_red_node_with_black_children) {
+    RBTree<int, std::string> tree;
+    tree.insert(20, "twenty");
+    tree.insert(10, "ten");
+    tree.insert(30, "thirty");
+    tree.insert(5, "five");
+    tree.insert(15, "fifteen");
+
+    /*
+                     20(Black)
+                    /         \
+                10(Red)      30(Black)
+                /    \
+             5(B)    15(B)
+    */
+
+    EXPECT_NO_THROW(tree.erase(10));
+    /*
+    
+                     20(Black)
+                    /         \
+                15(Black)    30(Black)
+                /
+             5(Black)
+    */
+    EXPECT_THROW(tree.find(10), std::out_of_range);
+}
+
+TEST(TestRBTree, test_erase_root_with_two_children) {
+    RBTree<int, std::string> tree;
+    tree.insert(20, "twenty");
+    tree.insert(10, "ten");
+    tree.insert(30, "thirty");
+    tree.insert(5, "five");
+    tree.insert(15, "fifteen");
+    tree.insert(25, "twenty five");
+    tree.insert(35, "thirty five");
+
+    /*
+                     20(Black)
+                    /         \
+                10(Red)      30(Red)
+                /    \       /    \
+             5(B)   15(B)  25(B)  35(B)
+
+    */
+
+    EXPECT_NO_THROW(tree.erase(20));
+    /*
+    
+                     25(Black)  
+                    /         \
+                10(Red)      30(Red)
+                /    \            \
+             5(B)   15(B)         35(B)
+    */
+    EXPECT_THROW(tree.find(20), std::out_of_range);
+
+    auto new_root = tree.get_root_ptr();
+    ASSERT_NE(new_root, nullptr);
+    EXPECT_EQ(new_root->_color, Color::Black);
+}
+
+
+    TEST(TestRBTree, test_cascade_erase) {
+    RBTree<int, std::string> tree;
+    tree.insert(50, "fifty");
+    tree.insert(30, "thirty");
+    tree.insert(70, "seventy");
+    tree.insert(20, "twenty");
+    tree.insert(40, "forty");
+    tree.insert(60, "sixty");
+    tree.insert(80, "eighty");
+    tree.insert(10, "ten");
+    tree.insert(35, "thirty five");
+    tree.insert(45, "forty five");
+    tree.insert(55, "fifty five");
+    tree.insert(75, "seventy five");
+    tree.insert(90, "ninety");
+
+    /*
+                  50 (Black)
+                /            \
+               /              \
+         30 (Black)           70 (Black)
+         /        \           /        \
+     20 (Red)    40 (Red) 60 (Red)    80 (Red)
+     /           /    \    /   \      /    \
+  10 (Black) 35(B) 45(B) 55(B) 65(B) 75(B) 90(B)
+    */
+
+    EXPECT_NO_THROW(tree.erase(10));
+    EXPECT_THROW(tree.find(10), std::out_of_range);
+    /*
+                  50 (Black)
+                /            \
+              /                \
+        30 (Red)               70 (Red)
+        /      \               /        \
+    20 (Black)  40 (Black) 60 (Black)  80 (Black)
+                 /   \       /           /    \
+           35 (Red) 45 (Red) 55 (Red) 75 (Red) 90 (Red)
+
+ */
+    auto* root = tree.find_node(50);
+    ASSERT_NE(root, nullptr);
+    EXPECT_EQ(root->_color, Color::Black);
+    EXPECT_EQ(root->_parent, nullptr);
+
+    auto* node30 = root->_left;
+    ASSERT_NE(node30, nullptr);
+    EXPECT_EQ(node30->_data.first, 30);
+    EXPECT_EQ(node30->_color, Color::Red);
+    EXPECT_EQ(node30->_parent, root);
+
+    auto* node20 = node30->_left;
+    ASSERT_NE(node20, nullptr);
+    EXPECT_EQ(node20->_data.first, 20);
+    EXPECT_EQ(node20->_color, Color::Black);
+    EXPECT_EQ(node20->_parent, node30);
+
+    auto* node40 = node30->_right;
+    ASSERT_NE(node40, nullptr);
+    EXPECT_EQ(node40->_data.first, 40);
+    EXPECT_EQ(node40->_color, Color::Black);
+    EXPECT_EQ(node40->_parent, node30);
+
+    auto* node35 = node40->_left;
+    ASSERT_NE(node35, nullptr);
+    EXPECT_EQ(node35->_data.first, 35);
+    EXPECT_EQ(node35->_color, Color::Red);
+    EXPECT_EQ(node35->_parent, node40);
+
+    auto* node45 = node40->_right;
+    ASSERT_NE(node45, nullptr);
+    EXPECT_EQ(node45->_data.first, 45);
+    EXPECT_EQ(node45->_color, Color::Red);
+    EXPECT_EQ(node45->_parent, node40);
+
+    auto* node70 = root->_right;
+    ASSERT_NE(node70, nullptr);
+    EXPECT_EQ(node70->_data.first, 70);
+    EXPECT_EQ(node70->_color, Color::Red);
+    EXPECT_EQ(node70->_parent, root);
+
+    auto* node60 = node70->_left;
+    ASSERT_NE(node60, nullptr);
+    EXPECT_EQ(node60->_data.first, 60);
+    EXPECT_EQ(node60->_color, Color::Black);
+    EXPECT_EQ(node60->_parent, node70);
+
+    auto* node55 = node60->_left;
+    ASSERT_NE(node55, nullptr);
+    EXPECT_EQ(node55->_data.first, 55);
+    EXPECT_EQ(node55->_color, Color::Red);
+    EXPECT_EQ(node55->_parent, node60);
+
+    auto* node80 = node70->_right;
+    ASSERT_NE(node80, nullptr);
+    EXPECT_EQ(node80->_data.first, 80);
+    EXPECT_EQ(node80->_color, Color::Black);
+    EXPECT_EQ(node80->_parent, node70);
+
+    auto* node75 = node80->_left;
+    ASSERT_NE(node75, nullptr);
+    EXPECT_EQ(node75->_data.first, 75);
+    EXPECT_EQ(node75->_color, Color::Red);
+    EXPECT_EQ(node75->_parent, node80);
+
+    auto* node90 = node80->_right;
+    ASSERT_NE(node90, nullptr);
+    EXPECT_EQ(node90->_data.first, 90);
+    EXPECT_EQ(node90->_color, Color::Red);
+    EXPECT_EQ(node90->_parent, node80);
+}

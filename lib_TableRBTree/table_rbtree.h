@@ -1,26 +1,25 @@
 #pragma once
-#define UNSORTED_ON_BSTree_H
-
-#include "../lib_ITable/itable.h"
-#include "../lib_BSTree/bstree.h"
-#include "../lib_BaseBSTree/base_bstree.h"
-#include <iostream>   
-#include <iomanip>
+#include <iostream>
+#include <algorithm>
 #include <stdexcept>
+#include <iomanip> 
+#include "../lib_ITable/itable.h"
+#include "../lib_TVector/tvector.h"
+#include "../lib_RBTree/rbtree.h"
 
 template <class TKey, class TValue>
-class TableBSTree : public ITable<TKey, TValue> {
+class TableRBTree : public ITable<TKey, TValue> {
 private:
-    BSTree<TKey, TValue> _rows;
+    RBTree<TKey, TValue> _rows;
 
-    const Node<TKey, TValue>* get_node_by_index(
-        const Node<TKey, TValue>* node,
+    const RBNode<TKey, TValue>* get_node_by_index(
+        const RBNode<TKey, TValue>* node,
         size_t index,
         size_t& current_index) const
     {
         if (node == nullptr) return nullptr;
 
-        const Node<TKey, TValue>* left = get_node_by_index(
+        const RBNode<TKey, TValue>* left = get_node_by_index(
             node->_left, index, current_index);
         if (left != nullptr) return left;
 
@@ -29,8 +28,7 @@ private:
 
         return get_node_by_index(node->_right, index, current_index);
     }
-
-    void print_dlcr_rec(const Node<TKey, TValue>* node, int key_width, int value_width) const noexcept {
+    void print_dlcr_rec(const RBNode<TKey, TValue>* node, int key_width, int value_width) const noexcept {
         if (node == nullptr) return;
 
         print_dlcr_rec(node->_left, key_width, value_width);
@@ -42,7 +40,7 @@ private:
     }
 
 public:
-    TableBSTree() {}
+    TableRBTree() {}
 
     void insert(const TKey& key, const TValue& value) override {
         _rows.insert(key, value);
@@ -70,10 +68,11 @@ public:
     }
 
     const TKey& get_key(size_t index) const {
-        if (index >= _rows.size()) 
+        if (index >= _rows.size())
             throw std::out_of_range("Index out of range");
         size_t current_index = 0;
-        const Node<TKey, TValue>* node =
+
+        const RBNode<TKey, TValue>* node =
             get_node_by_index(_rows.get_root_ptr(), index, current_index);
         return node->_data.first;
     }
@@ -94,6 +93,7 @@ public:
         os << "+" << std::endl;
     }
 
+  
     void print() override {
         const int KEY_WIDTH = 15;
         const int VALUE_WIDTH = 60;
