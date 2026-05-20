@@ -124,8 +124,8 @@ private:
 
     void recovery_balance_insert(Node* node) noexcept {
         while (node != this->_root && get_color(node->_parent) == Color::Red) {
-            Node* parent = node->_P;
-            Node* G = P->_P;
+            Node* P = node->_parent;      
+            Node* G = P->_parent;         
 
             if (P == G->_left) {
                 Node* uncle = G->_right;
@@ -139,7 +139,7 @@ private:
                     if (node == P->_right) {
                         node = P;
                         this->left_rotate(node);
-                        P = node->_P;
+                        P = node->_parent;    
                     }
                     set_color(P, Color::Black);
                     set_color(G, Color::Red);
@@ -158,7 +158,7 @@ private:
                     if (node == P->_left) {
                         node = P;
                         this->right_rotate(node);
-                        P = node->_P;
+                        P = node->_parent;  
                     }
                     set_color(P, Color::Black);
                     set_color(G, Color::Red);
@@ -170,7 +170,8 @@ private:
     }
 
     void recovery_balance_erase(Node* x, Node* x_parent) noexcept {
-        while (x != this->_root && (get_color(x) == Color::Black || get_color(x) == Color::BlackBlack)) {
+        while (x != this->_root && (get_color(x) == Color::Black || 
+            get_color(x) == Color::BlackBlack)) {
             if (x == x_parent->_left) {
                 handle_erase_case(x, x_parent, x_parent->_right, true);
             }
@@ -191,21 +192,7 @@ public:
     RBTree() : BaseBSTree<TKey, TValue, RBNode<TKey, TValue>>() {}
 
 
-    Node* find_node(const TKey& key) const noexcept {
-        Node* cur = this->_root;
-        while (cur != nullptr) {
-            if (key == cur->_data.first) {
-                return cur;
-            }
-            if (key < cur->_data.first) {
-                cur = cur->_left;
-            }
-            else {
-                cur = cur->_right;
-            }
-        }
-        return nullptr;
-    }
+    
 
     void insert(const TKey& key, const TValue& value) {
         Node* new_node = this->insert_node(key, value);
