@@ -45,6 +45,7 @@ add_subdirectory(lib_MathVector)
 add_subdirectory(lib_TableAVLTree)
 add_subdirectory(lib_AdjacencyMatrix)
 add_subdirectory(lib_TableRBTree)
+add_subdirectory(lib_MyDiagram)
 add_subdirectory(lib_Dijkstra_algorithm)
 add_subdirectory(main)                # подключаем дополнительный CMakeLists.txt из подкаталога с именем main
 

@@ -24,7 +24,73 @@ template <class TKey, class TValue>
 class RBTree : public BaseBSTree<TKey, TValue, RBNode<TKey, TValue>> {
     using Node = RBNode<TKey, TValue>;
 
+public:
+    void print() const noexcept {
+        if (this->_root == nullptr) {
+            std::cout << "Дерево пустое." << std::endl;
+            return;
+        }
+        print_tree_helper(this->_root, "", true);
+    }
+
 private:
+    void print_tree_helper(Node* node, std::string indent, bool last) const noexcept {
+        if (node != nullptr) {
+            std::cout << indent;
+            if (last) {
+                std::cout << "|-- ";
+                indent += "    ";
+            }
+            else {
+                std::cout << "|-- ";
+                indent += "|   ";
+            }
+
+            std::string color_str;
+            if (node->_color == Color::Red) {
+                color_str = "[R]";
+            }
+            else {
+                color_str = "[B]";
+            }
+            std::cout << node->_data.first << " " << color_str << std::endl;
+
+            print_tree_helper(node->_right, indent, false);
+            print_tree_helper(node->_left, indent, true);
+        }
+    }
+
+private:
+    void LL(Node* node) noexcept {
+        this->right_rotate(node);
+    }
+
+    void RR(Node* node) noexcept {
+        this->left_rotate(node);
+    }
+
+    void LR(Node* node) noexcept {
+        if (node != nullptr && node->_left != nullptr) {
+            this->left_rotate(node->_left);
+            this->right_rotate(node);
+        }
+    }
+
+    void RL(Node* node) noexcept {
+        if (node != nullptr && node->_right != nullptr) {
+            this->right_rotate(node->_right);
+            this->left_rotate(node);
+        }
+    }
+
+    void swap_colors(Node* n1, Node* n2) noexcept {
+        if (n1 != nullptr && n2 != nullptr) {
+            Color temp = n1->_color;
+            n1->_color = n2->_color;
+            n2->_color = temp;
+        }
+    }
+
     Color get_color(const Node* node) const noexcept {
         if (node == nullptr) {
             return Color::Black;
@@ -39,14 +105,6 @@ private:
         if (node != nullptr) {
             node->_color = color;
         }
-    }
-
-    Node* tree_minimum(Node* node) const noexcept {
-        Node* current = node;
-        while (current != nullptr && current->_left != nullptr) {
-            current = current->_left;
-        }
-        return current;
     }
 
     void replace_node(Node* u, Node* v) noexcept {
@@ -64,135 +122,164 @@ private:
         }
     }
 
-    void handle_erase_case(Node*& x, Node*& x_p, Node* s, bool is_left) noexcept {
-        if (get_color(s) == Color::Red) {
-            set_color(s, Color::Black);
-            set_color(x_p, Color::Red);
+    void handle_erase_case(Node*& x, Node*& P, Node* S, bool is_left) noexcept {
+        if (get_color(S) == Color::Red) {
+            set_color(S, Color::Black);
+            set_color(P, Color::Red);
+
             if (is_left) {
-                this->left_rotate(x_p);
+                this->RR(P);
             }
             else {
-                this->right_rotate(x_p);
+                this->LL(P);
             }
-            x_p = x->_parent;
-            if (is_left) {
-                s = x_p->_right;
-            }
-            else {
-                s = x_p->_left;
+            if (x != nullptr) P = x->_parent;
+
+            if (P != nullptr) {
+                if (is_left) {
+                    S = P->_right;
+                }
+                else {
+                    S = P->_left;
+                }
             }
         }
 
-        if (get_color(s->_left) == Color::Black && get_color(s->_right) == Color::Black) {
-            set_color(s, Color::Red);
-            if (get_color(x_p) == Color::Red) {
-                set_color(x_p, Color::Black);
+        if (S != nullptr && get_color(S->_left) == Color::Black && get_color(S->_right) == Color::Black) {
+            set_color(S, Color::Red);
+
+            if (get_color(P) == Color::Red) {
+                set_color(P, Color::Black);
+                x = P;
             }
             else {
-                set_color(x_p, Color::BlackBlack);
-                x = x_p;
-                x_p = x->_parent;
+                set_color(P, Color::BlackBlack);
+                x = P;
+                if (x != nullptr) P = x->_parent;
             }
         }
-        else {
-            if (is_left && get_color(s->_right) == Color::Black) {
-                set_color(s->_left, Color::Black);
-                set_color(s, Color::Red);
-                this->right_rotate(s);
-                s = x_p->_right;
+        else if (S != nullptr) {
+            if (is_left && get_color(S->_right) == Color::Black) {
+                set_color(S->_left, Color::Black);
+                set_color(S, Color::Red);
+                this->LL(S);
+                S = P->_right;
             }
-            else if (!is_left && get_color(s->_left) == Color::Black) {
-                set_color(s->_right, Color::Black);
-                set_color(s, Color::Red);
-                this->left_rotate(s);
-                s = x_p->_left;
+            else if (!is_left && get_color(S->_left) == Color::Black) {
+                set_color(S->_right, Color::Black);
+                set_color(S, Color::Red);
+                this->RR(S);
+                S = P->_left;
             }
 
-            set_color(s, get_color(x_p));
-            set_color(x_p, Color::Black);
+            set_color(S, get_color(P));
+            set_color(P, Color::Black);
+
             if (is_left) {
-                set_color(s->_right, Color::Black);
-                this->left_rotate(x_p);
+                set_color(S->_right, Color::Black);
+                this->RR(P);
             }
             else {
-                set_color(s->_left, Color::Black);
-                this->right_rotate(x_p);
+                set_color(S->_left, Color::Black);
+                this->LL(P);
             }
+
             x = this->_root;
         }
     }
 
-    void recovery_balance_insert(Node* node) noexcept {
-        while (node != this->_root && get_color(node->_parent) == Color::Red) {
-            Node* P = node->_parent;      
-            Node* G = P->_parent;         
-
-            if (P == G->_left) {
-                Node* uncle = G->_right;
-                if (get_color(uncle) == Color::Red) {
-                    set_color(P, Color::Black);
-                    set_color(uncle, Color::Black);
-                    set_color(G, Color::Red);
-                    node = G;
-                }
-                else {
-                    if (node == P->_right) {
-                        node = P;
-                        this->left_rotate(node);
-                        P = node->_parent;    
-                    }
-                    set_color(P, Color::Black);
-                    set_color(G, Color::Red);
-                    this->right_rotate(G);
-                }
+    void recovery_balance_erase(Node* x, Node* P) noexcept {
+        Node* current = x;
+        while (current != this->_root && (current == nullptr || get_color(current) == Color::Black)) {
+            if (P == nullptr)
+                break;
+            if (current == P->_left) {
+                Node* S = P->_right;
+                handle_erase_case(current, P, S, true);
             }
             else {
-                Node* uncle = G->_left;
-                if (get_color(uncle) == Color::Red) {
-                    set_color(P, Color::Black);
-                    set_color(uncle, Color::Black);
-                    set_color(G, Color::Red);
-                    node = G;
-                }
-                else {
-                    if (node == P->_left) {
-                        node = P;
-                        this->right_rotate(node);
-                        P = node->_parent;  
-                    }
-                    set_color(P, Color::Black);
-                    set_color(G, Color::Red);
-                    this->left_rotate(G);
-                }
+                Node* S = P->_left;
+                handle_erase_case(current, P, S, false);
+            }
+
+            if (current != nullptr) P = current->_parent;
+            else if (P != nullptr) P = P->_parent;
+        }
+        if (current != nullptr) set_color(current, Color::Black);
+    }
+
+    void recovery_balance_insert(Node* node) noexcept {
+        while (node != this->_root && get_color(node->_parent) == Color::Red) {
+            Node* P = node->_parent;
+            Node* G = P->_parent;
+
+            if (G == nullptr) break;
+
+            if (P == G->_left) {
+                Node* U = G->_right;
+                handle_insert_case(node, P, G, U, true);
+            }
+            else {
+                Node* U = G->_left;
+                handle_insert_case(node, P, G, U, false);
             }
         }
         set_color(this->_root, Color::Black);
     }
 
-    void recovery_balance_erase(Node* x, Node* x_parent) noexcept {
-        while (x != this->_root && (get_color(x) == Color::Black || 
-            get_color(x) == Color::BlackBlack)) {
-            if (x == x_parent->_left) {
-                handle_erase_case(x, x_parent, x_parent->_right, true);
+    void handle_insert_case(Node*& node, Node* P, Node* G, Node* U, bool is_left) noexcept {
+        if (get_color(U) == Color::Red) {
+            set_color(P, Color::Black);
+            set_color(U, Color::Black);
+            set_color(G, Color::Red);
+            node = G;
+        }
+        else {
+            if (is_left) {
+                if (node == P->_right) {
+                    this->left_rotate(P);
+                    node = P;
+                    P = node->_parent;
+                }
+                this->right_rotate(G);
+                set_color(P, Color::Black);
+                set_color(G, Color::Red);
             }
             else {
-                handle_erase_case(x, x_parent, x_parent->_left, false);
+                if (node == P->_left) {
+                    this->right_rotate(P);
+                    node = P;
+                    P = node->_parent;
+                }
+                this->left_rotate(G);
+                set_color(P, Color::Black);
+                set_color(G, Color::Red);
             }
-            if (x != nullptr) {
-                x_parent = x->_parent;
-            }
-        }
-        set_color(x, Color::Black);
-        if (x != nullptr && x->_color == Color::BlackBlack) {
-            x->_color = Color::Black;
         }
     }
 
 public:
     RBTree() : BaseBSTree<TKey, TValue, RBNode<TKey, TValue>>() {}
 
+    Node* get_root_ptr() const noexcept {
+        return this->_root;
+    }
 
-    
+    Node* find_node(const TKey& key) const noexcept {
+        Node* cur = this->_root;
+        while (cur != nullptr) {
+            if (key == cur->_data.first) {
+                return cur;
+            }
+            if (key < cur->_data.first) {
+                cur = cur->_left;
+            }
+            else {
+                cur = cur->_right;
+            }
+        }
+        return nullptr;
+    }
 
     void insert(const TKey& key, const TValue& value) {
         Node* new_node = this->insert_node(key, value);
@@ -200,7 +287,6 @@ public:
             set_color(new_node, Color::Red);
             recovery_balance_insert(new_node);
         }
-        set_color(this->_root, Color::Black);
     }
 
     void erase(const TKey& key) {
@@ -210,37 +296,37 @@ public:
 
         Node* y = z;
         Node* x;
-        Node* x_p;
+        Node* P;
         Color y_orig = y->_color;
 
         if (!z->_left) {
             x = z->_right;
-            x_p = z->_parent;
+            P = z->_parent;
             replace_node(z, z->_right);
         }
         else if (!z->_right) {
             x = z->_left;
-            x_p = z->_parent;
+            P = z->_parent;
             replace_node(z, z->_left);
         }
         else {
-            y = tree_minimum(z->_right);
+            y = this->find_max(z->_left);
             y_orig = y->_color;
-            x = y->_right;
+            x = y->_left;
 
             if (y->_parent == z) {
-                x_p = y;
+                P = y;
             }
             else {
-                x_p = y->_parent;
-                replace_node(y, y->_right);
-                y->_right = z->_right;
-                y->_right->_parent = y;
+                P = y->_parent;
+                replace_node(y, y->_left);
+                y->_left = z->_left;
+                y->_left->_parent = y;
             }
 
             replace_node(z, y);
-            y->_left = z->_left;
-            y->_left->_parent = y;
+            y->_right = z->_right;
+            y->_right->_parent = y;
             y->_color = z->_color;
         }
 
@@ -248,8 +334,11 @@ public:
         this->_size--;
 
         if (y_orig == Color::Black) {
-            recovery_balance_erase(x, x_p);
+            recovery_balance_erase(x, P);
         }
-        set_color(this->_root, Color::Black);
+
+        if (this->_root) {
+            set_color(this->_root, Color::Black);
+        }
     }
 };
