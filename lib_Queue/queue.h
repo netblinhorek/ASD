@@ -14,6 +14,7 @@ public:
     Queue(int size = 100);
     ~Queue();
 
+    void grow();
     void push(T val);
     void pop();
     T head() const;
@@ -42,9 +43,22 @@ Queue<T>::~Queue() {
 }
 
 template<class T>
+void Queue<T>::grow() {
+    const int new_size = _size * 2;
+    T* new_data = new T[new_size];
+    for (int i = 0; i < _count; ++i) {
+        new_data[i] = _data[(_head + i) % _size];
+    }
+    delete[] _data;
+    _data = new_data;
+    _size = new_size;
+    _head = 0;
+}
+
+template<class T>
 void Queue<T>::push(T val) {
     if (is_full()) {
-        throw std::logic_error("Queue is full");
+        grow();
     }
     int tail_index = (_head + _count) % _size;
     _data[tail_index] = val;

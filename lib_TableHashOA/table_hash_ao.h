@@ -1,6 +1,4 @@
 #pragma once
-#define SIZE 100
-#define SHIFT
 
 #include "../lib_ITable/itable.h"
 #include "../lib_TVector/tvector.h"

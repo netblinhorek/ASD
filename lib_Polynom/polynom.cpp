@@ -351,3 +351,35 @@ std::istream& operator>>(std::istream& is, Polynom& p) {
     return is;
 }
 
+#include <random>
+
+// Функция генерирует один случайный полином со случайным количеством мономов
+Polynom generate_random_polynom(size_t max_terms = 6) {
+    // Используем статичные генераторы, чтобы они не инициализировались заново при каждом вызове
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+
+    // 1. Задаем диапазоны случайных значений
+    std::uniform_int_distribution<size_t> terms_dist(1, max_terms); // Случайное кол-во мономов в полиноме (от 1 до max_terms)
+    std::uniform_real_distribution<double> coeff_dist(-50.0, 50.0);  // Случайный коэффициент монома
+    std::uniform_int_distribution<int> degree_dist(0, 4);           // Случайная степень для x, y, z (от 0 до 4)
+
+    Polynom polynom;
+    size_t num_terms = terms_dist(gen); // Определяем, сколько мономов будет в этом полиноме
+
+    for (size_t i = 0; i < num_terms; ++i) {
+        double coeff = coeff_dist(gen);
+        int deg_x = degree_dist(gen);
+        int deg_y = degree_dist(gen);
+        int deg_z = degree_dist(gen);
+
+        // ВАЖНО: Подставьте сюда конструктор вашего класса Monom!
+        // Если у вас конструктор принимает параметры иначе, просто адаптируйте эту строку.
+        Monom m(coeff, deg_x, deg_y, deg_z);
+
+        // Добавляем созданный моном в полином с помощью вашего метода
+        polynom.add_monom(m);
+    }
+
+    return polynom;
+}

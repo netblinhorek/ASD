@@ -1,0 +1,40 @@
+%% Mermaid class diagram for tables
+classDiagram
+    class ITable~TKey,TValue~ {
+        +virtual ~ITable()
+        +insert(const TKey&, const TValue&)
+        +erase(const TKey&)
+        +found(const TKey&) : TValue&
+        +is_empty() : bool
+        +print()
+    }
+
+    ITable <|-- UnsortedTableM~TKey,TValue~
+    ITable <|-- UnsortedTableL~TKey,TValue~
+    ITable <|-- SortedTableM~TKey,TValue~
+    ITable <|-- TableTree~TKey,TValue~
+    ITable <|-- TableBSTree~TKey,TValue~
+    ITable <|-- TableAVLTree~TKey,TValue~
+    ITable <|-- TableRBTree~TKey,TValue~
+    ITable <|-- HashTableC~std::string,TValue~
+    ITable <|-- HashTableAO~std::string,TValue~
+
+    UnsortedTableM : -TVector<TPair> _rows
+    UnsortedTableM : +operator[](const TKey&)
+    UnsortedTableL : -List<TPair> _rows
+    UnsortedTableL : +operator[](const TKey&)
+    SortedTableM : -TVector<TPair> _rows
+    SortedTableM : +binary_search_pos(...)
+    SortedTableM : +get_key(size_t)
+    TableTree : -Tree<TKey,TValue> _rows
+    TableTree : +operator[](const TKey&)
+    TableBSTree : -BSTree<TKey,TValue> _rows
+    TableBSTree : +size() / +get_key(size_t)
+    TableAVLTree : -AVLTree<TKey,TValue> _rows
+    TableAVLTree : +size() / +get_key(size_t)
+    TableRBTree : -RBTree<TKey,TValue> _rows
+    TableRBTree : +size() / +get_key(size_t)
+    HashTableC : -TVector<List<HashData>> _rows
+    HashTableC : +h(const string&)
+    HashTableAO : -TVector<HashData> _rows
+    HashTableAO : +h(const string&) / +hh(size_t)

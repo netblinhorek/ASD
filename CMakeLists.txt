@@ -1,8 +1,9 @@
 ﻿# указывайте последнюю доступную вам версию CMake
 
 cmake_minimum_required(VERSION 3.14)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # название проекта
 project(Algorithms-and-Data-Structures)
@@ -44,10 +45,12 @@ add_subdirectory(lib_BaseBSTree)
 add_subdirectory(lib_MathVector)
 add_subdirectory(lib_TableAVLTree)
 add_subdirectory(lib_AdjacencyMatrix)
+
 add_subdirectory(lib_TableRBTree)
-add_subdirectory(lib_MyDiagram)
+
 add_subdirectory(lib_Dijkstra_algorithm)
 add_subdirectory(main)                # подключаем дополнительный CMakeLists.txt из подкаталога с именем main
+add_subdirectory(experiments)         # замеры времени для таблиц (TableExperiments)
 
 option(BTEST "build test?" ON)        # указываем подключаем ли google-тесты (ON или YES) или нет (OFF или NO)
 

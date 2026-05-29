@@ -27,7 +27,7 @@ class RBTree : public BaseBSTree<TKey, TValue, RBNode<TKey, TValue>> {
 public:
     void print() const noexcept {
         if (this->_root == nullptr) {
-            std::cout << "Äåðåâî ïóñòîå." << std::endl;
+            std::cout << "˜˜˜˜˜˜ ˜˜˜˜˜˜." << std::endl;
             return;
         }
         print_tree_helper(this->_root, "", true);
@@ -122,90 +122,91 @@ private:
         }
     }
 
-    void handle_erase_case(Node*& x, Node*& P, Node* S, bool is_left) noexcept {
-        if (get_color(S) == Color::Red) {
-            set_color(S, Color::Black);
-            set_color(P, Color::Red);
+    void recovery_balance_erase(Node* x, Node* parent) noexcept {
+        while (x != this->_root && get_color(x) == Color::Black) {
+            if (parent == nullptr) {
+                break;
+            }
+
+            const bool is_left = (x == parent->_left);
 
             if (is_left) {
-                this->RR(P);
-            }
-            else {
-                this->LL(P);
-            }
-            if (x != nullptr) P = x->_parent;
+                Node* w = parent->_right;
 
-            if (P != nullptr) {
-                if (is_left) {
-                    S = P->_right;
+                if (w == nullptr) {
+                    x = parent;
+                    parent = x->_parent;
+                    continue;
+                }
+
+                if (get_color(w) == Color::Red) {
+                    set_color(w, Color::Black);
+                    set_color(parent, Color::Red);
+                    this->left_rotate(parent);
+                    w = parent->_right;
+                }
+
+                if (get_color(w->_left) == Color::Black && get_color(w->_right) == Color::Black) {
+                    set_color(w, Color::Red);
+                    x = parent;
+                    parent = x->_parent;
                 }
                 else {
-                    S = P->_left;
+                    if (get_color(w->_right) == Color::Black) {
+                        set_color(w->_left, Color::Black);
+                        set_color(w, Color::Red);
+                        this->right_rotate(w);
+                        w = parent->_right;
+                    }
+                    set_color(w, get_color(parent));
+                    set_color(parent, Color::Black);
+                    set_color(w->_right, Color::Black);
+                    this->left_rotate(parent);
+                    x = this->_root;
+                    parent = x->_parent;
+                }
+            }
+            else {
+                Node* w = parent->_left;
+
+                if (w == nullptr) {
+                    x = parent;
+                    parent = x->_parent;
+                    continue;
+                }
+
+                if (get_color(w) == Color::Red) {
+                    set_color(w, Color::Black);
+                    set_color(parent, Color::Red);
+                    this->right_rotate(parent);
+                    w = parent->_left;
+                }
+
+                if (get_color(w->_right) == Color::Black && get_color(w->_left) == Color::Black) {
+                    set_color(w, Color::Red);
+                    x = parent;
+                    parent = x->_parent;
+                }
+                else {
+                    if (get_color(w->_left) == Color::Black) {
+                        set_color(w->_right, Color::Black);
+                        set_color(w, Color::Red);
+                        this->left_rotate(w);
+                        w = parent->_left;
+                    }
+                    set_color(w, get_color(parent));
+                    set_color(parent, Color::Black);
+                    set_color(w->_left, Color::Black);
+                    this->right_rotate(parent);
+                    x = this->_root;
+                    parent = x->_parent;
                 }
             }
         }
 
-        if (S != nullptr && get_color(S->_left) == Color::Black && get_color(S->_right) == Color::Black) {
-            set_color(S, Color::Red);
-
-            if (get_color(P) == Color::Red) {
-                set_color(P, Color::Black);
-                x = P;
-            }
-            else {
-                set_color(P, Color::BlackBlack);
-                x = P;
-                if (x != nullptr) P = x->_parent;
-            }
+        if (x != nullptr) {
+            set_color(x, Color::Black);
         }
-        else if (S != nullptr) {
-            if (is_left && get_color(S->_right) == Color::Black) {
-                set_color(S->_left, Color::Black);
-                set_color(S, Color::Red);
-                this->LL(S);
-                S = P->_right;
-            }
-            else if (!is_left && get_color(S->_left) == Color::Black) {
-                set_color(S->_right, Color::Black);
-                set_color(S, Color::Red);
-                this->RR(S);
-                S = P->_left;
-            }
-
-            set_color(S, get_color(P));
-            set_color(P, Color::Black);
-
-            if (is_left) {
-                set_color(S->_right, Color::Black);
-                this->RR(P);
-            }
-            else {
-                set_color(S->_left, Color::Black);
-                this->LL(P);
-            }
-
-            x = this->_root;
-        }
-    }
-
-    void recovery_balance_erase(Node* x, Node* P) noexcept {
-        Node* current = x;
-        while (current != this->_root && (current == nullptr || get_color(current) == Color::Black)) {
-            if (P == nullptr)
-                break;
-            if (current == P->_left) {
-                Node* S = P->_right;
-                handle_erase_case(current, P, S, true);
-            }
-            else {
-                Node* S = P->_left;
-                handle_erase_case(current, P, S, false);
-            }
-
-            if (current != nullptr) P = current->_parent;
-            else if (P != nullptr) P = P->_parent;
-        }
-        if (current != nullptr) set_color(current, Color::Black);
     }
 
     void recovery_balance_insert(Node* node) noexcept {

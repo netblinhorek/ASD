@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 #include <string>
 #include "../lib_RBTree/rbtree.h" 
-#include "../lib_BaseBSTree/base_bstree.h" 
+#include "../lib_BaseBSTree/base_bstree.h"
+#include "../lib_Polynom/polynom.h"
+#include "../lib_Monom/monom.h" 
 
 TEST(TestRBTree, test_default_constructor_empty_tree) {
     RBTree<int, std::string> tree;
@@ -129,7 +131,7 @@ TEST(TestRBTree, test_erase_red_leaf_no_rotation) {
 TEST(TestRBTree, case1_recolor) {
     RBTree<int, int> tree;
     /*
-        вставка 50, 25, 75              вставка 15
+        пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 50, 25, 75              пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 15
 
          50 (B)                             50 (B)                           50 (B)
         /      \                           /      \                         /      \
@@ -163,7 +165,7 @@ TEST(TestRBTree, case2_LL) {
     RBTree<int, int> tree;
 
     /*
-                                                    вставка 5                          LL
+                                                    пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 5                          LL
 
                  50 (B)                             50 (B)                           50 (B)
                 /      \                           /      \                         /      \
@@ -199,7 +201,7 @@ TEST(TestRBTree, case3_LR) {
     RBTree<int, int> tree;
 
     /*
-                                              вставка 18
+                                              пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 18
 
              50 (B)                             50 (B)                           50 [B]
             /      \                           /      \                         /      \
@@ -243,7 +245,7 @@ TEST(TestRBTree, case3_LR) {
 TEST(TestRBTree, case4_RL) {
     RBTree<int, int> tree;
     /*
-                                          вставка 80                           RL
+                                          пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 80                           RL
 
          50 (B)                             50 (B)                           50 (B)
         /      \                           /      \                         /      \
@@ -283,7 +285,7 @@ TEST(TestRBTree, case4_RL) {
 TEST(TestRBTree, case5_RR) {
     RBTree<int, int> tree;
     /*
-                                          вставка 95                           RR
+                                          пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 95                           RR
 
          50 (B)                             50 (B)                           50 (B)
         /      \                           /      \                         /      \
@@ -434,7 +436,7 @@ TEST(TestRBTree, ManyElements_OnlyRotations) {
     /*
                     20 [B]                      20 [B]                        20 [B]
                   /      \                    /      \                      /      \
-               10 [В]   30 [В]             10 [В]   30 [В]                5 [B]   30 [R]
+               10 [пїЅ]   30 [пїЅ]             10 [пїЅ]   30 [пїЅ]                5 [B]   30 [R]
                /                           /                             /    \
              5 [R]                       5 [R]                         3 [R]  10 [R]
                                         /
@@ -707,7 +709,7 @@ TEST(TestRBTree, rotation_to_rotation) {
     EXPECT_EQ(n100->_color, Color::Black);
 }
 
-TEST(TestRBTree, case1_red_sibling) { // не подходит по кейсы
+TEST(TestRBTree, case1_red_sibling) { // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     RBTree<int, int> tree;
 
     tree.insert(30, 0);
@@ -764,7 +766,7 @@ TEST(TestRBTree, case1_red_sibling) { // не подходит по кейсы
     EXPECT_EQ(n20->_right->_color, Color::Black);
 }
 
-TEST(TestRBTree, erase_case1_red_sibling) { // брат красный + кейс 3 Р - кр
+TEST(TestRBTree, erase_case1_red_sibling) { // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ + пїЅпїЅпїЅпїЅ 3 пїЅ - пїЅпїЅ
     RBTree<int, int> tree;
     tree.insert(30, 0);
     tree.insert(10, 0);
@@ -792,7 +794,7 @@ TEST(TestRBTree, erase_case1_red_sibling) { // брат красный + кейс 3 Р - кр
                 /      \
             50 [B]      80 [B]
                /
-             30 [В]
+             30 [пїЅ]
                \
              40[R]
     */
@@ -825,7 +827,7 @@ TEST(TestRBTree, erase_case1_red_sibling) { // брат красный + кейс 3 Р - кр
 }
 
 
-TEST(TestRBTree, erase_case2A_black_sibling_red_parent) { //родитель красный
+TEST(TestRBTree, erase_case2A_black_sibling_red_parent) { //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     RBTree<int, int> tree;
 
     tree.insert(30, 0);
@@ -913,7 +915,7 @@ TEST(TestRBTree, erase_case3_black_sibling_near_child_red_left) {
     /*
                20 [B]
               /      \
-          10 [B]* 40 [B] (Брат S)
+          10 [B]* 40 [B] (пїЅпїЅпїЅпїЅ S)
                     /
                 30 [R]
     */
@@ -1266,4 +1268,34 @@ TEST(TestRBTree, rbtree_big_rotation_black_wiht_red_child) {
     ASSERT_NE(node_160->_right, nullptr);
     EXPECT_EQ(node_160->_right->_data.first, 170);
     EXPECT_EQ(node_160->_right->_color, Color::Red);
+}
+
+TEST(TestRBTree, SequentialInsertFindErase100) {
+    RBTree<int, std::string> tree;
+    for (int i = 0; i < 100; ++i) {
+        EXPECT_NO_THROW(tree.insert(i, std::to_string(i)));
+    }
+    for (int i = 0; i < 100; ++i) {
+        EXPECT_NO_THROW(tree.find(i));
+    }
+    for (int i = 0; i < 100; ++i) {
+        EXPECT_NO_THROW(tree.erase(i));
+    }
+    EXPECT_TRUE(tree.is_empty());
+}
+
+TEST(TestRBTree, SequentialInsertFindErase100WithPolynom) {
+    RBTree<int, Polynom> tree;
+    for (int i = 0; i < 100; ++i) {
+        Polynom p;
+        p.add_monom(Monom(static_cast<double>(i + 1), i % 5, (i + 1) % 4, (i + 2) % 3));
+        EXPECT_NO_THROW(tree.insert(i, p));
+    }
+    for (int i = 0; i < 100; ++i) {
+        EXPECT_NO_THROW(tree.find(i));
+    }
+    for (int i = 0; i < 100; ++i) {
+        EXPECT_NO_THROW(tree.erase(i));
+    }
+    EXPECT_TRUE(tree.is_empty());
 }
