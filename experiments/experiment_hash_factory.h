@@ -5,6 +5,7 @@
 
 namespace bench {
 
+
 template <class HashTable>
 struct HashTableFactory;
 
@@ -22,4 +23,4 @@ struct HashTableFactory<HashTableAO<std::string, TValue>> {
     }
 };
 
-}  // namespace bench
+}  

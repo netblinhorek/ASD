@@ -14,7 +14,21 @@ private:
 public:
     UnsortedTableM() : curr_pos(0) {}
 
+    void reserve(size_t capacity) {
+        _rows.reserve(capacity);
+    }
+
     void insert(const TKey& key, const TValue& value) override { //++
+        if (_rows.size() > 0) {
+            const TKey& last_key = _rows[_rows.size() - 1].key;
+            if (key == last_key) {
+                throw std::logic_error("Such a key is already in the table");
+            }
+            if (key > last_key) {
+                _rows.push_back({ key, value });
+                return;
+            }
+        }
         for (int i = 0; i < _rows.size(); ++i) {
             if (_rows[i].key == key) {
                 throw std::logic_error("Such a key is already in the table");

@@ -9,12 +9,12 @@ namespace {
 using bench::run_int_key_benchmark;
 using bench::TableValue;
 
-const std::vector<size_t> kSizes = { 100, 1000, 10000, 100000 };
+const std::vector<size_t> kSizes = bench::kBenchmarkSizes;
 
-}  // namespace
+}  
 
 void bench_sorted_arr(std::vector<bench::RowResult>& rows) {
-    run_int_key_benchmark<SortedTableM<int, TableValue>>(
+    run_int_key_benchmark<SortedTableM<std::string, TableValue>>(
         "Vector (sorted)", kSizes, rows,
         "O(n)", "O(log n)", "O(n)");
 }

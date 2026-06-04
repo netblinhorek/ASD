@@ -22,21 +22,61 @@ struct HashData {
 
     HashData() : _state(HashDataStatus::empty), key(), value() {}
     HashData(const TKey& k, const TValue& v, HashDataStatus state = HashDataStatus::busy)
-        : _state(state), key(k), value(v) {}
+        : _state(state), key(k), value(v) {
+    }
 };
 
 template <class TKey, class TValue>
 class HashTableAO : public ITable<std::string, TValue> {
-public:
-    HashTableAO(size_t capacity = 15) : _size(capacity), _count(0), _shift(1) {
-        _rows.resize(_size);
+private:
+    TVector<HashData<TKey, TValue>> _rows;
+    size_t _size;
+    size_t _count;
+    size_t _shift;
 
+    size_t h(const std::string& key) const noexcept {
+        size_t hash = 0;
+        for (unsigned char c : key) {
+            hash = (hash * 31 + c) % _size;
+        }
+        return hash;
+    }
+
+    size_t hh(size_t hash) const noexcept {
+        return (hash + _shift) % _size;
+    }
+
+    void update_shift() {
+        _shift = 1;
         for (size_t i = std::max(2, (int)(_size / 15)); i < _size; i++) {
             if (is_simple(i, _size)) {
                 _shift = i;
                 break;
             }
         }
+    }
+
+    void rehash(size_t new_capacity) {
+        TVector<HashData<TKey, TValue>> old_rows = _rows;
+        size_t old_size = _size;
+
+        _size = new_capacity;
+        _rows.clear();
+        _rows.resize(_size);
+        update_shift();
+        _count = 0;
+
+        for (size_t i = 0; i < old_size; i++) {
+            if (old_rows[i]._state == HashDataStatus::busy) {
+                insert(old_rows[i].key, old_rows[i].value);
+            }
+        }
+    }
+
+public:
+    HashTableAO(size_t capacity = 15) : _size(capacity), _count(0), _shift(1) {
+        _rows.resize(_size);
+        update_shift();
     }
 
     bool is_simple(size_t a, size_t b) {
@@ -49,20 +89,41 @@ public:
     }
 
     void insert(const std::string& key, const TValue& value) override {
+        // ƒл€ открытой адресации порог заполнени€ 70% критичен дл€ сохранени€ скорости O(1)
+        if (_count >= _size * 0.7) {
+            rehash(_size * 2 + 1);
+        }
+
         size_t hash = h(key);
         size_t first_hash = hash;
+        int first_deleted_idx = -1;
 
         while (1) {
-            if (_rows[hash]._state != HashDataStatus::busy) {
-                _rows[hash] = HashData<TKey, TValue>(key, value, HashDataStatus::busy);
+            if (_rows[hash]._state == HashDataStatus::empty) {
+                // ≈сли по пути встретили удаленную €чейку, пишем в нее, иначе в текущую пустую
+                size_t target_idx = (first_deleted_idx != -1) ? first_deleted_idx : hash;
+                _rows[target_idx] = HashData<TKey, TValue>(key, value, HashDataStatus::busy);
                 _count++;
                 return;
             }
-            if (_rows[hash].key == key) {
+
+            if (_rows[hash]._state == HashDataStatus::deleted) {
+                if (first_deleted_idx == -1) {
+                    first_deleted_idx = static_cast<int>(hash);
+                }
+            }
+            else if (_rows[hash]._state == HashDataStatus::busy && _rows[hash].key == key) {
                 throw std::logic_error("Such a key is already in the table");
             }
+
             hash = hh(hash);
             if (first_hash == hash) {
+                // ≈сли обошли круг, но нашли удаленное место
+                if (first_deleted_idx != -1) {
+                    _rows[first_deleted_idx] = HashData<TKey, TValue>(key, value, HashDataStatus::busy);
+                    _count++;
+                    return;
+                }
                 throw std::logic_error("Hash table is full");
             }
         }
@@ -130,8 +191,7 @@ public:
             return found(key);
         }
         catch (const std::logic_error&) {
-            static TValue default_value = TValue();
-            insert(key, default_value);
+            insert(key, TValue());
             return found(key);
         }
     }
@@ -167,7 +227,6 @@ public:
         const int VALUE_WIDTH = 50;
 
         std::cout << "\n\t *** Table ***\t\n" << std::endl;
-
         print_line(std::cout, KEY_WIDTH, VALUE_WIDTH);
 
         std::cout << "| " << std::left << std::setw(KEY_WIDTH) << "Key"
@@ -183,25 +242,6 @@ public:
                     << " |" << std::endl;
             }
         }
-
         print_line(std::cout, KEY_WIDTH, VALUE_WIDTH);
-    }
-
-private:
-    TVector<HashData<TKey, TValue>> _rows;
-    size_t _size;
-    size_t _count;
-    size_t _shift;
-
-    size_t h(const std::string& key) const noexcept {
-        size_t hash = 0;
-        for (size_t i = 0; i < key.length(); i++) {
-            hash += key[i];
-        }
-        return hash % _size;
-    }
-
-    size_t hh(size_t hash) const noexcept {
-        return (hash + _shift) % _size;
     }
 };

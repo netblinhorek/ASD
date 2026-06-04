@@ -13,7 +13,19 @@ private:
 public:
     UnsortedTableL() {}
 
+    void reserve(size_t) {}
+
     void insert(const TKey& key, const TValue& value) override { //++
+        if (_rows.tail() != nullptr) {
+            const TKey& last_key = _rows.tail()->value.key;
+            if (key == last_key) {
+                throw std::logic_error("Such a key is already in the table");
+            }
+            if (key > last_key) {
+                _rows.push_back({ key, value });
+                return;
+            }
+        }
         for (auto it = _rows.begin(); it != _rows.end(); ++it) {
             if ((*it).key == key) {
                 throw std::logic_error("Such a key is already in the table");

@@ -24,10 +24,25 @@ private:
 
     size_t h(const std::string& key) const noexcept {
         size_t hash = 0;
-        for (size_t i = 0; i < key.length(); i++) {
-            hash += (key[i]);
+        for (unsigned char c : key) {
+            hash = (hash * 31 + c) % _size;
         }
-        return hash % _size;
+        return hash;
+    }
+
+    void rehash(size_t new_capacity) {
+        TVector<List<HashData>> new_rows;
+        new_rows.resize(new_capacity);
+        size_t old_size = _size;
+        _size = new_capacity;
+
+        for (size_t i = 0; i < old_size; i++) {
+            for (auto it = _rows[i].begin(); it != _rows[i].end(); ++it) {
+                size_t new_hash = h(it.get_node()->value.key);
+                new_rows[new_hash].push_back(it.get_node()->value);
+            }
+        }
+        _rows = new_rows;
     }
 
 public:
@@ -36,11 +51,14 @@ public:
     }
 
     void insert(const std::string& key, const TValue& value) override {
+        if (_count >= _size) {
+            rehash(_size * 2 + 1);
+        }
+
         size_t hash = h(key);
+        HashData* found_node = find_in_list(_rows[hash], key);
 
-        HashData* found = find_in_list(_rows[hash], key);
-
-        if (found != nullptr) {
+        if (found_node != nullptr) {
             throw std::logic_error("Such a key is already in the table");
         }
         _rows[hash].push_back(HashData(key, value));
@@ -49,10 +67,9 @@ public:
 
     void erase(const std::string& key) override {
         size_t hash = h(key);
+        HashData* found_node = find_in_list(_rows[hash], key);
 
-        HashData* found = find_in_list(_rows[hash], key);
-
-        if (found == nullptr) {
+        if (found_node == nullptr) {
             throw std::logic_error("Key not found in the table");
         }
 
@@ -65,7 +82,7 @@ public:
             }
         }
     }
-   
+
     HashData* find_in_list(List<HashData>& list, const std::string& key) {
         for (auto it = list.begin(); it != list.end(); ++it) {
             if (it.get_node()->value.key == key) {
@@ -77,12 +94,11 @@ public:
 
     TValue& found(const std::string& key) override {
         size_t hash = h(key);
-        HashData* found = find_in_list(_rows[hash], key);
-        if (found == nullptr) {
+        HashData* found_node = find_in_list(_rows[hash], key);
+        if (found_node == nullptr) {
             throw std::logic_error("Key not found in the table");
         }
-
-        return found->value;
+        return found_node->value;
     }
 
     bool is_empty() const noexcept override {
@@ -113,6 +129,7 @@ public:
     const TValue& operator[](const std::string& key) const {
         return found(key);
     }
+
     void print_line(std::ostream& os, int key_width, int value_width) const {
         os << "+";
         for (int i = 0; i < key_width + 2; i++) os << "-";
@@ -126,7 +143,6 @@ public:
         const int VALUE_WIDTH = 50;
 
         std::cout << "\n\t *** Hash Table (Chaining) ***\t\n" << std::endl;
-
         print_line(std::cout, KEY_WIDTH, VALUE_WIDTH);
 
         std::cout << "| " << std::left << std::setw(KEY_WIDTH) << "Key"
@@ -142,7 +158,6 @@ public:
                     << " |" << std::endl;
             }
         }
-
         print_line(std::cout, KEY_WIDTH, VALUE_WIDTH);
     }
 };

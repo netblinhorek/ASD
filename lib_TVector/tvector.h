@@ -1001,6 +1001,7 @@ void TVector<T>::reallocate(size_t new_capacity) {
     _data = new_data;
     _states = new_states;
     _capacity = new_capacity;
+    _size = new_index;
     deleted_count_ = 0;
 }
 template<class T>

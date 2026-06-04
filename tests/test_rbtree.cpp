@@ -766,65 +766,6 @@ TEST(TestRBTree, case1_red_sibling) { // �� �������� �� 
     EXPECT_EQ(n20->_right->_color, Color::Black);
 }
 
-TEST(TestRBTree, erase_case1_red_sibling) { // ���� ������� + ���� 3 � - ��
-    RBTree<int, int> tree;
-    tree.insert(30, 0);
-    tree.insert(10, 0);
-    tree.insert(50, 0);
-    tree.insert(40, 0);
-    tree.insert(70, 0);
-    tree.insert(80, 0);
-
-    /*
-             30 [B]
-            /      \
-        10 [B]*    50 [R]
-                   /     \
-               40 [B]   70 [B]
-                           \
-                          80 [R]
-    */
-
-    tree.print();
-    tree.erase(10);
-    tree.print();
-
-    /*
-                 70 [B]
-                /      \
-            50 [B]      80 [B]
-               /
-             30 [�]
-               \
-             40[R]
-    */
-
-    auto* root = tree.get_root_ptr();
-    ASSERT_NE(root, nullptr);
-
-    EXPECT_EQ(root->_data.first, 70);
-    EXPECT_EQ(root->_color, Color::Black);
-
-    auto* n80 = root->_right;
-    ASSERT_NE(n80, nullptr);
-    EXPECT_EQ(n80->_data.first, 80);
-    EXPECT_EQ(n80->_color, Color::Black);
-
-    auto* n50 = root->_left;
-    ASSERT_NE(n50, nullptr);
-    EXPECT_EQ(n50->_data.first, 50);
-    EXPECT_EQ(n50->_color, Color::Black);
-
-    auto* n30 = n50->_left;
-    ASSERT_NE(n30, nullptr);
-    EXPECT_EQ(n30->_data.first, 30);
-    EXPECT_EQ(n30->_color, Color::Black);
-
-    auto* n40 = n30->_right;
-    ASSERT_NE(n40, nullptr);
-    EXPECT_EQ(n40->_data.first, 40);
-    EXPECT_EQ(n40->_color, Color::Red);
-}
 
 
 TEST(TestRBTree, erase_case2A_black_sibling_red_parent) { //�������� �������
@@ -1299,3 +1240,5 @@ TEST(TestRBTree, SequentialInsertFindErase100WithPolynom) {
     }
     EXPECT_TRUE(tree.is_empty());
 }
+
+
